@@ -45,11 +45,15 @@ export async function POST(req: NextRequest) {
   if (error) return error;
 
   try {
-    const { batch_date, notes, client_id, batch_number } = await req.json();
+    const { batch_date, notes, client_id, batch_number, date_of_application, date_of_hauling } = await req.json();
+
+    await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS date_of_application DATE`;
+    await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS date_of_hauling DATE`;
 
     const [inserted] = await sql`
-      INSERT INTO batches (batch_number, client_id, batch_date, notes)
-      VALUES ('TMP', ${client_id || null}, ${batch_date || new Date().toISOString().split('T')[0]}, ${notes || ''})
+      INSERT INTO batches (batch_number, client_id, batch_date, notes, date_of_application, date_of_hauling)
+      VALUES ('TMP', ${client_id || null}, ${batch_date || new Date().toISOString().split('T')[0]}, ${notes || ''},
+        ${date_of_application || null}, ${date_of_hauling || null})
       RETURNING id
     `;
 

@@ -12,6 +12,8 @@ interface Batch {
   client_id: number | null;
   batch_date: string;
   notes: string;
+  date_of_application: string | null;
+  date_of_hauling: string | null;
   client_name: string | null;
   client_code: string | null;
   client_heads: number | null;
@@ -148,6 +150,14 @@ export default function BatchDetailPage() {
             <div>
               <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Allocation</p>
               <p className="font-semibold text-gray-900">₱{num(Number(batch.client_allocation ?? 0))}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Date of Application</p>
+              <p className="font-semibold text-gray-900">{batch.date_of_application ? fmtDate(batch.date_of_application) : '—'}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Date of Hauling</p>
+              <p className="font-semibold text-red-600">{batch.date_of_hauling ? fmtDate(batch.date_of_hauling) : '—'}</p>
             </div>
           </div>
         </div>

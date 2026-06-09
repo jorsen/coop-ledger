@@ -11,6 +11,8 @@ interface Batch {
   batch_number: string;
   batch_date: string;
   notes: string;
+  date_of_application: string | null;
+  date_of_hauling: string | null;
   transaction_count: number;
   total_bags: number;
   total_debit: number;
@@ -68,10 +70,10 @@ export default function ClientLedgerPage() {
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<{ tx?: Transaction } | null>(null);
   const [batchModal, setBatchModal] = useState(false);
-  const [batchForm, setBatchForm] = useState({ batch_number: '', batch_date: '', notes: '' });
+  const [batchForm, setBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '' });
   const [savingBatch, setSavingBatch] = useState(false);
   const [editBatch, setEditBatch] = useState<Batch | null>(null);
-  const [editBatchForm, setEditBatchForm] = useState({ batch_number: '', batch_date: '', notes: '' });
+  const [editBatchForm, setEditBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '' });
   const [savingEditBatch, setSavingEditBatch] = useState(false);
 
   const fetchData = useCallback(async () => {
@@ -101,7 +103,7 @@ export default function ClientLedgerPage() {
     });
     setSavingBatch(false);
     setBatchModal(false);
-    setBatchForm({ batch_number: '', batch_date: '', notes: '' });
+    setBatchForm({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '' });
     fetchData();
   }
 
@@ -395,7 +397,7 @@ export default function ClientLedgerPage() {
                     <Eye className="w-3.5 h-3.5" /> View
                   </button>
                   <button
-                    onClick={() => { setEditBatch(b); setEditBatchForm({ batch_number: b.batch_number, batch_date: b.batch_date, notes: b.notes }); }}
+                    onClick={() => { setEditBatch(b); setEditBatchForm({ batch_number: b.batch_number, batch_date: b.batch_date, notes: b.notes, date_of_application: b.date_of_application ?? '', date_of_hauling: b.date_of_hauling ?? '' }); }}
                     className="text-gray-400 hover:text-gray-600"
                   >
                     <Pencil className="w-3.5 h-3.5" />
@@ -438,7 +440,7 @@ export default function ClientLedgerPage() {
                   value={batchForm.batch_number}
                   onChange={(e) => setBatchForm((f) => ({ ...f, batch_number: e.target.value }))}
                   placeholder="Auto-generated if empty"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
                 />
               </div>
               <div>
@@ -447,9 +449,32 @@ export default function ClientLedgerPage() {
                   type="date"
                   value={batchForm.batch_date}
                   onChange={(e) => setBatchForm((f) => ({ ...f, batch_date: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                  className="w-full border border-gray-300 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                  style={{ backgroundColor: '#ffffff', height: '42px', WebkitAppearance: 'none', appearance: 'none' }}
                   required
                 />
+              </div>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <div style={{ flex: 1 }}>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Date of Application</label>
+                  <input
+                    type="date"
+                    value={batchForm.date_of_application}
+                    onChange={(e) => setBatchForm((f) => ({ ...f, date_of_application: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                    style={{ backgroundColor: '#ffffff', height: '42px', WebkitAppearance: 'none', appearance: 'none' }}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Date of Hauling</label>
+                  <input
+                    type="date"
+                    value={batchForm.date_of_hauling}
+                    onChange={(e) => setBatchForm((f) => ({ ...f, date_of_hauling: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                    style={{ backgroundColor: '#ffffff', height: '42px', WebkitAppearance: 'none', appearance: 'none' }}
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Notes</label>
@@ -458,7 +483,7 @@ export default function ClientLedgerPage() {
                   onChange={(e) => setBatchForm((f) => ({ ...f, notes: e.target.value }))}
                   rows={2}
                   placeholder="Optional description…"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 resize-none"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 resize-none"
                 />
               </div>
               <div className="flex gap-3 pt-2">
@@ -496,7 +521,7 @@ export default function ClientLedgerPage() {
                   value={editBatchForm.batch_number}
                   onChange={(e) => setEditBatchForm((f) => ({ ...f, batch_number: e.target.value }))}
                   placeholder="e.g. BT-001"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
                   required
                 />
               </div>
@@ -506,9 +531,32 @@ export default function ClientLedgerPage() {
                   type="date"
                   value={editBatchForm.batch_date}
                   onChange={(e) => setEditBatchForm((f) => ({ ...f, batch_date: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                  className="w-full border border-gray-300 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                  style={{ backgroundColor: '#ffffff', height: '42px', WebkitAppearance: 'none', appearance: 'none' }}
                   required
                 />
+              </div>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <div style={{ flex: 1 }}>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Date of Application</label>
+                  <input
+                    type="date"
+                    value={editBatchForm.date_of_application}
+                    onChange={(e) => setEditBatchForm((f) => ({ ...f, date_of_application: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                    style={{ backgroundColor: '#ffffff', height: '42px', WebkitAppearance: 'none', appearance: 'none' }}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Date of Hauling</label>
+                  <input
+                    type="date"
+                    value={editBatchForm.date_of_hauling}
+                    onChange={(e) => setEditBatchForm((f) => ({ ...f, date_of_hauling: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                    style={{ backgroundColor: '#ffffff', height: '42px', WebkitAppearance: 'none', appearance: 'none' }}
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Notes</label>
@@ -517,7 +565,7 @@ export default function ClientLedgerPage() {
                   onChange={(e) => setEditBatchForm((f) => ({ ...f, notes: e.target.value }))}
                   rows={2}
                   placeholder="Optional description…"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 resize-none"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 resize-none"
                 />
               </div>
               <div className="flex gap-3 pt-2">

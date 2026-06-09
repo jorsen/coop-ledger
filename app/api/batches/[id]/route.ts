@@ -42,13 +42,18 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   const { error } = await requireAuth();
   if (error) return error;
 
-  const { batch_number, batch_date, notes } = await req.json();
+  const { batch_number, batch_date, notes, date_of_application, date_of_hauling } = await req.json();
+
+  await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS date_of_application DATE`;
+  await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS date_of_hauling DATE`;
 
   const [updated] = await sql`
     UPDATE batches
-    SET batch_number = ${batch_number},
-        batch_date   = ${batch_date},
-        notes        = ${notes || ''}
+    SET batch_number        = ${batch_number},
+        batch_date          = ${batch_date},
+        notes               = ${notes || ''},
+        date_of_application = ${date_of_application || null},
+        date_of_hauling     = ${date_of_hauling || null}
     WHERE id = ${params.id}
     RETURNING *
   `;
