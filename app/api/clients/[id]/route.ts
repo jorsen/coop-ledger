@@ -10,11 +10,13 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
   if (!client) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const transactions = await sql`
-    SELECT *,
-      CASE WHEN bags > 0 THEN ROUND(debit / bags, 2) ELSE NULL END AS price_per_bag
-    FROM transactions
-    WHERE client_id = ${params.id}
-    ORDER BY date ASC, created_at ASC
+    SELECT t.*,
+      CASE WHEN t.bags > 0 THEN ROUND(t.debit / t.bags, 2) ELSE NULL END AS price_per_bag,
+      b.batch_number AS batch_no
+    FROM transactions t
+    LEFT JOIN batches b ON b.id = t.batch_id
+    WHERE t.client_id = ${params.id}
+    ORDER BY t.date ASC, t.created_at ASC
   `;
 
   return NextResponse.json({ ...client, transactions });
