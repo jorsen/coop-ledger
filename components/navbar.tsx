@@ -23,7 +23,7 @@ export default function Navbar() {
   }
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
+    <header className="bg-white border-b border-gray-200 sticky top-0 z-30 print:hidden">
       <div className="max-w-7xl mx-auto px-6 h-14 flex items-center gap-6">
         {/* Logo */}
         <Link href="/dashboard" className="flex items-center gap-2 shrink-0">

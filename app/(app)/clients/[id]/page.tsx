@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Plus, Pencil, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, Pencil, Trash2, Printer } from 'lucide-react';
 import TransactionModal from '@/components/transaction-modal';
 
 interface Client {
@@ -76,14 +76,21 @@ export default function ClientLedgerPage() {
   return (
     <div>
       {/* Back + header */}
+      {/* Print header — only visible when printing */}
+      <div className="hidden print:block mb-6 border-b border-gray-300 pb-4">
+        <p className="text-lg font-bold">Feed Cooperative — Client Ledger</p>
+        <p className="text-sm mt-1">Client: <strong>{client.name}</strong> &nbsp;|&nbsp; ID: {client.client_code} &nbsp;|&nbsp; Loan #{client.loan_number}</p>
+        <p className="text-sm">Heads: {client.heads} &nbsp;|&nbsp; Allocation: {peso(client.allocation)} &nbsp;|&nbsp; Printed: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+      </div>
+
       <button
         onClick={() => router.push('/clients')}
-        className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-4"
+        className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-4 print:hidden"
       >
         <ArrowLeft className="w-4 h-4" /> Back to Clients
       </button>
 
-      <div className="flex items-start justify-between mb-6">
+      <div className="flex items-start justify-between mb-6 print:hidden">
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-semibold text-gray-900">{client.name}</h1>
@@ -99,19 +106,27 @@ export default function ClientLedgerPage() {
             ID: {client.client_code} · Loan #{client.loan_number} · {client.heads} heads · Allocation: {peso(client.allocation)}
           </p>
         </div>
-        <button
-          onClick={() => setModal({})}
-          className="flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700"
-        >
-          <Plus className="w-4 h-4" />
-          Add Transaction
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => window.print()}
+            className="flex items-center gap-2 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50"
+          >
+            <Printer className="w-4 h-4" /> Print
+          </button>
+          <button
+            onClick={() => setModal({})}
+            className="flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700"
+          >
+            <Plus className="w-4 h-4" />
+            Add Transaction
+          </button>
+        </div>
       </div>
 
       {/* Summary */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {[
-          { label: 'Total Debit',  value: peso(totalDebit),  color: 'text-gray-900' },
+          { label: 'Total Sales',  value: peso(totalDebit),  color: 'text-gray-900' },
           { label: 'Total Credit', value: peso(totalCredit), color: 'text-green-600' },
           { label: 'Balance',      value: peso(balance),     color: balance > 0 ? 'text-red-600' : 'text-green-600' },
           { label: 'Total Bags',   value: totalBags,         color: 'text-gray-900' },
@@ -135,9 +150,9 @@ export default function ClientLedgerPage() {
                 <th className="text-left text-xs font-medium text-gray-500 px-6 py-3">Date</th>
                 <th className="text-left text-xs font-medium text-gray-500 px-6 py-3">Feed</th>
                 <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Bags</th>
-                <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Debit</th>
+                <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Total Price</th>
                 <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Credit</th>
-                <th className="px-6 py-3" />
+                <th className="px-6 py-3 print:hidden" />
               </tr>
             </thead>
             <tbody>
@@ -161,7 +176,7 @@ export default function ClientLedgerPage() {
                   <td className="px-6 py-3 text-sm text-gray-700 text-right">{tx.bags}</td>
                   <td className="px-6 py-3 text-sm font-medium text-gray-900 text-right">{peso(tx.debit)}</td>
                   <td className="px-6 py-3 text-sm text-green-600 text-right">{peso(tx.credit)}</td>
-                  <td className="px-6 py-3">
+                  <td className="px-6 py-3 print:hidden">
                     <div className="flex items-center justify-end gap-2">
                       <button
                         onClick={() => setModal({ tx })}

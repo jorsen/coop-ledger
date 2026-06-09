@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Plus, Pencil, Trash2, Search } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, Printer } from 'lucide-react';
 import TransactionModal from '@/components/transaction-modal';
 
 interface Client { id: number; name: string }
@@ -66,22 +66,41 @@ export default function TransactionsPage() {
 
   return (
     <div>
-      <div className="flex items-start justify-between mb-6">
+      {/* Print header */}
+      <div className="hidden print:block mb-6 border-b border-gray-300 pb-4">
+        <p className="text-lg font-bold">Feed Cooperative — Transactions</p>
+        <p className="text-sm mt-1">
+          {(search || clientId || fromDate || toDate)
+            ? `Filtered: ${[search, fromDate && `From ${fromDate}`, toDate && `To ${toDate}`].filter(Boolean).join(' · ')}`
+            : 'All Transactions'}
+          &nbsp;|&nbsp; Printed: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+        </p>
+      </div>
+
+      <div className="flex items-start justify-between mb-6 print:hidden">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Transactions</h1>
           <p className="text-sm text-gray-500 mt-0.5">All cooperative transactions</p>
         </div>
-        <button
-          onClick={() => setModal({})}
-          className="flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700"
-        >
-          <Plus className="w-4 h-4" />
-          Add Transaction
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => window.print()}
+            className="flex items-center gap-2 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50"
+          >
+            <Printer className="w-4 h-4" /> Print
+          </button>
+          <button
+            onClick={() => setModal({})}
+            className="flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700"
+          >
+            <Plus className="w-4 h-4" />
+            Add Transaction
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 mb-4 flex flex-wrap gap-3">
+      <div className="bg-white rounded-xl border border-gray-200 p-4 mb-4 flex flex-wrap gap-3 print:hidden">
         <div className="relative flex-1 min-w-48">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
@@ -130,7 +149,7 @@ export default function TransactionsPage() {
       {transactions.length > 0 && (
         <div className="flex gap-6 text-sm mb-3 px-1">
           <span className="text-gray-500">{transactions.length} records</span>
-          <span className="text-gray-700">Debit: <strong>{peso(totalDebit)}</strong></span>
+          <span className="text-gray-700">Total Price: <strong>{peso(totalDebit)}</strong></span>
           <span className="text-gray-700">Credit: <strong className="text-green-600">{peso(totalCredit)}</strong></span>
           <span className="text-gray-700">Bags: <strong>{totalBags}</strong></span>
         </div>
@@ -146,9 +165,9 @@ export default function TransactionsPage() {
                 <th className="text-left text-xs font-medium text-gray-500 px-6 py-3">Client</th>
                 <th className="text-left text-xs font-medium text-gray-500 px-6 py-3">Feed</th>
                 <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Bags</th>
-                <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Debit</th>
+                <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Total Price</th>
                 <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Credit</th>
-                <th className="px-6 py-3" />
+                <th className="px-6 py-3 print:hidden" />
               </tr>
             </thead>
             <tbody>
@@ -180,7 +199,7 @@ export default function TransactionsPage() {
                   <td className="px-6 py-3 text-sm text-gray-700 text-right">{tx.bags}</td>
                   <td className="px-6 py-3 text-sm font-medium text-gray-900 text-right">{peso(tx.debit)}</td>
                   <td className="px-6 py-3 text-sm text-green-600 text-right">{peso(tx.credit)}</td>
-                  <td className="px-6 py-3">
+                  <td className="px-6 py-3 print:hidden">
                     <div className="flex items-center justify-end gap-2">
                       <button
                         onClick={() => setModal({ tx })}

@@ -62,7 +62,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatCard label="Active Clients"      value={stats?.active_clients ?? 0}     icon={Users}      iconBg="bg-green-50"  iconColor="text-green-700" />
         <StatCard label="Total Transactions"  value={stats?.total_transactions ?? 0} icon={FileText}   iconBg="bg-blue-50"   iconColor="text-blue-600" />
-        <StatCard label="Total Debit"         value={peso(stats?.total_debit ?? 0)}  icon={TrendingUp} iconBg="bg-green-50"  iconColor="text-green-700" />
+        <StatCard label="Total Sales"          value={peso(stats?.total_debit ?? 0)}  icon={TrendingUp} iconBg="bg-green-50"  iconColor="text-green-700" />
         <StatCard label="Total Bags"          value={stats?.total_bags ?? 0}         icon={Package}    iconBg="bg-orange-50" iconColor="text-orange-600" />
       </div>
 
@@ -83,7 +83,7 @@ export default function DashboardPage() {
                 <th className="text-left text-xs font-medium text-gray-500 px-6 py-3">Client</th>
                 <th className="text-left text-xs font-medium text-gray-500 px-6 py-3">Feed</th>
                 <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Bags</th>
-                <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Debit</th>
+                <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Total Price</th>
                 <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Credit</th>
               </tr>
             </thead>

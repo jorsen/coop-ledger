@@ -203,7 +203,7 @@ export default function TransactionModal({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">
-                Debit (₱)
+                Total Price (₱)
                 {autoDebit !== null && (
                   <span className="ml-1 font-normal text-green-600">auto-filled</span>
                 )}
