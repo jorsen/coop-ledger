@@ -127,26 +127,28 @@ export default function BatchDetailPage() {
       </button>
 
       {batch.client_name && (
-        <div className="bg-white rounded-xl border border-gray-200 px-6 py-4 mb-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
-          <div>
-            <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Name</p>
-            <p className="font-semibold text-gray-900">{batch.client_name}</p>
-          </div>
-          <div>
-            <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Loan #</p>
-            <p className="font-semibold text-gray-900">{batch.client_id}</p>
-          </div>
-          <div>
-            <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Client ID</p>
-            <p className="font-semibold text-gray-900">{batch.client_code ?? '—'}</p>
-          </div>
-          <div>
-            <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5"># of Heads</p>
-            <p className="font-semibold text-gray-900">{batch.client_heads ?? '—'}</p>
-          </div>
-          <div className="sm:col-span-4">
-            <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Allocation</p>
-            <p className="font-semibold text-gray-900">₱{num(Number(batch.client_allocation ?? 0))}</p>
+        <div className="bg-white rounded-xl border border-gray-200 px-4 py-4 mb-4 text-sm">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-3">
+            <div className="col-span-2 sm:col-span-2">
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Name</p>
+              <p className="font-semibold text-gray-900">{batch.client_name}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Loan #</p>
+              <p className="font-semibold text-gray-900">{batch.batch_number}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Client ID</p>
+              <p className="font-semibold text-gray-900">{batch.client_code ?? '—'}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5"># of Heads</p>
+              <p className="font-semibold text-gray-900">{batch.client_heads ?? '—'}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Allocation</p>
+              <p className="font-semibold text-gray-900">₱{num(Number(batch.client_allocation ?? 0))}</p>
+            </div>
           </div>
         </div>
       )}

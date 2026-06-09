@@ -148,20 +148,20 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Date of Hauling</label>
-              <input
-                type="date"
-                value={form.date_of_hauling}
-                onChange={(e) => set('date_of_hauling', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-              />
-            </div>
-            <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">Date of Application</label>
               <input
                 type="date"
                 value={form.date_of_application}
                 onChange={(e) => set('date_of_application', e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Date of Hauling</label>
+              <input
+                type="date"
+                value={form.date_of_hauling}
+                onChange={(e) => set('date_of_hauling', e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
               />
             </div>
