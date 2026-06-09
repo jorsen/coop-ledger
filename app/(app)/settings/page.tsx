@@ -76,12 +76,11 @@ function AddFeedTypeModal({ onClose, onSave }: { onClose: () => void; onSave: ()
 
 // ── Add Price modal ───────────────────────────────────────────────────────────
 function AddPriceModal({ feedType, onClose, onSave }: { feedType: FeedType; onClose: () => void; onSave: () => void }) {
-  const today = new Date().toISOString().split('T')[0];
-  const [price, setPrice]           = useState('');
+  const [price, setPrice]             = useState('');
   const [deliveryFee, setDeliveryFee] = useState('');
-  const [date, setDate]             = useState(today);
-  const [loading, setLoading]       = useState(false);
-  const [error, setError]           = useState('');
+  const [date, setDate]               = useState('');
+  const [loading, setLoading]         = useState(false);
+  const [error, setError]             = useState('');
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -111,30 +110,28 @@ function AddPriceModal({ feedType, onClose, onSave }: { feedType: FeedType; onCl
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-lg leading-none">×</button>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Effective Date</label>
-              <input
-                type="date"
-                value={date}
-                onChange={e => setDate(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Price / Bag (₱)</label>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={price}
-                onChange={e => setPrice(e.target.value)}
-                placeholder={feedType.current_price ? String(feedType.current_price) : '0'}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-                required
-              />
-            </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Effective Date</label>
+            <input
+              type="date"
+              value={date}
+              onChange={e => setDate(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Price / Bag (₱)</label>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={price}
+              onChange={e => setPrice(e.target.value)}
+              placeholder="e.g. 1625"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+              required
+            />
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1">Delivery Fee / Bag (₱)</label>
@@ -277,21 +274,25 @@ function FeedTypeCard({ feedType, onRefresh }: { feedType: FeedType; onRefresh: 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function SettingsPage() {
   // Delivery fee setting
-  const [deliveryFee, setDeliveryFee] = useState('');
+  const [deliveryFee, setDeliveryFee]         = useState('');
+  const [currentDeliveryFee, setCurrentDeliveryFee] = useState<string | null>(null);
   const [settingsLoading, setSettingsLoading] = useState(true);
   const [saving, setSaving]                   = useState(false);
   const [saved, setSaved]                     = useState(false);
   const [settingsError, setSettingsError]     = useState('');
 
   // Feed types
-  const [feedTypes, setFeedTypes]   = useState<FeedType[]>([]);
+  const [feedTypes, setFeedTypes]       = useState<FeedType[]>([]);
   const [feedsLoading, setFeedsLoading] = useState(true);
   const [addFeedModal, setAddFeedModal] = useState(false);
 
   useEffect(() => {
     fetch('/api/settings')
       .then(r => r.json())
-      .then(data => { setDeliveryFee(data.delivery_fee ?? ''); setSettingsLoading(false); });
+      .then(data => {
+        setCurrentDeliveryFee(data.delivery_fee ?? null);
+        setSettingsLoading(false);
+      });
   }, []);
 
   const fetchFeedTypes = useCallback(async () => {
@@ -313,6 +314,8 @@ export default function SettingsPage() {
     });
     setSaving(false);
     if (!res.ok) { setSettingsError('Failed to save.'); return; }
+    setCurrentDeliveryFee(deliveryFee || '0');
+    setDeliveryFee('');
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   }
@@ -326,15 +329,20 @@ export default function SettingsPage() {
       <div className="bg-white rounded-xl border border-gray-200 mb-6">
         <div className="px-6 py-5">
           <h2 className="text-sm font-semibold text-gray-800 mb-1">Default Delivery Fee</h2>
-          <p className="text-xs text-gray-500 mb-4">
+          <p className="text-xs text-gray-500 mb-1">
             Used per bag when no delivery fee is set on a specific feed price entry.
           </p>
+          {!settingsLoading && currentDeliveryFee !== null && (
+            <p className="text-xs text-gray-400 mb-4">
+              Current: <span className="font-medium text-gray-600">₱{currentDeliveryFee}</span>
+            </p>
+          )}
           {settingsLoading ? (
             <div className="h-9 w-32 bg-gray-100 rounded-lg animate-pulse" />
           ) : (
             <form onSubmit={handleSaveSettings} className="flex items-end gap-3">
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Delivery Fee / Bag (₱)</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1">New Delivery Fee / Bag (₱)</label>
                 <input
                   type="number"
                   min="0"
