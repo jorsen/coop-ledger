@@ -8,6 +8,8 @@ export async function GET() {
   if (error) return error;
 
   await sql`ALTER TABLE feed_prices ADD COLUMN IF NOT EXISTS delivery_fee_per_bag DECIMAL(12,2) NOT NULL DEFAULT 0`;
+  await sql`ALTER TABLE clients ADD COLUMN IF NOT EXISTS date_of_hauling DATE`;
+  await sql`ALTER TABLE clients ADD COLUMN IF NOT EXISTS date_of_application DATE`;
 
   await sql`
     CREATE TABLE IF NOT EXISTS settings (

@@ -11,6 +11,8 @@ interface Client {
   status: string;
   heads: number | string;
   allocation: number | string;
+  date_of_hauling: string;
+  date_of_application: string;
 }
 
 interface ClientModalProps {
@@ -27,6 +29,8 @@ const EMPTY: Client = {
   status: 'active',
   heads: '',
   allocation: '',
+  date_of_hauling: '',
+  date_of_application: '',
 };
 
 export default function ClientModal({ mode, client, onClose, onSave }: ClientModalProps) {
@@ -137,6 +141,27 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
                 value={form.allocation}
                 onChange={(e) => set('allocation', e.target.value)}
                 placeholder="0"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Date of Hauling</label>
+              <input
+                type="date"
+                value={form.date_of_hauling}
+                onChange={(e) => set('date_of_hauling', e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Date of Application</label>
+              <input
+                type="date"
+                value={form.date_of_application}
+                onChange={(e) => set('date_of_application', e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
               />
             </div>
