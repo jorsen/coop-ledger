@@ -9,6 +9,7 @@ import { usePoll } from '@/hooks/use-poll';
 interface Batch {
   id: number;
   batch_number: string;
+  client_id: number | null;
   batch_date: string;
   notes: string;
 }
@@ -89,10 +90,10 @@ export default function BatchDetailPage() {
       </div>
 
       <button
-        onClick={() => router.push('/batches')}
+        onClick={() => batch.client_id ? router.push(`/clients/${batch.client_id}`) : router.push('/clients')}
         className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-4 print:hidden"
       >
-        <ArrowLeft className="w-4 h-4" /> Back to Batches
+        <ArrowLeft className="w-4 h-4" /> Back to Caretaker
       </button>
 
       <div className="flex items-start justify-between mb-6 print:hidden">

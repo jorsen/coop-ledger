@@ -7,7 +7,7 @@ interface Client {
   id?: number;
   client_code: string;
   name: string;
-  loan_number: string;
+  batch_number: string;
   status: string;
   heads: number;
   allocation: number;
@@ -23,7 +23,7 @@ interface ClientModalProps {
 const EMPTY: Client = {
   client_code: '',
   name: '',
-  loan_number: '1',
+  batch_number: '1',
   status: 'active',
   heads: 0,
   allocation: 0,
@@ -96,10 +96,10 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
               </div>
             )}
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Loan #</label>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Batch #</label>
               <input
-                value={form.loan_number}
-                onChange={(e) => set('loan_number', e.target.value)}
+                value={form.batch_number}
+                onChange={(e) => set('batch_number', e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
                 placeholder="e.g. 1"
               />

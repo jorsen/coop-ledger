@@ -10,7 +10,7 @@ interface Client {
   id: number;
   client_code: string;
   name: string;
-  loan_number: string;
+  batch_number: string;
   status: string;
   heads: number;
   allocation: number;
@@ -105,7 +105,7 @@ export default function ClientsPage() {
               </span>
             </div>
             <p className="text-xs text-gray-500">
-              ID: {client.client_code} · Loan #{client.loan_number}
+              ID: {client.client_code} · Batch #{client.batch_number}
             </p>
             <p className="text-xs text-gray-400 mb-3">{client.transaction_count} transaction(s)</p>
 

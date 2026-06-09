@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS clients (
   id          SERIAL PRIMARY KEY,
   client_code VARCHAR(20)    UNIQUE NOT NULL,
   name        VARCHAR(100)   NOT NULL,
-  loan_number VARCHAR(20)    DEFAULT '1',
+  batch_number VARCHAR(20)   DEFAULT '1',
   status      VARCHAR(20)    DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
   heads       INTEGER        DEFAULT 0,
   allocation  DECIMAL(12,2)  DEFAULT 0,
@@ -29,10 +29,21 @@ CREATE TABLE IF NOT EXISTS transactions (
 -- Add sales_invoice to existing tables if running on an existing DB
 ALTER TABLE transactions ADD COLUMN IF NOT EXISTS sales_invoice VARCHAR(50) DEFAULT '';
 
--- Batch groups — a batch groups a set of transactions (e.g. one delivery run)
+-- Rename loan_number to batch_number on existing DBs
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='clients' AND column_name='loan_number') THEN
+    ALTER TABLE clients RENAME COLUMN loan_number TO batch_number;
+  END IF;
+END $$;
+
+-- Add client_id to batches on existing DBs
+ALTER TABLE batches ADD COLUMN IF NOT EXISTS client_id INTEGER REFERENCES clients(id) ON DELETE CASCADE;
+
+-- Batch groups — a batch groups a set of transactions per caretaker
 CREATE TABLE IF NOT EXISTS batches (
   id           SERIAL PRIMARY KEY,
   batch_number VARCHAR(20)  UNIQUE NOT NULL,
+  client_id    INTEGER      REFERENCES clients(id) ON DELETE CASCADE,
   batch_date   DATE         NOT NULL DEFAULT CURRENT_DATE,
   notes        TEXT         DEFAULT '',
   created_at   TIMESTAMPTZ  DEFAULT NOW()

@@ -24,14 +24,14 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   const { error } = await requireAuth();
   if (error) return error;
 
-  const { client_code, name, loan_number, status, heads, allocation } = await req.json();
+  const { client_code, name, batch_number, status, heads, allocation } = await req.json();
 
   const [updated] = await sql`
     UPDATE clients
     SET
       client_code  = ${client_code},
       name         = ${name},
-      loan_number  = ${loan_number},
+      batch_number  = ${batch_number},
       status       = ${status},
       heads        = ${heads},
       allocation   = ${allocation},

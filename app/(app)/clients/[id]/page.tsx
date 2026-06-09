@@ -2,15 +2,25 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Plus, Pencil, Trash2, Printer } from 'lucide-react';
+import { ArrowLeft, Plus, Pencil, Trash2, Printer, ClipboardList, Eye } from 'lucide-react';
 import TransactionModal from '@/components/transaction-modal';
 import { usePoll } from '@/hooks/use-poll';
+
+interface Batch {
+  id: number;
+  batch_number: string;
+  batch_date: string;
+  notes: string;
+  transaction_count: number;
+  total_bags: number;
+  total_debit: number;
+}
 
 interface Client {
   id: number;
   client_code: string;
   name: string;
-  loan_number: string;
+  batch_number: string;
   status: string;
   heads: number;
   allocation: number;
@@ -43,21 +53,49 @@ export default function ClientLedgerPage() {
   const router = useRouter();
   const [client, setClient] = useState<Client | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [batches, setBatches] = useState<Batch[]>([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<{ tx?: Transaction } | null>(null);
+  const [batchModal, setBatchModal] = useState(false);
+  const [batchForm, setBatchForm] = useState({ batch_date: new Date().toISOString().split('T')[0], notes: '' });
+  const [savingBatch, setSavingBatch] = useState(false);
 
   const fetchData = useCallback(async () => {
-    const res = await fetch(`/api/clients/${id}`);
-    if (!res.ok) { router.push('/clients'); return; }
-    const data = await res.json();
+    const [clientRes, batchRes] = await Promise.all([
+      fetch(`/api/clients/${id}`),
+      fetch(`/api/batches?client_id=${id}`),
+    ]);
+    if (!clientRes.ok) { router.push('/clients'); return; }
+    const data = await clientRes.json();
     const { transactions: txs, ...clientData } = data;
     setClient(clientData);
     setTransactions(txs);
+    const batchData = await batchRes.json();
+    if (Array.isArray(batchData)) setBatches(batchData);
     setLoading(false);
   }, [id, router]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
   usePoll(fetchData);
+
+  async function handleCreateBatch() {
+    setSavingBatch(true);
+    await fetch('/api/batches', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...batchForm, client_id: id }),
+    });
+    setSavingBatch(false);
+    setBatchModal(false);
+    setBatchForm({ batch_date: new Date().toISOString().split('T')[0], notes: '' });
+    fetchData();
+  }
+
+  async function handleDeleteBatch(batchId: number) {
+    if (!confirm('Delete this batch? Transactions will remain but lose their batch assignment.')) return;
+    await fetch(`/api/batches/${batchId}`, { method: 'DELETE' });
+    fetchData();
+  }
 
   async function handleDelete(txId: number) {
     if (!confirm('Delete this transaction?')) return;
@@ -101,7 +139,7 @@ export default function ClientLedgerPage() {
       {/* Print header — only visible when printing */}
       <div className="hidden print:block mb-6 border-b border-gray-300 pb-4">
         <p className="text-lg font-bold">Feed Cooperative — Client Ledger</p>
-        <p className="text-sm mt-1">Client: <strong>{client.name}</strong> &nbsp;|&nbsp; ID: {client.client_code} &nbsp;|&nbsp; Loan #{client.loan_number}</p>
+        <p className="text-sm mt-1">Client: <strong>{client.name}</strong> &nbsp;|&nbsp; ID: {client.client_code} &nbsp;|&nbsp; Batch #{client.batch_number}</p>
         <p className="text-sm">Heads: {client.heads} &nbsp;|&nbsp; Allocation: {peso(client.allocation)} &nbsp;|&nbsp; Printed: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
       </div>
 
@@ -125,7 +163,7 @@ export default function ClientLedgerPage() {
             </span>
           </div>
           <p className="text-sm text-gray-500 mt-0.5">
-            ID: {client.client_code} · Loan #{client.loan_number} · {client.heads} heads · Allocation: {peso(client.allocation)}
+            ID: {client.client_code} · Batch #{client.batch_number} · {client.heads} heads · Allocation: {peso(client.allocation)}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -270,6 +308,62 @@ export default function ClientLedgerPage() {
         )}
       </div>
 
+      {/* Batches section */}
+      <div className="mt-8 bg-white rounded-xl border border-gray-200 print:hidden">
+        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <ClipboardList className="w-4 h-4 text-gray-500" />
+            <h2 className="font-semibold text-gray-900">Batches</h2>
+            {batches.length > 0 && (
+              <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">{batches.length}</span>
+            )}
+          </div>
+          <button
+            onClick={() => setBatchModal(true)}
+            className="flex items-center gap-1.5 text-sm text-green-800 font-medium hover:text-green-700"
+          >
+            <Plus className="w-4 h-4" /> New Batch
+          </button>
+        </div>
+
+        {batches.length === 0 ? (
+          <p className="text-sm text-gray-400 text-center py-8">No batches yet. Create one to group transactions.</p>
+        ) : (
+          <div className="divide-y divide-gray-50">
+            {batches.map((b) => (
+              <div key={b.id} className="px-6 py-3 flex items-center gap-4 hover:bg-gray-50/50">
+                <span className="bg-green-800 text-white text-xs font-bold px-2 py-0.5 rounded shrink-0">
+                  {b.batch_number}
+                </span>
+                <span className="text-sm text-gray-500 shrink-0">
+                  {new Date(b.batch_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                </span>
+                {b.notes && <span className="text-xs text-gray-400 truncate">{b.notes}</span>}
+                <div className="ml-auto flex items-center gap-4 shrink-0 text-sm text-gray-500">
+                  <span>{b.transaction_count} tx</span>
+                  <span>{b.total_bags} bags</span>
+                  <span className="font-medium text-gray-700">
+                    {new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(b.total_debit)}
+                  </span>
+                  <button
+                    onClick={() => router.push(`/batches/${b.id}`)}
+                    className="flex items-center gap-1 text-green-700 hover:text-green-600"
+                  >
+                    <Eye className="w-3.5 h-3.5" /> View
+                  </button>
+                  <button
+                    onClick={() => handleDeleteBatch(b.id)}
+                    className="text-red-400 hover:text-red-600"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {modal !== null && (
         <TransactionModal
           transaction={modal.tx}
@@ -278,6 +372,54 @@ export default function ClientLedgerPage() {
           onClose={() => setModal(null)}
           onSave={() => { setModal(null); fetchData(); }}
         />
+      )}
+
+      {/* New Batch Modal */}
+      {batchModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-sm">
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+              <h2 className="text-base font-semibold text-gray-900">New Batch</h2>
+              <button onClick={() => setBatchModal(false)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Batch Date *</label>
+                <input
+                  type="date"
+                  value={batchForm.batch_date}
+                  onChange={(e) => setBatchForm((f) => ({ ...f, batch_date: e.target.value }))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Notes</label>
+                <textarea
+                  value={batchForm.notes}
+                  onChange={(e) => setBatchForm((f) => ({ ...f, notes: e.target.value }))}
+                  rows={2}
+                  placeholder="Optional description…"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 resize-none"
+                />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setBatchModal(false)}
+                  className="flex-1 border border-gray-300 text-gray-700 py-2 rounded-lg text-sm font-medium hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCreateBatch}
+                  disabled={savingBatch}
+                  className="flex-1 bg-green-800 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50"
+                >
+                  {savingBatch ? 'Creating…' : 'Create Batch'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

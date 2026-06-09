@@ -2,14 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Users, FileText, Wheat, ClipboardList, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, Wheat, LogOut } from 'lucide-react';
 import clsx from 'clsx';
 
 const NAV_LINKS = [
   { href: '/dashboard',    label: 'Dashboard',    icon: LayoutDashboard },
   { href: '/clients',      label: 'Caretakers',   icon: Users },
   { href: '/transactions', label: 'Transactions', icon: FileText },
-  { href: '/batches',      label: 'Batches',      icon: ClipboardList },
   { href: '/feeds',        label: 'Feeds',        icon: Wheat },
 ];
 
