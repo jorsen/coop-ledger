@@ -9,8 +9,8 @@ interface Client {
   name: string;
   batch_number: string;
   status: string;
-  heads: number;
-  allocation: number;
+  heads: number | string;
+  allocation: number | string;
 }
 
 interface ClientModalProps {
@@ -23,10 +23,10 @@ interface ClientModalProps {
 const EMPTY: Client = {
   client_code: '',
   name: '',
-  batch_number: '1',
+  batch_number: '',
   status: 'active',
-  heads: 0,
-  allocation: 0,
+  heads: '',
+  allocation: '',
 };
 
 export default function ClientModal({ mode, client, onClose, onSave }: ClientModalProps) {
@@ -121,21 +121,22 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">Heads</label>
               <input
-                type="number"
-                min="0"
+                type="text"
+                inputMode="numeric"
                 value={form.heads}
-                onChange={(e) => set('heads', Number(e.target.value))}
+                onChange={(e) => set('heads', e.target.value)}
+                placeholder="0"
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
               />
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">Allocation (₱)</label>
               <input
-                type="number"
-                min="0"
-                step="0.01"
+                type="text"
+                inputMode="numeric"
                 value={form.allocation}
-                onChange={(e) => set('allocation', Number(e.target.value))}
+                onChange={(e) => set('allocation', e.target.value)}
+                placeholder="0"
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
               />
             </div>
