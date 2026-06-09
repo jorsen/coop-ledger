@@ -6,7 +6,16 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
   const { error } = await requireAuth();
   if (error) return error;
 
-  const [batch] = await sql`SELECT * FROM batches WHERE id = ${params.id}`;
+  const [batch] = await sql`
+    SELECT b.*,
+      c.name        AS client_name,
+      c.client_code AS client_code,
+      c.heads       AS client_heads,
+      c.allocation  AS client_allocation
+    FROM batches b
+    LEFT JOIN clients c ON c.id = b.client_id
+    WHERE b.id = ${params.id}
+  `;
   if (!batch) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const transactions = await sql`

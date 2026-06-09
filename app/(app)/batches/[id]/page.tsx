@@ -12,15 +12,10 @@ interface Batch {
   client_id: number | null;
   batch_date: string;
   notes: string;
-}
-
-interface ClientInfo {
-  id: number;
-  name: string;
-  client_code: string;
-  batch_number: string;
-  heads: number;
-  allocation: number;
+  client_name: string | null;
+  client_code: string | null;
+  client_heads: number | null;
+  client_allocation: number | null;
 }
 
 interface Transaction {
@@ -52,7 +47,6 @@ export default function BatchDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const [batch, setBatch] = useState<Batch | null>(null);
-  const [clientInfo, setClientInfo] = useState<ClientInfo | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [clients, setClients] = useState<{ id: number; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
@@ -66,11 +60,6 @@ export default function BatchDetailPage() {
     setBatch(batchData);
     setTransactions(Array.isArray(txs) ? txs : []);
     setLoading(false);
-    if (batchData.client_id) {
-      fetch(`/api/clients/${batchData.client_id}`)
-        .then((r) => r.json())
-        .then((c) => setClientInfo(c));
-    }
   }, [id, router]);
 
   useEffect(() => {
@@ -137,27 +126,27 @@ export default function BatchDetailPage() {
         <ArrowLeft className="w-4 h-4" /> Back to Caretaker
       </button>
 
-      {clientInfo && (
+      {batch.client_name && (
         <div className="bg-white rounded-xl border border-gray-200 px-6 py-4 mb-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
           <div>
             <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Name</p>
-            <p className="font-semibold text-gray-900">{clientInfo.name}</p>
+            <p className="font-semibold text-gray-900">{batch.client_name}</p>
           </div>
           <div>
             <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Loan #</p>
-            <p className="font-semibold text-gray-900">{clientInfo.id}</p>
+            <p className="font-semibold text-gray-900">{batch.client_id}</p>
           </div>
           <div>
             <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Client ID</p>
-            <p className="font-semibold text-gray-900">{clientInfo.client_code}</p>
+            <p className="font-semibold text-gray-900">{batch.client_code ?? '—'}</p>
           </div>
           <div>
             <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5"># of Heads</p>
-            <p className="font-semibold text-gray-900">{clientInfo.heads ?? '—'}</p>
+            <p className="font-semibold text-gray-900">{batch.client_heads ?? '—'}</p>
           </div>
           <div className="sm:col-span-4">
             <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Allocation</p>
-            <p className="font-semibold text-gray-900">₱{num(Number(clientInfo.allocation ?? 0))}</p>
+            <p className="font-semibold text-gray-900">₱{num(Number(batch.client_allocation ?? 0))}</p>
           </div>
         </div>
       )}
