@@ -1,0 +1,34 @@
+import { NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth';
+import { sql } from '@/lib/db';
+
+export async function GET() {
+  const { error } = await requireAuth();
+  if (error) return error;
+
+  const [stats, recent] = await Promise.all([
+    sql`
+      SELECT
+        (SELECT COUNT(*) FROM clients WHERE status = 'active')::int  AS active_clients,
+        (SELECT COUNT(*) FROM transactions)::int                     AS total_transactions,
+        (SELECT COALESCE(SUM(debit), 0) FROM transactions)           AS total_debit,
+        (SELECT COALESCE(SUM(bags), 0)  FROM transactions)::int      AS total_bags
+    `,
+    sql`
+      SELECT
+        t.id,
+        t.date,
+        t.feed_type,
+        t.bags,
+        t.debit,
+        t.credit,
+        c.name AS client_name
+      FROM transactions t
+      JOIN clients c ON c.id = t.client_id
+      ORDER BY t.date DESC, t.created_at DESC
+      LIMIT 10
+    `,
+  ]);
+
+  return NextResponse.json({ stats: stats[0], recent });
+}
