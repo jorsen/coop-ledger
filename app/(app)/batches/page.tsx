@@ -31,7 +31,8 @@ export default function BatchesPage() {
 
   const fetchBatches = useCallback(async () => {
     const res = await fetch('/api/batches');
-    setBatches(await res.json());
+    const data = await res.json();
+    if (Array.isArray(data)) setBatches(data);
     setLoading(false);
   }, []);
 

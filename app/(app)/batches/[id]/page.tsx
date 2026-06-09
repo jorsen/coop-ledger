@@ -48,7 +48,7 @@ export default function BatchDetailPage() {
     const data = await res.json();
     const { transactions: txs, ...batchData } = data;
     setBatch(batchData);
-    setTransactions(txs);
+    setTransactions(Array.isArray(txs) ? txs : []);
     setLoading(false);
   }, [id, router]);
 
