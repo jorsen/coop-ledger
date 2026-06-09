@@ -115,7 +115,7 @@ export default function TransactionsPage() {
           onChange={(e) => setClientId(e.target.value)}
           className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 min-w-40"
         >
-          <option value="">All clients</option>
+          <option value="">All caretakers</option>
           {clients.map((c) => (
             <option key={c.id} value={c.id}>{c.name}</option>
           ))}
@@ -162,7 +162,7 @@ export default function TransactionsPage() {
             <thead>
               <tr className="border-b border-gray-100">
                 <th className="text-left text-xs font-medium text-gray-500 px-6 py-3">Date</th>
-                <th className="text-left text-xs font-medium text-gray-500 px-6 py-3">Client</th>
+                <th className="text-left text-xs font-medium text-gray-500 px-6 py-3">Caretaker</th>
                 <th className="text-left text-xs font-medium text-gray-500 px-6 py-3">Feed</th>
                 <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Bags</th>
                 <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Total Price</th>

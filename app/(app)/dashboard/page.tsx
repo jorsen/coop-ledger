@@ -20,6 +20,7 @@ interface RecentTransaction {
   bags: number;
   debit: number;
   credit: number;
+  price_per_bag: number | null;
 }
 
 const peso = (n: number) =>
@@ -80,9 +81,10 @@ export default function DashboardPage() {
             <thead>
               <tr className="border-b border-gray-100">
                 <th className="text-left text-xs font-medium text-gray-500 px-6 py-3">Date</th>
-                <th className="text-left text-xs font-medium text-gray-500 px-6 py-3">Client</th>
+                <th className="text-left text-xs font-medium text-gray-500 px-6 py-3">Caretaker</th>
                 <th className="text-left text-xs font-medium text-gray-500 px-6 py-3">Feed</th>
                 <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Bags</th>
+                <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Price/Bag</th>
                 <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Total Price</th>
                 <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Credit</th>
               </tr>
@@ -90,7 +92,7 @@ export default function DashboardPage() {
             <tbody>
               {recent.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="text-center text-sm text-gray-400 py-10">
+                  <td colSpan={7} className="text-center text-sm text-gray-400 py-10">
                     No transactions yet.
                   </td>
                 </tr>
@@ -107,6 +109,9 @@ export default function DashboardPage() {
                     )}
                   </td>
                   <td className="px-6 py-3 text-sm text-gray-700 text-right">{tx.bags}</td>
+                  <td className="px-6 py-3 text-sm text-gray-600 text-right">
+                    {tx.price_per_bag ? peso(tx.price_per_bag) : '—'}
+                  </td>
                   <td className="px-6 py-3 text-sm font-medium text-gray-900 text-right">{peso(tx.debit)}</td>
                   <td className="px-6 py-3 text-sm text-green-600 text-right">{peso(tx.credit)}</td>
                 </tr>
