@@ -14,6 +14,8 @@ interface Client {
   status: string;
   heads: number;
   allocation: number;
+  date_of_hauling: string;
+  date_of_application: string;
   transaction_count: number;
 }
 
