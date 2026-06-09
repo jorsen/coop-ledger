@@ -133,7 +133,7 @@ export default function ClientsPage() {
               </div>
               <div>
                 <p className="text-xs text-gray-500">Hauling Date</p>
-                <p className="text-sm font-semibold text-gray-900">{fmtDate(client.date_of_hauling)}</p>
+                <p className="text-sm font-semibold text-red-600">{fmtDate(client.date_of_hauling)}</p>
               </div>
             </div>
 
