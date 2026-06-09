@@ -123,9 +123,8 @@ function AddPriceModal({ feedType, onClose, onSave }: { feedType: FeedType; onCl
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1">Price / Bag (₱)</label>
             <input
-              type="number"
-              min="0"
-              step="0.01"
+              type="text"
+              inputMode="numeric"
               value={price}
               onChange={e => setPrice(e.target.value)}
               placeholder="e.g. 1625"
@@ -136,9 +135,8 @@ function AddPriceModal({ feedType, onClose, onSave }: { feedType: FeedType; onCl
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1">Delivery Fee / Bag (₱)</label>
             <input
-              type="number"
-              min="0"
-              step="0.01"
+              type="text"
+              inputMode="numeric"
               value={deliveryFee}
               onChange={e => setDeliveryFee(e.target.value)}
               placeholder="e.g. 80"
@@ -344,9 +342,8 @@ export default function SettingsPage() {
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">New Delivery Fee / Bag (₱)</label>
                 <input
-                  type="number"
-                  min="0"
-                  step="0.01"
+                  type="text"
+                  inputMode="numeric"
                   value={deliveryFee}
                   onChange={e => setDeliveryFee(e.target.value)}
                   placeholder="e.g. 80"

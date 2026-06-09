@@ -12,9 +12,9 @@ interface Transaction {
   client_id: number | '';
   date: string;
   feed_type: string;
-  bags: number;
+  bags: number | string;
   debit: number;
-  credit: number;
+  credit: number | string;
   notes: string;
   sales_invoice: string;
   batch_id?: number | null;
@@ -33,9 +33,9 @@ const EMPTY: Transaction = {
   client_id: '',
   date: new Date().toISOString().split('T')[0],
   feed_type: '',
-  bags: 0,
+  bags: '',
   debit: 0,
-  credit: 0,
+  credit: '',
   notes: '',
   sales_invoice: '',
   batch_id: null,
@@ -97,8 +97,9 @@ export default function TransactionModal({
 
   // Auto-calculate debit when bags or price changes (only if not editing)
   useEffect(() => {
-    if (!transaction && pricePerBag !== null && form.bags > 0) {
-      setForm((f) => ({ ...f, debit: form.bags * pricePerBag }));
+    const bagsNum = Number(form.bags);
+    if (!transaction && pricePerBag !== null && bagsNum > 0) {
+      setForm((f) => ({ ...f, debit: bagsNum * pricePerBag }));
     }
   }, [pricePerBag, form.bags, transaction]);
 
@@ -131,7 +132,7 @@ export default function TransactionModal({
     }
   }
 
-  const autoDebit = pricePerBag !== null && form.bags > 0 ? form.bags * pricePerBag : null;
+  const autoDebit = pricePerBag !== null && Number(form.bags) > 0 ? Number(form.bags) * pricePerBag : null;
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
@@ -208,10 +209,11 @@ export default function TransactionModal({
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">Bags</label>
               <input
-                type="number"
-                min="0"
+                type="text"
+                inputMode="numeric"
                 value={form.bags}
-                onChange={(e) => set('bags', Number(e.target.value))}
+                onChange={(e) => set('bags', e.target.value)}
+                placeholder="0"
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
               />
             </div>
@@ -253,20 +255,21 @@ export default function TransactionModal({
                 Total Price (₱)
               </label>
               <input
-                type="number"
-                value={form.debit}
+                type="text"
+                value={form.debit === 0 ? '' : form.debit}
                 readOnly
+                placeholder="auto"
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 text-gray-700 cursor-not-allowed"
               />
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">Credit (₱)</label>
               <input
-                type="number"
-                min="0"
-                step="0.01"
+                type="text"
+                inputMode="numeric"
                 value={form.credit}
-                onChange={(e) => set('credit', Number(e.target.value))}
+                onChange={(e) => set('credit', e.target.value)}
+                placeholder="0"
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
               />
             </div>
