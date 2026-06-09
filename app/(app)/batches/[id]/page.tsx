@@ -127,14 +127,14 @@ export default function BatchDetailPage() {
       </button>
 
       {batch.client_name && (
-        <div className="bg-white rounded-xl border border-gray-200 px-4 py-4 mb-4 text-sm">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-3">
-            <div className="col-span-2 sm:col-span-2">
+        <div className="bg-white rounded-xl border border-gray-200 px-6 py-4 mb-4 text-sm">
+          <div className="flex flex-wrap gap-x-10 gap-y-3">
+            <div>
               <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Name</p>
               <p className="font-semibold text-gray-900">{batch.client_name}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Loan #</p>
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Batch #</p>
               <p className="font-semibold text-gray-900">{batch.batch_number}</p>
             </div>
             <div>
