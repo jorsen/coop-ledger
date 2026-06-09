@@ -88,10 +88,10 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="p-6" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Batch # + Client ID (edit only) */}
-          <div className="grid grid-cols-2 gap-5">
-            <div>
+          <div style={{ display: 'flex', gap: '16px' }}>
+            <div style={{ flex: 1 }}>
               <label className="block text-xs font-medium text-gray-700 mb-2">Batch #</label>
               <input
                 value={form.batch_number}
@@ -100,8 +100,8 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
                 placeholder="e.g. 1"
               />
             </div>
-            {mode === 'edit' ? (
-              <div>
+            {mode === 'edit' && (
+              <div style={{ flex: 1 }}>
                 <label className="block text-xs font-medium text-gray-700 mb-2">Client ID</label>
                 <input
                   value={form.client_code}
@@ -109,7 +109,7 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
                   className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
                 />
               </div>
-            ) : <div />}
+            )}
           </div>
 
           {/* Full Name — full width */}
@@ -125,8 +125,8 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
           </div>
 
           {/* Heads + Allocation */}
-          <div className="grid grid-cols-2 gap-5">
-            <div>
+          <div style={{ display: 'flex', gap: '16px' }}>
+            <div style={{ flex: 1 }}>
               <label className="block text-xs font-medium text-gray-700 mb-2">Heads</label>
               <input
                 type="text"
@@ -137,7 +137,7 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
                 className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
               />
             </div>
-            <div>
+            <div style={{ flex: 1 }}>
               <label className="block text-xs font-medium text-gray-700 mb-2">Allocation (₱)</label>
               <input
                 type="text"
@@ -151,8 +151,8 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
           </div>
 
           {/* Date of Application + Date of Hauling */}
-          <div className="grid grid-cols-2 gap-5">
-            <div>
+          <div style={{ display: 'flex', gap: '16px' }}>
+            <div style={{ flex: 1 }}>
               <label className="block text-xs font-medium text-gray-700 mb-2">Date of Application</label>
               <input
                 type="date"
@@ -161,7 +161,7 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
                 className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
               />
             </div>
-            <div>
+            <div style={{ flex: 1 }}>
               <label className="block text-xs font-medium text-gray-700 mb-2">Date of Hauling</label>
               <input
                 type="date"
