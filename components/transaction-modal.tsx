@@ -231,18 +231,6 @@ export default function TransactionModal({
             </div>
           </div>
 
-          {/* Sales Invoice */}
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Sales Invoice #</label>
-            <input
-              type="text"
-              value={form.sales_invoice}
-              onChange={(e) => set('sales_invoice', e.target.value)}
-              placeholder="e.g. 297438"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-            />
-          </div>
-
           {/* Notes */}
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1">Notes</label>

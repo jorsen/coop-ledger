@@ -147,7 +147,6 @@ export default function BatchDetailPage() {
               <tr className="border-b border-gray-100 bg-gray-50">
                 <th className="text-left text-xs font-medium text-gray-500 px-4 py-3">Date</th>
                 <th className="text-left text-xs font-medium text-gray-500 px-4 py-3">Caretaker</th>
-                <th className="text-left text-xs font-medium text-gray-500 px-4 py-3">Sales Invoice</th>
                 <th className="text-left text-xs font-medium text-gray-500 px-4 py-3">Feed</th>
                 <th className="text-right text-xs font-medium text-gray-500 px-4 py-3">Bags</th>
                 <th className="text-right text-xs font-medium text-gray-500 px-4 py-3">Price/Bag</th>
@@ -159,16 +158,15 @@ export default function BatchDetailPage() {
             <tbody>
               {transactions.length === 0 && (
                 <tr>
-                  <td colSpan={9} className="text-center text-sm text-gray-400 py-10">
+                  <td colSpan={8} className="text-center text-sm text-gray-400 py-10">
                     No transactions in this batch yet.
                   </td>
                 </tr>
               )}
               {transactions.map((tx) => (
                 <tr key={tx.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50">
-                  <td className="px-4 py-3 text-blue-600 whitespace-nowrap">{fmtDate(tx.date)}</td>
+                  <td className="px-4 py-3 text-gray-700 whitespace-nowrap">{fmtDate(tx.date)}</td>
                   <td className="px-4 py-3 font-medium text-gray-900">{tx.client_name}</td>
-                  <td className="px-4 py-3 text-gray-500">{tx.sales_invoice || '—'}</td>
                   <td className="px-4 py-3">
                     {tx.feed_type && (
                       <span className="inline-block bg-green-50 text-green-800 text-xs font-medium px-2 py-0.5 rounded">
@@ -202,7 +200,7 @@ export default function BatchDetailPage() {
               ))}
               {transactions.length > 0 && (
                 <tr className="border-t-2 border-gray-200 bg-gray-50 font-semibold text-sm">
-                  <td colSpan={4} className="px-4 py-3 text-xs text-gray-500" />
+                  <td colSpan={3} className="px-4 py-3 text-xs text-gray-500" />
                   <td className="px-4 py-3 text-right text-gray-700">{totalBags}</td>
                   <td />
                   <td className="px-4 py-3 text-right text-gray-900">{peso(totalDebit)}</td>
