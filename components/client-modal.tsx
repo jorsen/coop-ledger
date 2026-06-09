@@ -158,7 +158,7 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
                 type="date"
                 value={form.date_of_application}
                 onChange={(e) => set('date_of_application', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                className="w-full bg-white border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
               />
             </div>
             <div style={{ flex: 1 }}>
@@ -167,7 +167,7 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
                 type="date"
                 value={form.date_of_hauling}
                 onChange={(e) => set('date_of_hauling', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                className="w-full bg-white border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
               />
             </div>
           </div>
