@@ -309,12 +309,10 @@ export default function ClientLedgerPage() {
                   <span className="font-bold text-gray-900">Total</span>
                   <span className="font-bold text-gray-900 underline">{num(grandTotal)}</span>
                 </div>
-                {totalDeliveryFee > 0 && (
-                  <div className="flex justify-between pt-2 border-t border-dashed border-gray-200">
-                    <span className="text-xs text-gray-400">Delivery Fee</span>
-                    <span className="text-xs text-gray-500">{num(totalDeliveryFee)}</span>
-                  </div>
-                )}
+                <div className="flex justify-between pt-1">
+                  <span className="text-xs text-gray-400">Del Fee</span>
+                  <span className="text-xs text-gray-500">{num(totalDeliveryFee)}</span>
+                </div>
               </div>
             </div>
           </div>
