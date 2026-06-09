@@ -40,7 +40,7 @@ interface Transaction {
   batch_no: string | null;
 }
 
-const DFFS2_FIXED = 500;
+const DFFS2_RATE = 0.007; // 0.7% of principal
 
 // Plain number, no ₱ symbol
 const num = (n: number) =>
@@ -129,7 +129,8 @@ export default function ClientLedgerPage() {
   // Totals computed from totalDebit directly for consistent rounding (matches reference)
   const totalDffs1    = Math.round(totalDebit * 1.15) / 100;
   const totalInterest = Math.round(totalDebit * 2.3)  / 100;
-  const grandTotal    = balance + totalInterest + totalDffs1 + DFFS2_FIXED;
+  const dffs2         = Math.floor(balance * DFFS2_RATE);   // 0.7% of principal, truncated
+  const grandTotal    = balance + totalInterest + totalDffs1 + dffs2;
 
   if (loading) {
     return (
@@ -221,6 +222,7 @@ export default function ClientLedgerPage() {
                 <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3">FEEDS</th>
                 <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3">TR_DATE</th>
                 <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">NO.OF BAGS</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Price/Bag</th>
                 <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Debit</th>
                 <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Credit</th>
                 <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Balance</th>
@@ -232,7 +234,7 @@ export default function ClientLedgerPage() {
             <tbody>
               {withComputed.length === 0 && (
                 <tr>
-                  <td colSpan={9} className="text-center text-sm text-gray-400 py-10">
+                  <td colSpan={10} className="text-center text-sm text-gray-400 py-10">
                     No transactions yet.
                   </td>
                 </tr>
@@ -242,6 +244,9 @@ export default function ClientLedgerPage() {
                   <td className="px-4 py-3 text-gray-800">{tx.feed_type || '—'}</td>
                   <td className="px-4 py-3 text-blue-600 whitespace-nowrap">{fmtDate(tx.date)}</td>
                   <td className="px-4 py-3 text-gray-700 text-right">{Number(tx.bags).toFixed(2)}</td>
+                  <td className="px-4 py-3 text-gray-600 text-right">
+                    {tx.price_per_bag ? num(Number(tx.price_per_bag)) : '—'}
+                  </td>
                   <td className="px-4 py-3 text-gray-900 text-right">{num(tx.debit)}</td>
                   <td className="px-4 py-3 text-gray-700 text-right">{num(Number(tx.credit))}</td>
                   <td className="px-4 py-3 font-semibold text-gray-900 text-right">{num(tx.runningBalance)}</td>
@@ -265,6 +270,7 @@ export default function ClientLedgerPage() {
                 <tr className="border-t-2 border-gray-300 bg-gray-50 font-semibold text-sm">
                   <td colSpan={2} className="px-4 py-3" />
                   <td className="px-4 py-3 text-right text-gray-700">{Number(totalBags).toFixed(2)}</td>
+                  <td className="px-4 py-3" />
                   <td className="px-4 py-3 text-right text-gray-900">{num(totalDebit)}</td>
                   <td className="px-4 py-3 text-right text-gray-500">-</td>
                   <td className="px-4 py-3 text-right text-gray-900">{num(balance)}</td>
@@ -296,7 +302,7 @@ export default function ClientLedgerPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">DFFS 2</span>
-                  <span className="font-medium text-gray-900">{num(DFFS2_FIXED)}</span>
+                  <span className="font-medium text-gray-900">{num(dffs2)}</span>
                 </div>
                 <div className="flex justify-between border-t border-gray-300 pt-2 mt-1">
                   <span className="font-bold text-gray-900">Total</span>
