@@ -87,7 +87,7 @@ export default function ClientLedgerPage() {
         onClick={() => router.push('/clients')}
         className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-4 print:hidden"
       >
-        <ArrowLeft className="w-4 h-4" /> Back to Clients
+        <ArrowLeft className="w-4 h-4" /> Back to Caretakers
       </button>
 
       <div className="flex items-start justify-between mb-6 print:hidden">
