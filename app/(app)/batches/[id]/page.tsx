@@ -129,34 +129,38 @@ export default function BatchDetailPage() {
       </button>
 
       {batch.client_name && (
-        <div className="bg-white rounded-xl border border-gray-200 px-6 py-4 mb-4 text-sm">
-          <div className="flex flex-wrap gap-x-10 gap-y-3">
+        <div className="bg-white rounded-xl border border-gray-200 px-6 py-5 mb-4 text-sm">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-4">
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Name</p>
-              <p className="font-semibold text-gray-900">{batch.client_name}</p>
+              <p className="text-xs font-medium text-gray-400 mb-0.5">NAME</p>
+              <p className="font-bold text-gray-900">{batch.client_name}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Batch #</p>
-              <p className="font-semibold text-gray-900">{batch.batch_number}</p>
+              <p className="text-xs font-medium text-gray-400 mb-0.5">BATCH #</p>
+              <p className="font-semibold text-blue-600">{batch.batch_number}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Client ID</p>
-              <p className="font-semibold text-gray-900">{batch.client_code ?? '—'}</p>
+              <p className="text-xs font-medium text-gray-400 mb-0.5">CLIENT ID</p>
+              <p className="font-semibold text-gray-700">{batch.client_code ?? '—'}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5"># of Heads</p>
+              <p className="text-xs font-medium text-gray-400 mb-0.5">STATUS</p>
+              <span className="inline-block text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-800">Active</span>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-gray-400 mb-0.5"># OF HEADS</p>
               <p className="font-semibold text-gray-900">{batch.client_heads ?? '—'}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Allocation</p>
+              <p className="text-xs font-medium text-gray-400 mb-0.5">ALLOCATION</p>
               <p className="font-semibold text-gray-900">₱{num(Number(batch.client_allocation ?? 0))}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Date of Application</p>
+              <p className="text-xs font-medium text-gray-400 mb-0.5">DATE OF APPLICATION</p>
               <p className="font-semibold text-gray-900">{batch.date_of_application ? fmtDate(batch.date_of_application) : '—'}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Date of Hauling</p>
+              <p className="text-xs font-medium text-gray-400 mb-0.5">DATE OF HAULING</p>
               <p className="font-semibold text-red-600">{batch.date_of_hauling ? fmtDate(batch.date_of_hauling) : '—'}</p>
             </div>
           </div>
