@@ -84,17 +84,17 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Client ID *</label>
-              <input
-                value={form.client_code}
-                onChange={(e) => set('client_code', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-                placeholder="e.g. 003"
-                required
-              />
-            </div>
+          <div className={`grid gap-4 ${mode === 'edit' ? 'grid-cols-2' : 'grid-cols-1'}`}>
+            {mode === 'edit' && (
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Client ID</label>
+                <input
+                  value={form.client_code}
+                  onChange={(e) => set('client_code', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                />
+              </div>
+            )}
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">Loan #</label>
               <input

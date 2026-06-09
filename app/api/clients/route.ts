@@ -23,17 +23,23 @@ export async function POST(req: NextRequest) {
   const { error } = await requireAuth();
   if (error) return error;
 
-  const body = await req.json();
-  const { client_code, name, loan_number, status, heads, allocation } = body;
+  const { name, loan_number, status, heads, allocation } = await req.json();
 
-  if (!client_code || !name) {
-    return NextResponse.json({ error: 'client_code and name are required' }, { status: 400 });
+  if (!name) {
+    return NextResponse.json({ error: 'name is required' }, { status: 400 });
   }
 
-  const [client] = await sql`
+  // Insert with a temporary code, then update to the zero-padded id
+  const [inserted] = await sql`
     INSERT INTO clients (client_code, name, loan_number, status, heads, allocation)
-    VALUES (${client_code}, ${name}, ${loan_number || '1'}, ${status || 'active'}, ${heads || 0}, ${allocation || 0})
-    RETURNING *
+    VALUES ('TMP', ${name}, ${loan_number || '1'}, ${status || 'active'}, ${heads || 0}, ${allocation || 0})
+    RETURNING id
+  `;
+
+  const autoCode = String(inserted.id).padStart(3, '0');
+
+  const [client] = await sql`
+    UPDATE clients SET client_code = ${autoCode} WHERE id = ${inserted.id} RETURNING *
   `;
 
   return NextResponse.json(client, { status: 201 });
