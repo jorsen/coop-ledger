@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { X, Info } from 'lucide-react';
 
 interface Client { id: number; name: string }
+interface FeedType { id: number; name: string; current_price: number | null }
 
 interface Transaction {
   id?: number;
@@ -34,6 +35,9 @@ const EMPTY: Transaction = {
   notes: '',
 };
 
+const peso = (n: number) =>
+  new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(n);
+
 export default function TransactionModal({
   transaction,
   clients,
@@ -41,17 +45,46 @@ export default function TransactionModal({
   onClose,
   onSave,
 }: TransactionModalProps) {
-  const [form, setForm] = useState<Transaction>(() => {
-    if (transaction) return transaction;
-    return { ...EMPTY, client_id: defaultClientId ?? '' };
-  });
+  const [form, setForm] = useState<Transaction>(() =>
+    transaction ? transaction : { ...EMPTY, client_id: defaultClientId ?? '' }
+  );
+  const [feedTypes, setFeedTypes] = useState<FeedType[]>([]);
+  const [pricePerBag, setPricePerBag] = useState<number | null>(null);
+  const [priceDate, setPriceDate] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetch('/api/feed-types').then((r) => r.json()).then(setFeedTypes);
+  }, []);
 
   useEffect(() => {
     if (transaction) setForm(transaction);
     else setForm({ ...EMPTY, client_id: defaultClientId ?? '' });
   }, [transaction, defaultClientId]);
+
+  // Look up effective price whenever feed type or date changes
+  const fetchPrice = useCallback(async (feedTypeName: string, date: string) => {
+    if (!feedTypeName || !date) { setPricePerBag(null); return; }
+    const feedType = feedTypes.find((f) => f.name === feedTypeName);
+    if (!feedType) { setPricePerBag(null); return; }
+
+    const res = await fetch(`/api/feed-types/${feedType.id}/price?date=${date}`);
+    const data = await res.json();
+    setPricePerBag(data.price_per_bag ? Number(data.price_per_bag) : null);
+    setPriceDate(data.effective_date ?? null);
+  }, [feedTypes]);
+
+  useEffect(() => {
+    fetchPrice(form.feed_type, form.date);
+  }, [form.feed_type, form.date, fetchPrice]);
+
+  // Auto-calculate debit when bags or price changes (only if not editing)
+  useEffect(() => {
+    if (!transaction && pricePerBag !== null && form.bags > 0) {
+      setForm((f) => ({ ...f, debit: form.bags * pricePerBag }));
+    }
+  }, [pricePerBag, form.bags, transaction]);
 
   function set<K extends keyof Transaction>(key: K, value: Transaction[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -61,23 +94,19 @@ export default function TransactionModal({
     e.preventDefault();
     setError('');
     setLoading(true);
-
     try {
       const url    = transaction ? `/api/transactions/${transaction.id}` : '/api/transactions';
       const method = transaction ? 'PUT' : 'POST';
-
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
-
       if (!res.ok) {
         const data = await res.json();
         setError(data.error ?? 'Something went wrong');
         return;
       }
-
       onSave();
     } catch {
       setError('Network error. Please try again.');
@@ -85,6 +114,8 @@ export default function TransactionModal({
       setLoading(false);
     }
   }
+
+  const autoDebit = pricePerBag !== null && form.bags > 0 ? form.bags * pricePerBag : null;
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
@@ -99,6 +130,7 @@ export default function TransactionModal({
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {/* Client */}
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1">Client *</label>
             <select
@@ -114,6 +146,7 @@ export default function TransactionModal({
             </select>
           </div>
 
+          {/* Date + Bags */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">Date *</label>
@@ -137,19 +170,44 @@ export default function TransactionModal({
             </div>
           </div>
 
+          {/* Feed type */}
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1">Feed Type</label>
-            <input
+            <select
               value={form.feed_type}
               onChange={(e) => set('feed_type', e.target.value)}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-              placeholder="e.g. STARTER LUNTIAN 50KLS"
-            />
+            >
+              <option value="">Select feed type</option>
+              {feedTypes.map((f) => (
+                <option key={f.id} value={f.name}>{f.name}</option>
+              ))}
+            </select>
+
+            {/* Price hint */}
+            {pricePerBag !== null && (
+              <p className="mt-1 flex items-center gap-1 text-xs text-green-700">
+                <Info className="w-3 h-3" />
+                Price on {priceDate}: {peso(pricePerBag)} / bag
+                {autoDebit !== null && (
+                  <span className="ml-1 font-medium">→ Debit: {peso(autoDebit)}</span>
+                )}
+              </p>
+            )}
+            {form.feed_type && pricePerBag === null && (
+              <p className="mt-1 text-xs text-amber-600">No price set for this date. Enter debit manually.</p>
+            )}
           </div>
 
+          {/* Debit + Credit */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Debit (₱)</label>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                Debit (₱)
+                {autoDebit !== null && (
+                  <span className="ml-1 font-normal text-green-600">auto-filled</span>
+                )}
+              </label>
               <input
                 type="number"
                 min="0"
@@ -172,6 +230,7 @@ export default function TransactionModal({
             </div>
           </div>
 
+          {/* Notes */}
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1">Notes</label>
             <textarea

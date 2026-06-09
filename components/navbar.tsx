@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Users, FileText, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, Wheat, LogOut } from 'lucide-react';
 import clsx from 'clsx';
 
 const NAV_LINKS = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/clients',   label: 'Clients',   icon: Users },
+  { href: '/dashboard',    label: 'Dashboard',    icon: LayoutDashboard },
+  { href: '/clients',      label: 'Clients',      icon: Users },
   { href: '/transactions', label: 'Transactions', icon: FileText },
+  { href: '/feeds',        label: 'Feeds',        icon: Wheat },
 ];
 
 export default function Navbar() {

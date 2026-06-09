@@ -24,3 +24,47 @@ CREATE TABLE IF NOT EXISTS transactions (
   notes       TEXT           DEFAULT '',
   created_at  TIMESTAMPTZ    DEFAULT NOW()
 );
+
+-- Feed types and price history
+-- Prices are time-based: changing a price does NOT affect saved transaction debits.
+
+CREATE TABLE IF NOT EXISTS feed_types (
+  id         SERIAL PRIMARY KEY,
+  name       VARCHAR(100) UNIQUE NOT NULL,
+  active     BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS feed_prices (
+  id             SERIAL PRIMARY KEY,
+  feed_type_id   INTEGER        NOT NULL REFERENCES feed_types(id) ON DELETE CASCADE,
+  price_per_bag  DECIMAL(12,2)  NOT NULL,
+  effective_date DATE           NOT NULL,
+  created_at     TIMESTAMPTZ    DEFAULT NOW(),
+  UNIQUE(feed_type_id, effective_date)
+);
+
+-- Seed feed types
+INSERT INTO feed_types (name) VALUES
+  ('STARTER LUNTIAN 50KLS'),
+  ('STARGROW LUNTIAN 50KLS'),
+  ('GROWER LUNTIAN 50KLS'),
+  ('FINISHER LUNTIAN 50KLS'),
+  ('PRE-STARTER LUNTIAN 50KLS')
+ON CONFLICT (name) DO NOTHING;
+
+-- Seed price history (year 2026)
+INSERT INTO feed_prices (feed_type_id, price_per_bag, effective_date)
+SELECT id, 1625, '2026-03-10' FROM feed_types WHERE name = 'STARTER LUNTIAN 50KLS'  UNION ALL
+SELECT id, 1595, '2026-03-10' FROM feed_types WHERE name = 'STARGROW LUNTIAN 50KLS' UNION ALL
+SELECT id, 1575, '2026-03-10' FROM feed_types WHERE name = 'GROWER LUNTIAN 50KLS'   UNION ALL
+SELECT id, 1635, '2026-03-11' FROM feed_types WHERE name = 'STARTER LUNTIAN 50KLS'  UNION ALL
+SELECT id, 1605, '2026-03-11' FROM feed_types WHERE name = 'STARGROW LUNTIAN 50KLS' UNION ALL
+SELECT id, 1585, '2026-03-11' FROM feed_types WHERE name = 'GROWER LUNTIAN 50KLS'   UNION ALL
+SELECT id, 1735, '2026-03-23' FROM feed_types WHERE name = 'STARTER LUNTIAN 50KLS'  UNION ALL
+SELECT id, 1705, '2026-03-23' FROM feed_types WHERE name = 'STARGROW LUNTIAN 50KLS' UNION ALL
+SELECT id, 1685, '2026-03-23' FROM feed_types WHERE name = 'GROWER LUNTIAN 50KLS'   UNION ALL
+SELECT id, 1785, '2026-04-24' FROM feed_types WHERE name = 'STARTER LUNTIAN 50KLS'  UNION ALL
+SELECT id, 1755, '2026-04-24' FROM feed_types WHERE name = 'STARGROW LUNTIAN 50KLS' UNION ALL
+SELECT id, 1735, '2026-04-24' FROM feed_types WHERE name = 'GROWER LUNTIAN 50KLS'
+ON CONFLICT (feed_type_id, effective_date) DO NOTHING;
