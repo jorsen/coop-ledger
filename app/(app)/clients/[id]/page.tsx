@@ -24,6 +24,8 @@ interface Client {
   status: string;
   heads: number;
   allocation: number;
+  date_of_hauling: string | null;
+  date_of_application: string | null;
 }
 
 interface Transaction {
@@ -206,13 +208,13 @@ export default function ClientLedgerPage() {
 
       {/* ── Client info card ─────────────────────────────────────────── */}
       <div className="bg-white border border-gray-200 rounded-xl px-6 py-5 mb-6 print:border-0 print:px-0 print:py-0 print:hidden">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-8 gap-y-4 text-sm">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-4 text-sm">
           <div>
             <p className="text-xs font-medium text-gray-400 mb-0.5">NAME</p>
             <p className="font-bold text-gray-900">{client.name}</p>
           </div>
           <div>
-            <p className="text-xs font-medium text-gray-400 mb-0.5">LOAN #</p>
+            <p className="text-xs font-medium text-gray-400 mb-0.5">BATCH #</p>
             <p className="font-semibold text-blue-600">{client.batch_number || '—'}</p>
           </div>
           <div>
@@ -220,12 +222,26 @@ export default function ClientLedgerPage() {
             <p className="font-semibold text-gray-700">{client.client_code}</p>
           </div>
           <div>
-            <p className="text-xs font-medium text-gray-400 mb-0.5"># of Heads</p>
-            <p className="font-semibold text-gray-900">{client.heads}</p>
+            <p className="text-xs font-medium text-gray-400 mb-0.5">STATUS</p>
+            <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${client.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-500'}`}>
+              {client.status.charAt(0).toUpperCase() + client.status.slice(1)}
+            </span>
           </div>
           <div>
-            <p className="text-xs font-medium text-gray-400 mb-0.5">Allocation</p>
-            <p className="font-semibold text-gray-900">{num(client.allocation)}</p>
+            <p className="text-xs font-medium text-gray-400 mb-0.5"># OF HEADS</p>
+            <p className="font-semibold text-gray-900">{client.heads || '—'}</p>
+          </div>
+          <div>
+            <p className="text-xs font-medium text-gray-400 mb-0.5">ALLOCATION</p>
+            <p className="font-semibold text-gray-900">₱{num(client.allocation)}</p>
+          </div>
+          <div>
+            <p className="text-xs font-medium text-gray-400 mb-0.5">DATE OF APPLICATION</p>
+            <p className="font-semibold text-gray-900">{client.date_of_application ? fmtDate(client.date_of_application) : '—'}</p>
+          </div>
+          <div>
+            <p className="text-xs font-medium text-gray-400 mb-0.5">DATE OF HAULING</p>
+            <p className="font-semibold text-gray-900">{client.date_of_hauling ? fmtDate(client.date_of_hauling) : '—'}</p>
           </div>
         </div>
       </div>
