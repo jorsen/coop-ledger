@@ -51,28 +51,33 @@ export async function POST(req: NextRequest) {
   const { error } = await requireAuth();
   if (error) return error;
 
-  const { client_id, date, feed_type, bags, debit, credit, notes } = await req.json();
+  const { client_id, date, feed_type, bags, debit, credit, notes, batch_id } = await req.json();
 
   if (!client_id || !date) {
     return NextResponse.json({ error: 'client_id and date are required' }, { status: 400 });
   }
 
-  // Auto-create a batch for this transaction
-  const [inserted] = await sql`
-    INSERT INTO batches (batch_number, client_id, batch_date, notes)
-    VALUES ('TMP', ${client_id}, ${date}, '')
-    RETURNING id
-  `;
-  const batchNumber = `BT-${String(inserted.id).padStart(3, '0')}`;
-  const [batch] = await sql`
-    UPDATE batches SET batch_number = ${batchNumber} WHERE id = ${inserted.id} RETURNING id
-  `;
+  let resolvedBatchId = batch_id || null;
+
+  // Auto-create a batch only when none is provided (e.g. adding from the ledger page)
+  if (!resolvedBatchId) {
+    const [inserted] = await sql`
+      INSERT INTO batches (batch_number, client_id, batch_date, notes)
+      VALUES ('TMP', ${client_id}, ${date}, '')
+      RETURNING id
+    `;
+    const batchNumber = `BT-${String(inserted.id).padStart(3, '0')}`;
+    const [batch] = await sql`
+      UPDATE batches SET batch_number = ${batchNumber} WHERE id = ${inserted.id} RETURNING id
+    `;
+    resolvedBatchId = batch.id;
+  }
 
   const [tx] = await sql`
     INSERT INTO transactions (client_id, date, feed_type, bags, debit, credit, notes, batch_id)
     VALUES (
       ${client_id}, ${date}, ${feed_type || ''}, ${bags || 0}, ${debit || 0}, ${credit || 0},
-      ${notes || ''}, ${batch.id}
+      ${notes || ''}, ${resolvedBatchId}
     )
     RETURNING *
   `;
