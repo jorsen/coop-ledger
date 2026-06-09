@@ -40,14 +40,22 @@ interface Transaction {
   batch_no: string | null;
 }
 
-const DFFS1_RATE = 0.0115;  // 1.15% per transaction
-const DFFS2_FIXED = 500;    // fixed per billing cycle
+const DFFS1_RATE = 0.0115;
+const DFFS2_FIXED = 500;
 
+// Plain number, no ₱ symbol
+const num = (n: number) =>
+  new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
+
+// With ₱ symbol (billing summary only)
 const peso = (n: number) =>
   new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(n);
 
-const fmtDate = (d: string) =>
-  new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+// M/D/YYYY  e.g. 2/23/2026
+const fmtDate = (d: string) => {
+  const [y, m, day] = d.split('-');
+  return `${parseInt(m)}/${parseInt(day)}/${y}`;
+};
 
 export default function ClientLedgerPage() {
   const { id } = useParams<{ id: string }>();
@@ -109,17 +117,15 @@ export default function ClientLedgerPage() {
   const totalBags   = transactions.reduce((s, t) => s + Number(t.bags), 0);
   const balance     = totalDebit - totalCredit;
 
-  // Per-row computed values
   const withComputed = transactions.map((tx, i) => {
     const runningBalance = transactions
       .slice(0, i + 1)
       .reduce((s, t) => s + Number(t.debit) - Number(t.credit), 0);
-    const dffs1 = Math.round(Number(tx.debit) * DFFS1_RATE * 100) / 100;
-    const interest = Math.round(dffs1 * 2 * 100) / 100;
+    const dffs1     = Math.round(Number(tx.debit) * DFFS1_RATE * 100) / 100;
+    const interest  = Math.round(dffs1 * 2 * 100) / 100;
     return { ...tx, runningBalance, dffs1, interest };
   });
 
-  // Summary totals
   const totalDffs1    = Math.round(withComputed.reduce((s, t) => s + t.dffs1, 0) * 100) / 100;
   const totalInterest = Math.round(withComputed.reduce((s, t) => s + t.interest, 0) * 100) / 100;
   const grandTotal    = balance + totalInterest + totalDffs1 + DFFS2_FIXED;
@@ -136,22 +142,26 @@ export default function ClientLedgerPage() {
 
   return (
     <div>
-      {/* Back + header */}
-      {/* Print header — only visible when printing */}
+      {/* ── Print header ─────────────────────────────────────────────── */}
       <div className="hidden print:flex print:justify-between mb-4 border-b border-gray-300 pb-3">
-        <div className="space-y-0.5 text-sm">
-          <p><span className="text-gray-500 mr-4">NAME</span><strong className="uppercase">{client.name}</strong></p>
-          <p><span className="text-gray-500 mr-4">BATCH #</span>{client.batch_number || '—'}</p>
-          <p><span className="text-gray-500 mr-4">CLIENT ID</span>{client.client_code}</p>
+        <div className="space-y-1 text-sm">
+          <p className="text-xs text-gray-500">NAME</p>
+          <p className="font-bold">{client.name}</p>
+          <p className="text-xs text-gray-500 mt-1">LOAN #</p>
+          <p className="font-semibold">{client.batch_number || '—'}</p>
+          <p className="text-xs text-gray-500 mt-1">CLIENT ID</p>
+          <p className="font-semibold">{client.client_code}</p>
         </div>
-        <div className="space-y-0.5 text-sm text-right">
-          <p><span className="text-gray-500 mr-4"># of Heads</span>{client.heads}</p>
-          <p><span className="text-gray-500 mr-4">Allocation</span>{new Intl.NumberFormat('en-PH', { minimumFractionDigits: 2 }).format(client.allocation)}</p>
-          <p className="text-xs text-gray-400">Printed: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+        <div className="space-y-1 text-sm text-right">
+          <p className="text-xs text-gray-500"># of Heads</p>
+          <p className="font-semibold">{client.heads}</p>
+          <p className="text-xs text-gray-500 mt-1">Allocation</p>
+          <p className="font-semibold">{num(client.allocation)}</p>
+          <p className="text-xs text-gray-400 mt-2">Printed: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
         </div>
       </div>
 
-      {/* Top bar: back + action buttons */}
+      {/* ── Top bar ──────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between mb-4 print:hidden">
         <button
           onClick={() => router.push('/clients')}
@@ -175,61 +185,47 @@ export default function ClientLedgerPage() {
         </div>
       </div>
 
-      {/* Client info card */}
-      <div className="bg-white border border-gray-200 rounded-xl px-6 py-4 mb-6 flex flex-col sm:flex-row sm:items-start gap-4 print:border-0 print:px-0 print:mb-4">
-        <div className="flex-1 space-y-1 text-sm">
-          <div className="flex gap-6">
-            <span className="text-gray-500 w-24 shrink-0">NAME</span>
-            <span className="font-bold text-gray-900 uppercase">{client.name}</span>
+      {/* ── Client info card ─────────────────────────────────────────── */}
+      <div className="bg-white border border-gray-200 rounded-xl px-6 py-5 mb-6 print:border-0 print:px-0 print:py-0 print:hidden">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-8 gap-y-4 text-sm">
+          <div>
+            <p className="text-xs font-medium text-gray-400 mb-0.5">NAME</p>
+            <p className="font-bold text-gray-900">{client.name}</p>
           </div>
-          <div className="flex gap-6">
-            <span className="text-gray-500 w-24 shrink-0">BATCH #</span>
-            <span className="font-semibold text-green-700">{client.batch_number || '—'}</span>
+          <div>
+            <p className="text-xs font-medium text-gray-400 mb-0.5">LOAN #</p>
+            <p className="font-semibold text-blue-600">{client.batch_number || '—'}</p>
           </div>
-          <div className="flex gap-6">
-            <span className="text-gray-500 w-24 shrink-0">CLIENT ID</span>
-            <span className="font-medium text-gray-700">{client.client_code}</span>
+          <div>
+            <p className="text-xs font-medium text-gray-400 mb-0.5">CLIENT ID</p>
+            <p className="font-semibold text-gray-700">{client.client_code}</p>
           </div>
-        </div>
-        <div className="space-y-1 text-sm sm:text-right">
-          <div className="flex sm:justify-end gap-6">
-            <span className="text-gray-500 shrink-0"># of Heads</span>
-            <span className="font-semibold text-gray-900">{client.heads}</span>
+          <div>
+            <p className="text-xs font-medium text-gray-400 mb-0.5"># of Heads</p>
+            <p className="font-semibold text-gray-900">{client.heads}</p>
           </div>
-          <div className="flex sm:justify-end gap-6">
-            <span className="text-gray-500 shrink-0">Allocation</span>
-            <span className="font-semibold text-gray-900">
-              {new Intl.NumberFormat('en-PH', { maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(client.allocation)}
-            </span>
-          </div>
-          <div className="flex sm:justify-end gap-6">
-            <span className="text-gray-500 shrink-0">Status</span>
-            <span className={`font-medium ${client.status === 'active' ? 'text-green-700' : 'text-gray-500'}`}>
-              {client.status}
-            </span>
+          <div>
+            <p className="text-xs font-medium text-gray-400 mb-0.5">Allocation</p>
+            <p className="font-semibold text-gray-900">{num(client.allocation)}</p>
           </div>
         </div>
       </div>
 
-
-      {/* Transactions table */}
+      {/* ── Transactions table ───────────────────────────────────────── */}
       <div className="bg-white rounded-xl border border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <h2 className="font-semibold text-gray-900">Transactions</h2>
-        </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-100 bg-gray-50">
-                <th className="text-left text-xs font-medium text-gray-500 px-4 py-3">Batch #</th>
-                <th className="text-left text-xs font-medium text-gray-500 px-4 py-3">Feeds</th>
-                <th className="text-left text-xs font-medium text-gray-500 px-4 py-3">TR Date</th>
-                <th className="text-right text-xs font-medium text-gray-500 px-4 py-3">No. of Bags</th>
-                <th className="text-right text-xs font-medium text-gray-500 px-4 py-3">Debit</th>
-                <th className="text-right text-xs font-medium text-gray-500 px-4 py-3">Credit</th>
-                <th className="text-right text-xs font-medium text-gray-500 px-4 py-3">Balance</th>
-                <th className="text-right text-xs font-medium text-gray-500 px-4 py-3">DFFS 1</th>
-                <th className="text-right text-xs font-medium text-gray-500 px-4 py-3">Interest</th>
+              <tr className="border-b border-gray-200 bg-gray-50">
+                <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3">FEEDS</th>
+                <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3">TR_DATE</th>
+                <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3">SALES INVOICE</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">NO.OF BAGS</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Debit</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Credit</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Balance</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">DFFS 1</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">INTEREST</th>
                 <th className="px-4 py-3 print:hidden" />
               </tr>
             </thead>
@@ -243,47 +239,38 @@ export default function ClientLedgerPage() {
               )}
               {withComputed.map((tx) => (
                 <tr key={tx.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50">
-                  <td className="px-4 py-3 text-xs font-medium text-gray-500">{tx.batch_no ?? '—'}</td>
-                  <td className="px-4 py-3 text-xs">
-                    {tx.feed_type && (
-                      <span className="inline-block bg-gray-100 text-gray-700 font-medium px-2 py-0.5 rounded">
-                        {tx.feed_type}
-                      </span>
-                    )}
+                  <td className="px-4 py-3 text-gray-800">{tx.feed_type || '—'}</td>
+                  <td className="px-4 py-3 text-blue-600 whitespace-nowrap">{fmtDate(tx.date)}</td>
+                  <td className="px-4 py-3 text-blue-600 font-medium">
+                    {tx.batch_no ? tx.batch_no.replace('BT-', '') : '—'}
                   </td>
-                  <td className="px-4 py-3 text-gray-700 whitespace-nowrap">{fmtDate(tx.date)}</td>
-                  <td className="px-4 py-3 text-gray-700 text-right">{tx.bags}</td>
-                  <td className="px-4 py-3 text-gray-900 text-right">{peso(tx.debit)}</td>
-                  <td className="px-4 py-3 text-gray-700 text-right">{Number(tx.credit) > 0 ? peso(tx.credit) : '0.00'}</td>
-                  <td className="px-4 py-3 font-semibold text-gray-900 text-right">{peso(tx.runningBalance)}</td>
+                  <td className="px-4 py-3 text-gray-700 text-right">{Number(tx.bags).toFixed(2)}</td>
+                  <td className="px-4 py-3 text-gray-900 text-right">{num(tx.debit)}</td>
+                  <td className="px-4 py-3 text-gray-700 text-right">{num(Number(tx.credit))}</td>
+                  <td className="px-4 py-3 font-semibold text-gray-900 text-right">{num(tx.runningBalance)}</td>
                   <td className="px-4 py-3 text-gray-600 text-right">{tx.dffs1.toFixed(2)}</td>
                   <td className="px-4 py-3 text-gray-600 text-right">{tx.interest.toFixed(2)}</td>
                   <td className="px-4 py-3 print:hidden">
                     <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={() => setModal({ tx })}
-                        className="p-1 text-gray-400 hover:text-gray-600"
-                      >
+                      <button onClick={() => setModal({ tx })} className="p-1 text-gray-400 hover:text-gray-600">
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
-                      <button
-                        onClick={() => handleDelete(tx.id)}
-                        className="p-1 text-red-400 hover:text-red-600"
-                      >
+                      <button onClick={() => handleDelete(tx.id)} className="p-1 text-red-400 hover:text-red-600">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </td>
                 </tr>
               ))}
+
               {/* Column totals row */}
               {withComputed.length > 0 && (
-                <tr className="border-t-2 border-gray-200 bg-gray-50 font-semibold">
-                  <td colSpan={3} className="px-4 py-3 text-xs text-gray-500" />
-                  <td className="px-4 py-3 text-right text-gray-700">{totalBags}</td>
-                  <td className="px-4 py-3 text-right text-gray-900">{peso(totalDebit)}</td>
-                  <td className="px-4 py-3 text-right text-gray-700">{totalCredit > 0 ? peso(totalCredit) : '-'}</td>
-                  <td className="px-4 py-3 text-right text-gray-900">{peso(balance)}</td>
+                <tr className="border-t-2 border-gray-300 bg-gray-50 font-semibold text-sm">
+                  <td colSpan={3} className="px-4 py-3" />
+                  <td className="px-4 py-3 text-right text-gray-700">{Number(totalBags).toFixed(2)}</td>
+                  <td className="px-4 py-3 text-right text-gray-900">{num(totalDebit)}</td>
+                  <td className="px-4 py-3 text-right text-gray-500">-</td>
+                  <td className="px-4 py-3 text-right text-gray-900">{num(balance)}</td>
                   <td className="px-4 py-3 text-right text-gray-700">{totalDffs1.toFixed(2)}</td>
                   <td className="px-4 py-3 text-right text-gray-700">{totalInterest.toFixed(2)}</td>
                   <td className="print:hidden" />
@@ -297,26 +284,26 @@ export default function ClientLedgerPage() {
         {withComputed.length > 0 && (
           <div className="border-t border-gray-200 px-6 py-4">
             <div className="flex justify-end">
-              <div className="w-64 space-y-2 text-sm">
+              <div className="w-72 space-y-1.5 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Principal</span>
-                  <span className="font-medium text-gray-900">{peso(balance)}</span>
+                  <span className="font-medium text-gray-900">{num(balance)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Interest</span>
-                  <span className="font-medium text-gray-900">{peso(totalInterest)}</span>
+                  <span className="font-medium text-gray-900">{num(totalInterest)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">DFFS 1</span>
-                  <span className="font-medium text-gray-900">{peso(totalDffs1)}</span>
+                  <span className="font-medium text-gray-900">{num(totalDffs1)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">DFFS 2</span>
-                  <span className="font-medium text-gray-900">{peso(DFFS2_FIXED)}</span>
+                  <span className="font-medium text-gray-900">{num(DFFS2_FIXED)}</span>
                 </div>
-                <div className="flex justify-between border-t border-gray-200 pt-2">
+                <div className="flex justify-between border-t border-gray-300 pt-2 mt-1">
                   <span className="font-bold text-gray-900">Total</span>
-                  <span className="font-bold text-gray-900 underline">{peso(grandTotal)}</span>
+                  <span className="font-bold text-gray-900 underline">{num(grandTotal)}</span>
                 </div>
               </div>
             </div>
@@ -324,7 +311,7 @@ export default function ClientLedgerPage() {
         )}
       </div>
 
-      {/* Batches section */}
+      {/* ── Batches section ──────────────────────────────────────────── */}
       <div className="mt-8 bg-white rounded-xl border border-gray-200 print:hidden">
         <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -352,14 +339,14 @@ export default function ClientLedgerPage() {
                   {b.batch_number}
                 </span>
                 <span className="text-sm text-gray-500 shrink-0">
-                  {new Date(b.batch_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  {fmtDate(b.batch_date)}
                 </span>
                 {b.notes && <span className="text-xs text-gray-400 truncate max-w-xs">{b.notes}</span>}
                 <div className="ml-auto flex items-center gap-3 shrink-0 text-sm text-gray-500">
                   <span>{b.transaction_count} tx</span>
                   <span>{b.total_bags} bags</span>
                   <span className="font-medium text-gray-700 hidden sm:inline">
-                    {new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(b.total_debit)}
+                    {num(b.total_debit)}
                   </span>
                   <button
                     onClick={() => router.push(`/batches/${b.id}`)}
