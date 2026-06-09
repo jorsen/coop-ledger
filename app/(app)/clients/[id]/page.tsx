@@ -116,21 +116,24 @@ export default function ClientLedgerPage() {
   const totalCredit      = transactions.reduce((s, t) => s + Number(t.credit), 0);
   const totalBags        = transactions.reduce((s, t) => s + Number(t.bags), 0);
   const totalDeliveryFee = transactions.reduce((s, t) => s + Number(t.delivery_fee ?? 0), 0);
-  const balance          = totalDebit - totalCredit;
+  // Net debit excludes delivery fee so DFFS and balance are computed on feed cost only
+  const netTotalDebit    = totalDebit - totalDeliveryFee;
+  const balance          = netTotalDebit - totalCredit;
 
   const withComputed = transactions.map((tx, i) => {
+    const deliveryFee = Number(tx.delivery_fee ?? 0);
+    const netDebit    = Number(tx.debit) - deliveryFee;
     const runningBalance = transactions
       .slice(0, i + 1)
-      .reduce((s, t) => s + Number(t.debit) - Number(t.credit), 0);
-    const d        = Number(tx.debit);
-    const dffs1    = Math.round(d * 1.15) / 100;   // debit × 1.15% — integer multiply avoids 0.0115 drift
-    const interest = Math.round(d * 2.3)  / 100;   // debit × 2.3%  — from original debit, not rounded dffs1
+      .reduce((s, t) => s + Number(t.debit) - Number(t.delivery_fee ?? 0) - Number(t.credit), 0);
+    const dffs1    = Math.round(netDebit * 1.15) / 100;
+    const interest = Math.round(netDebit * 2.3)  / 100;
     return { ...tx, runningBalance, dffs1, interest };
   });
 
-  // Totals computed from totalDebit directly for consistent rounding (matches reference)
-  const totalDffs1    = Math.round(totalDebit * 1.15) / 100;
-  const totalInterest = Math.round(totalDebit * 2.3)  / 100;
+  // Totals computed from net debit (feed cost only, delivery fee excluded)
+  const totalDffs1    = Math.round(netTotalDebit * 1.15) / 100;
+  const totalInterest = Math.round(netTotalDebit * 2.3)  / 100;
   const dffs2         = Math.floor(balance * DFFS2_RATE);   // 0.7% of principal, truncated
   const grandTotal    = balance + totalInterest + totalDffs1 + dffs2 + totalDeliveryFee;
 
@@ -273,7 +276,7 @@ export default function ClientLedgerPage() {
                   <td colSpan={2} className="px-4 py-3" />
                   <td className="px-4 py-3 text-right text-gray-700">{Number(totalBags).toFixed(2)}</td>
                   <td className="px-4 py-3" />
-                  <td className="px-4 py-3 text-right text-gray-900">{num(totalDebit)}</td>
+                  <td className="px-4 py-3 text-right text-gray-900">{num(netTotalDebit)}</td>
                   <td className="px-4 py-3 text-right text-gray-600">{num(totalDeliveryFee)}</td>
                   <td className="px-4 py-3 text-right text-gray-900">{num(balance)}</td>
                   <td className="px-4 py-3 text-right text-gray-700">{totalDffs1.toFixed(2)}</td>
@@ -291,7 +294,7 @@ export default function ClientLedgerPage() {
             <div className="flex justify-end">
               <div className="w-72 space-y-1.5 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Principal</span>
+                  <span className="text-gray-600">Principal (net)</span>
                   <span className="font-medium text-gray-900">{num(balance)}</span>
                 </div>
                 <div className="flex justify-between">
