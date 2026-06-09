@@ -217,7 +217,8 @@ export default function BatchDetailPage() {
       {modal !== null && (
         <TransactionModal
           transaction={modal.tx}
-          clients={clients}
+          clients={batch.client_id ? clients.filter((c) => c.id === batch.client_id) : clients}
+          defaultClientId={batch.client_id ?? undefined}
           defaultBatchId={batch.id}
           onClose={() => setModal(null)}
           onSave={() => { setModal(null); fetchData(); }}
