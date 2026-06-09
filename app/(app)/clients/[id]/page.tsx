@@ -220,7 +220,6 @@ export default function ClientLedgerPage() {
               <tr className="border-b border-gray-200 bg-gray-50">
                 <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3">FEEDS</th>
                 <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3">TR_DATE</th>
-                <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3">SALES INVOICE</th>
                 <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">NO.OF BAGS</th>
                 <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Debit</th>
                 <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Credit</th>
@@ -233,7 +232,7 @@ export default function ClientLedgerPage() {
             <tbody>
               {withComputed.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="text-center text-sm text-gray-400 py-10">
+                  <td colSpan={9} className="text-center text-sm text-gray-400 py-10">
                     No transactions yet.
                   </td>
                 </tr>
@@ -242,9 +241,6 @@ export default function ClientLedgerPage() {
                 <tr key={tx.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50">
                   <td className="px-4 py-3 text-gray-800">{tx.feed_type || '—'}</td>
                   <td className="px-4 py-3 text-blue-600 whitespace-nowrap">{fmtDate(tx.date)}</td>
-                  <td className="px-4 py-3 text-blue-600 font-medium">
-                    {tx.batch_no ? tx.batch_no.replace('BT-', '') : '—'}
-                  </td>
                   <td className="px-4 py-3 text-gray-700 text-right">{Number(tx.bags).toFixed(2)}</td>
                   <td className="px-4 py-3 text-gray-900 text-right">{num(tx.debit)}</td>
                   <td className="px-4 py-3 text-gray-700 text-right">{num(Number(tx.credit))}</td>
@@ -267,7 +263,7 @@ export default function ClientLedgerPage() {
               {/* Column totals row */}
               {withComputed.length > 0 && (
                 <tr className="border-t-2 border-gray-300 bg-gray-50 font-semibold text-sm">
-                  <td colSpan={3} className="px-4 py-3" />
+                  <td colSpan={2} className="px-4 py-3" />
                   <td className="px-4 py-3 text-right text-gray-700">{Number(totalBags).toFixed(2)}</td>
                   <td className="px-4 py-3 text-right text-gray-900">{num(totalDebit)}</td>
                   <td className="px-4 py-3 text-right text-gray-500">-</td>
