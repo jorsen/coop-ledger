@@ -17,7 +17,15 @@ export async function GET(req: NextRequest) {
   if (clientId) {
     transactions = await sql`
       SELECT t.*, c.name AS client_name,
-        CASE WHEN t.bags > 0 THEN ROUND(t.debit / t.bags, 2) ELSE NULL END AS price_per_bag
+        CASE WHEN t.bags > 0 THEN ROUND(t.debit / t.bags, 2) ELSE NULL END AS price_per_bag,
+        COALESCE((
+          SELECT fp.delivery_fee_per_bag
+          FROM feed_prices fp
+          JOIN feed_types ft ON ft.id = fp.feed_type_id
+          WHERE LOWER(ft.name) = LOWER(t.feed_type)
+            AND fp.effective_date <= t.date
+          ORDER BY fp.effective_date DESC LIMIT 1
+        ), 0) * t.bags AS delivery_fee
       FROM transactions t
       JOIN clients c ON c.id = t.client_id
       WHERE t.client_id = ${clientId}
@@ -26,7 +34,15 @@ export async function GET(req: NextRequest) {
   } else if (from || to || search) {
     transactions = await sql`
       SELECT t.*, c.name AS client_name,
-        CASE WHEN t.bags > 0 THEN ROUND(t.debit / t.bags, 2) ELSE NULL END AS price_per_bag
+        CASE WHEN t.bags > 0 THEN ROUND(t.debit / t.bags, 2) ELSE NULL END AS price_per_bag,
+        COALESCE((
+          SELECT fp.delivery_fee_per_bag
+          FROM feed_prices fp
+          JOIN feed_types ft ON ft.id = fp.feed_type_id
+          WHERE LOWER(ft.name) = LOWER(t.feed_type)
+            AND fp.effective_date <= t.date
+          ORDER BY fp.effective_date DESC LIMIT 1
+        ), 0) * t.bags AS delivery_fee
       FROM transactions t
       JOIN clients c ON c.id = t.client_id
       WHERE (${from}::date IS NULL OR t.date >= ${from}::date)
@@ -37,7 +53,15 @@ export async function GET(req: NextRequest) {
   } else {
     transactions = await sql`
       SELECT t.*, c.name AS client_name,
-        CASE WHEN t.bags > 0 THEN ROUND(t.debit / t.bags, 2) ELSE NULL END AS price_per_bag
+        CASE WHEN t.bags > 0 THEN ROUND(t.debit / t.bags, 2) ELSE NULL END AS price_per_bag,
+        COALESCE((
+          SELECT fp.delivery_fee_per_bag
+          FROM feed_prices fp
+          JOIN feed_types ft ON ft.id = fp.feed_type_id
+          WHERE LOWER(ft.name) = LOWER(t.feed_type)
+            AND fp.effective_date <= t.date
+          ORDER BY fp.effective_date DESC LIMIT 1
+        ), 0) * t.bags AS delivery_fee
       FROM transactions t
       JOIN clients c ON c.id = t.client_id
       ORDER BY t.date DESC, t.created_at DESC

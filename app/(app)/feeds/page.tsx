@@ -82,10 +82,11 @@ function AddPriceModal({
   onSave: () => void;
 }) {
   const today = new Date().toISOString().split('T')[0];
-  const [price, setPrice] = useState('');
-  const [date, setDate]   = useState(today);
-  const [loading, setLoading] = useState(false);
-  const [error, setError]    = useState('');
+  const [price, setPrice]       = useState('');
+  const [deliveryFee, setDeliveryFee] = useState('');
+  const [date, setDate]         = useState(today);
+  const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState('');
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -93,7 +94,12 @@ function AddPriceModal({
     const res = await fetch('/api/feed-prices', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ feed_type_id: feedType.id, price_per_bag: Number(price), effective_date: date }),
+      body: JSON.stringify({
+        feed_type_id: feedType.id,
+        price_per_bag: Number(price),
+        delivery_fee_per_bag: deliveryFee ? Number(deliveryFee) : 0,
+        effective_date: date,
+      }),
     });
     if (!res.ok) { setError((await res.json()).error); setLoading(false); return; }
     onSave();
@@ -134,6 +140,18 @@ function AddPriceModal({
                 required
               />
             </div>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Delivery Fee / Bag (₱)</label>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={deliveryFee}
+              onChange={(e) => setDeliveryFee(e.target.value)}
+              placeholder="e.g. 80"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+            />
           </div>
           <p className="text-xs text-gray-500">
             This only affects transactions on or after this date. Existing saved transactions will not change.

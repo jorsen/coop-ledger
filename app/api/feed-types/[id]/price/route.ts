@@ -11,7 +11,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   const date = req.nextUrl.searchParams.get('date') || new Date().toISOString().split('T')[0];
 
   const [row] = await sql`
-    SELECT price_per_bag, effective_date
+    SELECT price_per_bag, delivery_fee_per_bag, effective_date
     FROM feed_prices
     WHERE feed_type_id = ${params.id}
       AND effective_date <= ${date}::date

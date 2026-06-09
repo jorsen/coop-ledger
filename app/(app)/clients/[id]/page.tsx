@@ -37,6 +37,7 @@ interface Transaction {
   notes: string;
   sales_invoice: string;
   price_per_bag: number | null;
+  delivery_fee: number;
   batch_no: string | null;
 }
 
@@ -111,10 +112,11 @@ export default function ClientLedgerPage() {
     fetchData();
   }
 
-  const totalDebit  = transactions.reduce((s, t) => s + Number(t.debit), 0);
-  const totalCredit = transactions.reduce((s, t) => s + Number(t.credit), 0);
-  const totalBags   = transactions.reduce((s, t) => s + Number(t.bags), 0);
-  const balance     = totalDebit - totalCredit;
+  const totalDebit       = transactions.reduce((s, t) => s + Number(t.debit), 0);
+  const totalCredit      = transactions.reduce((s, t) => s + Number(t.credit), 0);
+  const totalBags        = transactions.reduce((s, t) => s + Number(t.bags), 0);
+  const totalDeliveryFee = transactions.reduce((s, t) => s + Number(t.delivery_fee ?? 0), 0);
+  const balance          = totalDebit - totalCredit;
 
   const withComputed = transactions.map((tx, i) => {
     const runningBalance = transactions
@@ -224,7 +226,7 @@ export default function ClientLedgerPage() {
                 <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">NO.OF BAGS</th>
                 <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Price/Bag</th>
                 <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Debit</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Credit</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Delivery Fee</th>
                 <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Balance</th>
                 <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">DFFS 1</th>
                 <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">INTEREST</th>
@@ -248,7 +250,7 @@ export default function ClientLedgerPage() {
                     {tx.price_per_bag ? num(Number(tx.price_per_bag)) : '—'}
                   </td>
                   <td className="px-4 py-3 text-gray-900 text-right">{num(tx.debit)}</td>
-                  <td className="px-4 py-3 text-gray-700 text-right">{num(Number(tx.credit))}</td>
+                  <td className="px-4 py-3 text-gray-600 text-right">{num(Number(tx.delivery_fee ?? 0))}</td>
                   <td className="px-4 py-3 font-semibold text-gray-900 text-right">{num(tx.runningBalance)}</td>
                   <td className="px-4 py-3 text-gray-600 text-right">{tx.dffs1.toFixed(2)}</td>
                   <td className="px-4 py-3 text-gray-600 text-right">{tx.interest.toFixed(2)}</td>
@@ -272,7 +274,7 @@ export default function ClientLedgerPage() {
                   <td className="px-4 py-3 text-right text-gray-700">{Number(totalBags).toFixed(2)}</td>
                   <td className="px-4 py-3" />
                   <td className="px-4 py-3 text-right text-gray-900">{num(totalDebit)}</td>
-                  <td className="px-4 py-3 text-right text-gray-500">-</td>
+                  <td className="px-4 py-3 text-right text-gray-600">{num(totalDeliveryFee)}</td>
                   <td className="px-4 py-3 text-right text-gray-900">{num(balance)}</td>
                   <td className="px-4 py-3 text-right text-gray-700">{totalDffs1.toFixed(2)}</td>
                   <td className="px-4 py-3 text-right text-gray-700">{totalInterest.toFixed(2)}</td>
