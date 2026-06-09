@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Users, FileText, Wheat, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, Wheat, Settings, LogOut, Menu, X } from 'lucide-react';
 import clsx from 'clsx';
 
 const NAV_LINKS = [
@@ -11,6 +11,7 @@ const NAV_LINKS = [
   { href: '/clients',      label: 'Caretakers',   icon: Users },
   { href: '/transactions', label: 'Transactions', icon: FileText },
   { href: '/feeds',        label: 'Feeds',        icon: Wheat },
+  { href: '/settings',     label: 'Settings',     icon: Settings },
 ];
 
 export default function Navbar() {

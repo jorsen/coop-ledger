@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
           WHERE LOWER(ft.name) = LOWER(t.feed_type)
             AND fp.effective_date <= t.date
           ORDER BY fp.effective_date DESC LIMIT 1
-        ), 0) * t.bags AS delivery_fee
+        ), (SELECT value::numeric FROM settings WHERE key = 'delivery_fee' LIMIT 1), 0) * t.bags AS delivery_fee
       FROM transactions t
       JOIN clients c ON c.id = t.client_id
       WHERE t.client_id = ${clientId}
@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
           WHERE LOWER(ft.name) = LOWER(t.feed_type)
             AND fp.effective_date <= t.date
           ORDER BY fp.effective_date DESC LIMIT 1
-        ), 0) * t.bags AS delivery_fee
+        ), (SELECT value::numeric FROM settings WHERE key = 'delivery_fee' LIMIT 1), 0) * t.bags AS delivery_fee
       FROM transactions t
       JOIN clients c ON c.id = t.client_id
       WHERE (${from}::date IS NULL OR t.date >= ${from}::date)
@@ -61,7 +61,7 @@ export async function GET(req: NextRequest) {
           WHERE LOWER(ft.name) = LOWER(t.feed_type)
             AND fp.effective_date <= t.date
           ORDER BY fp.effective_date DESC LIMIT 1
-        ), 0) * t.bags AS delivery_fee
+        ), (SELECT value::numeric FROM settings WHERE key = 'delivery_fee' LIMIT 1), 0) * t.bags AS delivery_fee
       FROM transactions t
       JOIN clients c ON c.id = t.client_id
       ORDER BY t.date DESC, t.created_at DESC

@@ -75,6 +75,12 @@ CREATE TABLE IF NOT EXISTS feed_prices (
 -- Add delivery_fee_per_bag to existing DBs
 ALTER TABLE feed_prices ADD COLUMN IF NOT EXISTS delivery_fee_per_bag DECIMAL(12,2) NOT NULL DEFAULT 0;
 
+-- App-wide settings (key-value)
+CREATE TABLE IF NOT EXISTS settings (
+  key   TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);
+
 -- Seed feed types
 INSERT INTO feed_types (name) VALUES
   ('STARTER LUNTIAN 50KLS'),
