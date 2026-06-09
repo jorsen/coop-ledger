@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
   if (error) return error;
 
   try {
-    const { batch_date, notes, client_id } = await req.json();
+    const { batch_date, notes, client_id, batch_number } = await req.json();
 
     const [inserted] = await sql`
       INSERT INTO batches (batch_number, client_id, batch_date, notes)
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
       RETURNING id
     `;
 
-    const batchNumber = `BT-${String(inserted.id).padStart(3, '0')}`;
+    const batchNumber = batch_number?.trim() || `BT-${String(inserted.id).padStart(3, '0')}`;
     const [batch] = await sql`
       UPDATE batches SET batch_number = ${batchNumber} WHERE id = ${inserted.id} RETURNING *
     `;

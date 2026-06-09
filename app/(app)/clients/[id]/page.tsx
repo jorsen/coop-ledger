@@ -66,8 +66,11 @@ export default function ClientLedgerPage() {
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<{ tx?: Transaction } | null>(null);
   const [batchModal, setBatchModal] = useState(false);
-  const [batchForm, setBatchForm] = useState({ batch_date: new Date().toISOString().split('T')[0], notes: '' });
+  const [batchForm, setBatchForm] = useState({ batch_number: '', batch_date: '', notes: '' });
   const [savingBatch, setSavingBatch] = useState(false);
+  const [editBatch, setEditBatch] = useState<Batch | null>(null);
+  const [editBatchForm, setEditBatchForm] = useState({ batch_number: '', batch_date: '', notes: '' });
+  const [savingEditBatch, setSavingEditBatch] = useState(false);
 
   const fetchData = useCallback(async () => {
     const [clientRes, batchRes] = await Promise.all([
@@ -96,7 +99,20 @@ export default function ClientLedgerPage() {
     });
     setSavingBatch(false);
     setBatchModal(false);
-    setBatchForm({ batch_date: new Date().toISOString().split('T')[0], notes: '' });
+    setBatchForm({ batch_number: '', batch_date: '', notes: '' });
+    fetchData();
+  }
+
+  async function handleUpdateBatch() {
+    if (!editBatch) return;
+    setSavingEditBatch(true);
+    await fetch(`/api/batches/${editBatch.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(editBatchForm),
+    });
+    setSavingEditBatch(false);
+    setEditBatch(null);
     fetchData();
   }
 
@@ -363,6 +379,12 @@ export default function ClientLedgerPage() {
                     <Eye className="w-3.5 h-3.5" /> View
                   </button>
                   <button
+                    onClick={() => { setEditBatch(b); setEditBatchForm({ batch_number: b.batch_number, batch_date: b.batch_date, notes: b.notes }); }}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </button>
+                  <button
                     onClick={() => handleDeleteBatch(b.id)}
                     className="text-red-400 hover:text-red-600"
                   >
@@ -395,12 +417,22 @@ export default function ClientLedgerPage() {
             </div>
             <div className="p-6 space-y-4">
               <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Batch Number</label>
+                <input
+                  value={batchForm.batch_number}
+                  onChange={(e) => setBatchForm((f) => ({ ...f, batch_number: e.target.value }))}
+                  placeholder="Auto-generated if empty"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                />
+              </div>
+              <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Batch Date *</label>
                 <input
                   type="date"
                   value={batchForm.batch_date}
                   onChange={(e) => setBatchForm((f) => ({ ...f, batch_date: e.target.value }))}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                  required
                 />
               </div>
               <div>
@@ -426,6 +458,65 @@ export default function ClientLedgerPage() {
                   className="flex-1 bg-green-800 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50"
                 >
                   {savingBatch ? 'Creating…' : 'Create Batch'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Batch Modal */}
+      {editBatch && (
+        <div className="fixed inset-0 bg-black/40 flex items-start justify-center z-50 p-4 pt-16">
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-sm">
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+              <h2 className="text-base font-semibold text-gray-900">Edit Batch</h2>
+              <button onClick={() => setEditBatch(null)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Batch Number *</label>
+                <input
+                  value={editBatchForm.batch_number}
+                  onChange={(e) => setEditBatchForm((f) => ({ ...f, batch_number: e.target.value }))}
+                  placeholder="e.g. BT-001"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Batch Date *</label>
+                <input
+                  type="date"
+                  value={editBatchForm.batch_date}
+                  onChange={(e) => setEditBatchForm((f) => ({ ...f, batch_date: e.target.value }))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Notes</label>
+                <textarea
+                  value={editBatchForm.notes}
+                  onChange={(e) => setEditBatchForm((f) => ({ ...f, notes: e.target.value }))}
+                  rows={2}
+                  placeholder="Optional description…"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 resize-none"
+                />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setEditBatch(null)}
+                  className="flex-1 border border-gray-300 text-gray-700 py-2 rounded-lg text-sm font-medium hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpdateBatch}
+                  disabled={savingEditBatch}
+                  className="flex-1 bg-green-800 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50"
+                >
+                  {savingEditBatch ? 'Saving…' : 'Save Changes'}
                 </button>
               </div>
             </div>

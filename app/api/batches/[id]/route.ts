@@ -21,6 +21,25 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
   return NextResponse.json({ ...batch, transactions });
 }
 
+export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+  const { error } = await requireAuth();
+  if (error) return error;
+
+  const { batch_number, batch_date, notes } = await req.json();
+
+  const [updated] = await sql`
+    UPDATE batches
+    SET batch_number = ${batch_number},
+        batch_date   = ${batch_date},
+        notes        = ${notes || ''}
+    WHERE id = ${params.id}
+    RETURNING *
+  `;
+
+  if (!updated) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  return NextResponse.json(updated);
+}
+
 export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
   const { error } = await requireAuth();
   if (error) return error;
