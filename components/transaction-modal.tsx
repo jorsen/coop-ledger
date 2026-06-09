@@ -15,12 +15,15 @@ interface Transaction {
   debit: number;
   credit: number;
   notes: string;
+  sales_invoice: string;
+  batch_id?: number | null;
 }
 
 interface TransactionModalProps {
   transaction?: Transaction;
   clients: Client[];
   defaultClientId?: number;
+  defaultBatchId?: number;
   onClose: () => void;
   onSave: () => void;
 }
@@ -33,6 +36,8 @@ const EMPTY: Transaction = {
   debit: 0,
   credit: 0,
   notes: '',
+  sales_invoice: '',
+  batch_id: null,
 };
 
 const peso = (n: number) =>
@@ -42,11 +47,12 @@ export default function TransactionModal({
   transaction,
   clients,
   defaultClientId,
+  defaultBatchId,
   onClose,
   onSave,
 }: TransactionModalProps) {
   const [form, setForm] = useState<Transaction>(() =>
-    transaction ? transaction : { ...EMPTY, client_id: defaultClientId ?? '' }
+    transaction ? transaction : { ...EMPTY, client_id: defaultClientId ?? '', batch_id: defaultBatchId ?? null }
   );
   const [feedTypes, setFeedTypes] = useState<FeedType[]>([]);
   const [pricePerBag, setPricePerBag] = useState<number | null>(null);
@@ -60,8 +66,8 @@ export default function TransactionModal({
 
   useEffect(() => {
     if (transaction) setForm(transaction);
-    else setForm({ ...EMPTY, client_id: defaultClientId ?? '' });
-  }, [transaction, defaultClientId]);
+    else setForm({ ...EMPTY, client_id: defaultClientId ?? '', batch_id: defaultBatchId ?? null });
+  }, [transaction, defaultClientId, defaultBatchId]);
 
   // Look up effective price whenever feed type or date changes
   const fetchPrice = useCallback(async (feedTypeName: string, date: string) => {
@@ -223,6 +229,18 @@ export default function TransactionModal({
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
               />
             </div>
+          </div>
+
+          {/* Sales Invoice */}
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Sales Invoice #</label>
+            <input
+              type="text"
+              value={form.sales_invoice}
+              onChange={(e) => set('sales_invoice', e.target.value)}
+              placeholder="e.g. 297438"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+            />
           </div>
 
           {/* Notes */}

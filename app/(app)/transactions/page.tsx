@@ -17,6 +17,7 @@ interface Transaction {
   debit: number;
   credit: number;
   notes: string;
+  sales_invoice: string;
   price_per_bag: number | null;
 }
 

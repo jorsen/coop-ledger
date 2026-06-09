@@ -51,15 +51,18 @@ export async function POST(req: NextRequest) {
   const { error } = await requireAuth();
   if (error) return error;
 
-  const { client_id, date, feed_type, bags, debit, credit, notes } = await req.json();
+  const { client_id, date, feed_type, bags, debit, credit, notes, batch_id, sales_invoice } = await req.json();
 
   if (!client_id || !date) {
     return NextResponse.json({ error: 'client_id and date are required' }, { status: 400 });
   }
 
   const [tx] = await sql`
-    INSERT INTO transactions (client_id, date, feed_type, bags, debit, credit, notes)
-    VALUES (${client_id}, ${date}, ${feed_type || ''}, ${bags || 0}, ${debit || 0}, ${credit || 0}, ${notes || ''})
+    INSERT INTO transactions (client_id, date, feed_type, bags, debit, credit, notes, batch_id, sales_invoice)
+    VALUES (
+      ${client_id}, ${date}, ${feed_type || ''}, ${bags || 0}, ${debit || 0}, ${credit || 0},
+      ${notes || ''}, ${batch_id || null}, ${sales_invoice || ''}
+    )
     RETURNING *
   `;
 

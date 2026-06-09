@@ -6,18 +6,20 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   const { error } = await requireAuth();
   if (error) return error;
 
-  const { client_id, date, feed_type, bags, debit, credit, notes } = await req.json();
+  const { client_id, date, feed_type, bags, debit, credit, notes, batch_id, sales_invoice } = await req.json();
 
   const [updated] = await sql`
     UPDATE transactions
     SET
-      client_id = ${client_id},
-      date      = ${date},
-      feed_type = ${feed_type},
-      bags      = ${bags},
-      debit     = ${debit},
-      credit    = ${credit},
-      notes     = ${notes}
+      client_id     = ${client_id},
+      date          = ${date},
+      feed_type     = ${feed_type},
+      bags          = ${bags},
+      debit         = ${debit},
+      credit        = ${credit},
+      notes         = ${notes},
+      batch_id      = ${batch_id || null},
+      sales_invoice = ${sales_invoice || ''}
     WHERE id = ${params.id}
     RETURNING *
   `;

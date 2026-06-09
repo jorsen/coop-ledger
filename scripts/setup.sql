@@ -14,16 +14,32 @@ CREATE TABLE IF NOT EXISTS clients (
 );
 
 CREATE TABLE IF NOT EXISTS transactions (
-  id          SERIAL PRIMARY KEY,
-  client_id   INTEGER        NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
-  date        DATE           NOT NULL,
-  feed_type   VARCHAR(100)   DEFAULT '',
-  bags        INTEGER        DEFAULT 0,
-  debit       DECIMAL(12,2)  DEFAULT 0,
-  credit      DECIMAL(12,2)  DEFAULT 0,
-  notes       TEXT           DEFAULT '',
-  created_at  TIMESTAMPTZ    DEFAULT NOW()
+  id             SERIAL PRIMARY KEY,
+  client_id      INTEGER        NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+  date           DATE           NOT NULL,
+  feed_type      VARCHAR(100)   DEFAULT '',
+  bags           INTEGER        DEFAULT 0,
+  debit          DECIMAL(12,2)  DEFAULT 0,
+  credit         DECIMAL(12,2)  DEFAULT 0,
+  notes          TEXT           DEFAULT '',
+  sales_invoice  VARCHAR(50)    DEFAULT '',
+  created_at     TIMESTAMPTZ    DEFAULT NOW()
 );
+
+-- Add sales_invoice to existing tables if running on an existing DB
+ALTER TABLE transactions ADD COLUMN IF NOT EXISTS sales_invoice VARCHAR(50) DEFAULT '';
+
+-- Batch groups — a batch groups a set of transactions (e.g. one delivery run)
+CREATE TABLE IF NOT EXISTS batches (
+  id           SERIAL PRIMARY KEY,
+  batch_number VARCHAR(20)  UNIQUE NOT NULL,
+  batch_date   DATE         NOT NULL DEFAULT CURRENT_DATE,
+  notes        TEXT         DEFAULT '',
+  created_at   TIMESTAMPTZ  DEFAULT NOW()
+);
+
+-- Add batch_id to transactions (nullable — existing rows stay unassigned)
+ALTER TABLE transactions ADD COLUMN IF NOT EXISTS batch_id INTEGER REFERENCES batches(id) ON DELETE SET NULL;
 
 -- Feed types and price history
 -- Prices are time-based: changing a price does NOT affect saved transaction debits.

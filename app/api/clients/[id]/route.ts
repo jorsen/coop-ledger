@@ -14,7 +14,7 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
       CASE WHEN bags > 0 THEN ROUND(debit / bags, 2) ELSE NULL END AS price_per_bag
     FROM transactions
     WHERE client_id = ${params.id}
-    ORDER BY date DESC, created_at DESC
+    ORDER BY date ASC, created_at ASC
   `;
 
   return NextResponse.json({ ...client, transactions });
