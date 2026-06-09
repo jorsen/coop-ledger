@@ -138,36 +138,28 @@ export default function ClientLedgerPage() {
     <div>
       {/* Back + header */}
       {/* Print header — only visible when printing */}
-      <div className="hidden print:block mb-6 border-b border-gray-300 pb-4">
-        <p className="text-lg font-bold">Feed Cooperative — Client Ledger</p>
-        <p className="text-sm mt-1">Client: <strong>{client.name}</strong> &nbsp;|&nbsp; ID: {client.client_code} &nbsp;|&nbsp; Batch #{client.batch_number}</p>
-        <p className="text-sm">Heads: {client.heads} &nbsp;|&nbsp; Allocation: {peso(client.allocation)} &nbsp;|&nbsp; Printed: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+      <div className="hidden print:flex print:justify-between mb-4 border-b border-gray-300 pb-3">
+        <div className="space-y-0.5 text-sm">
+          <p><span className="text-gray-500 mr-4">NAME</span><strong className="uppercase">{client.name}</strong></p>
+          <p><span className="text-gray-500 mr-4">BATCH #</span>{client.batch_number || '—'}</p>
+          <p><span className="text-gray-500 mr-4">CLIENT ID</span>{client.client_code}</p>
+        </div>
+        <div className="space-y-0.5 text-sm text-right">
+          <p><span className="text-gray-500 mr-4"># of Heads</span>{client.heads}</p>
+          <p><span className="text-gray-500 mr-4">Allocation</span>{new Intl.NumberFormat('en-PH', { minimumFractionDigits: 2 }).format(client.allocation)}</p>
+          <p className="text-xs text-gray-400">Printed: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+        </div>
       </div>
 
-      <button
-        onClick={() => router.push('/clients')}
-        className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-4 print:hidden"
-      >
-        <ArrowLeft className="w-4 h-4" /> Back to Caretakers
-      </button>
-
-      <div className="flex flex-col sm:flex-row sm:items-start gap-4 mb-6 print:hidden">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-semibold text-gray-900">{client.name}</h1>
-            <span
-              className={`text-xs font-medium px-2 py-0.5 rounded ${
-                client.status === 'active' ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'
-              }`}
-            >
-              {client.status}
-            </span>
-          </div>
-          <p className="text-sm text-gray-500 mt-0.5">
-            ID: {client.client_code} · Batch #{client.batch_number} · {client.heads} heads · Allocation: {peso(client.allocation)}
-          </p>
-        </div>
-        <div className="flex items-center gap-2 sm:ml-auto">
+      {/* Top bar: back + action buttons */}
+      <div className="flex items-center justify-between mb-4 print:hidden">
+        <button
+          onClick={() => router.push('/clients')}
+          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700"
+        >
+          <ArrowLeft className="w-4 h-4" /> Back to Caretakers
+        </button>
+        <div className="flex items-center gap-2">
           <button
             onClick={() => window.print()}
             className="flex items-center gap-2 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50"
@@ -178,26 +170,47 @@ export default function ClientLedgerPage() {
             onClick={() => setModal({})}
             className="flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700"
           >
-            <Plus className="w-4 h-4" />
-            Add Transaction
+            <Plus className="w-4 h-4" /> Add Transaction
           </button>
         </div>
       </div>
 
-      {/* Summary cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {[
-          { label: 'Total Sales',  value: peso(totalDebit),  color: 'text-gray-900' },
-          { label: 'Total Credit', value: peso(totalCredit), color: 'text-green-600' },
-          { label: 'Balance',      value: peso(balance),     color: balance > 0 ? 'text-red-600' : 'text-green-600' },
-          { label: 'Total Bags',   value: totalBags,         color: 'text-gray-900' },
-        ].map((item) => (
-          <div key={item.label} className="bg-white rounded-xl border border-gray-200 p-4">
-            <p className="text-xs text-gray-500 mb-1">{item.label}</p>
-            <p className={`text-lg font-semibold ${item.color}`}>{item.value}</p>
+      {/* Client info card */}
+      <div className="bg-white border border-gray-200 rounded-xl px-6 py-4 mb-6 flex flex-col sm:flex-row sm:items-start gap-4 print:border-0 print:px-0 print:mb-4">
+        <div className="flex-1 space-y-1 text-sm">
+          <div className="flex gap-6">
+            <span className="text-gray-500 w-24 shrink-0">NAME</span>
+            <span className="font-bold text-gray-900 uppercase">{client.name}</span>
           </div>
-        ))}
+          <div className="flex gap-6">
+            <span className="text-gray-500 w-24 shrink-0">BATCH #</span>
+            <span className="font-semibold text-green-700">{client.batch_number || '—'}</span>
+          </div>
+          <div className="flex gap-6">
+            <span className="text-gray-500 w-24 shrink-0">CLIENT ID</span>
+            <span className="font-medium text-gray-700">{client.client_code}</span>
+          </div>
+        </div>
+        <div className="space-y-1 text-sm sm:text-right">
+          <div className="flex sm:justify-end gap-6">
+            <span className="text-gray-500 shrink-0"># of Heads</span>
+            <span className="font-semibold text-gray-900">{client.heads}</span>
+          </div>
+          <div className="flex sm:justify-end gap-6">
+            <span className="text-gray-500 shrink-0">Allocation</span>
+            <span className="font-semibold text-gray-900">
+              {new Intl.NumberFormat('en-PH', { maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(client.allocation)}
+            </span>
+          </div>
+          <div className="flex sm:justify-end gap-6">
+            <span className="text-gray-500 shrink-0">Status</span>
+            <span className={`font-medium ${client.status === 'active' ? 'text-green-700' : 'text-gray-500'}`}>
+              {client.status}
+            </span>
+          </div>
+        </div>
       </div>
+
 
       {/* Transactions table */}
       <div className="bg-white rounded-xl border border-gray-200">
