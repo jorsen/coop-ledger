@@ -62,14 +62,15 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
       });
 
       if (!res.ok) {
-        const data = await res.json();
-        setError(data.error ?? 'Something went wrong');
+        let msg = 'Something went wrong';
+        try { const d = await res.json(); msg = d.error ?? msg; } catch {}
+        setError(msg);
         return;
       }
 
       onSave();
-    } catch {
-      setError('Network error. Please try again.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Network error. Please try again.');
     } finally {
       setLoading(false);
     }

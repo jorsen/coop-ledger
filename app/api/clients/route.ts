@@ -29,6 +29,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'name is required' }, { status: 400 });
   }
 
+  // Ensure new columns exist (safe on Neon — idempotent)
+  await sql`ALTER TABLE clients ADD COLUMN IF NOT EXISTS date_of_hauling DATE`;
+  await sql`ALTER TABLE clients ADD COLUMN IF NOT EXISTS date_of_application DATE`;
+
   // Insert with a temporary code, then update to the zero-padded id
   const [inserted] = await sql`
     INSERT INTO clients (client_code, name, batch_number, status, heads, allocation, date_of_hauling, date_of_application)

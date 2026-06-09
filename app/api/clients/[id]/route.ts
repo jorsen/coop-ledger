@@ -36,6 +36,9 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
   const { client_code, name, batch_number, status, heads, allocation, date_of_hauling, date_of_application } = await req.json();
 
+  await sql`ALTER TABLE clients ADD COLUMN IF NOT EXISTS date_of_hauling DATE`;
+  await sql`ALTER TABLE clients ADD COLUMN IF NOT EXISTS date_of_application DATE`;
+
   const [updated] = await sql`
     UPDATE clients
     SET
