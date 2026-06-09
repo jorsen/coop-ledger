@@ -12,7 +12,15 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
   const transactions = await sql`
     SELECT t.*,
       CASE WHEN t.bags > 0 THEN ROUND(t.debit / t.bags, 2) ELSE NULL END AS price_per_bag,
-      b.batch_number AS batch_no
+      b.batch_number AS batch_no,
+      COALESCE((
+        SELECT fp.delivery_fee_per_bag
+        FROM feed_prices fp
+        JOIN feed_types ft ON ft.id = fp.feed_type_id
+        WHERE LOWER(ft.name) = LOWER(t.feed_type)
+          AND fp.effective_date <= t.date
+        ORDER BY fp.effective_date DESC LIMIT 1
+      ), (SELECT value::numeric FROM settings WHERE key = 'delivery_fee' LIMIT 1), 0) * t.bags AS delivery_fee
     FROM transactions t
     LEFT JOIN batches b ON b.id = t.batch_id
     WHERE t.client_id = ${params.id}
