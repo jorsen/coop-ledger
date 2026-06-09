@@ -89,88 +89,96 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          {mode === 'edit' && (
+          {/* Batch # + Client ID (edit only) */}
+          <div className="grid grid-cols-2 gap-5">
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1.5">Client ID</label>
+              <label className="block text-xs font-medium text-gray-700 mb-2">Batch #</label>
               <input
-                value={form.client_code}
-                onChange={(e) => set('client_code', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                value={form.batch_number}
+                onChange={(e) => set('batch_number', e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                placeholder="e.g. 1"
               />
             </div>
-          )}
-
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1.5">Batch #</label>
-            <input
-              value={form.batch_number}
-              onChange={(e) => set('batch_number', e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-              placeholder="e.g. 1"
-            />
+            {mode === 'edit' ? (
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-2">Client ID</label>
+                <input
+                  value={form.client_code}
+                  onChange={(e) => set('client_code', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                />
+              </div>
+            ) : <div />}
           </div>
 
+          {/* Full Name — full width */}
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1.5">Full Name *</label>
+            <label className="block text-xs font-medium text-gray-700 mb-2">Full Name *</label>
             <input
               value={form.name}
               onChange={(e) => set('name', e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+              className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
               placeholder="e.g. Dela Cruz, Juan M."
               required
             />
           </div>
 
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1.5">Heads</label>
-            <input
-              type="text"
-              inputMode="numeric"
-              value={form.heads}
-              onChange={(e) => set('heads', e.target.value)}
-              placeholder="0"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-            />
+          {/* Heads + Allocation */}
+          <div className="grid grid-cols-2 gap-5">
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-2">Heads</label>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={form.heads}
+                onChange={(e) => set('heads', e.target.value)}
+                placeholder="0"
+                className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-2">Allocation (₱)</label>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={form.allocation}
+                onChange={(e) => set('allocation', e.target.value)}
+                placeholder="0"
+                className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+              />
+            </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1.5">Allocation (₱)</label>
-            <input
-              type="text"
-              inputMode="numeric"
-              value={form.allocation}
-              onChange={(e) => set('allocation', e.target.value)}
-              placeholder="0"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-            />
+          {/* Date of Application + Date of Hauling */}
+          <div className="grid grid-cols-2 gap-5">
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-2">Date of Application</label>
+              <input
+                type="date"
+                value={form.date_of_application}
+                onChange={(e) => set('date_of_application', e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-2">Date of Hauling</label>
+              <input
+                type="date"
+                value={form.date_of_hauling}
+                onChange={(e) => set('date_of_hauling', e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+              />
+            </div>
           </div>
 
+          {/* Status — full width */}
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1.5">Date of Application</label>
-            <input
-              type="date"
-              value={form.date_of_application}
-              onChange={(e) => set('date_of_application', e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1.5">Date of Hauling</label>
-            <input
-              type="date"
-              value={form.date_of_hauling}
-              onChange={(e) => set('date_of_hauling', e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1.5">Status</label>
+            <label className="block text-xs font-medium text-gray-700 mb-2">Status</label>
             <select
               value={form.status}
               onChange={(e) => set('status', e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+              className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
             >
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
