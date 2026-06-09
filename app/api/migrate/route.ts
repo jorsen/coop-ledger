@@ -17,6 +17,11 @@ export async function GET() {
   `;
 
   await sql`
+    INSERT INTO settings (key, value) VALUES ('delivery_fee', '80')
+    ON CONFLICT (key) DO NOTHING
+  `;
+
+  await sql`
     INSERT INTO feed_prices (feed_type_id, price_per_bag, delivery_fee_per_bag, effective_date)
     SELECT id, 1625, 70, '2026-01-01'::date FROM feed_types WHERE name = 'STARTER LUNTIAN 50KLS'  UNION ALL
     SELECT id, 1595, 70, '2026-01-01'::date FROM feed_types WHERE name = 'STARGROW LUNTIAN 50KLS' UNION ALL

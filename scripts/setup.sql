@@ -81,6 +81,10 @@ CREATE TABLE IF NOT EXISTS settings (
   value TEXT NOT NULL
 );
 
+-- Default delivery fee (used when no feed-type specific fee is set)
+INSERT INTO settings (key, value) VALUES ('delivery_fee', '80')
+ON CONFLICT (key) DO NOTHING;
+
 -- Seed feed types
 INSERT INTO feed_types (name) VALUES
   ('STARTER LUNTIAN 50KLS'),

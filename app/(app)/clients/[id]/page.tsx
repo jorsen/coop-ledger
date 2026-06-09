@@ -132,7 +132,7 @@ export default function ClientLedgerPage() {
   const totalDffs1    = Math.round(totalDebit * 1.15) / 100;
   const totalInterest = Math.round(totalDebit * 2.3)  / 100;
   const dffs2         = Math.floor(balance * DFFS2_RATE);   // 0.7% of principal, truncated
-  const grandTotal    = balance + totalInterest + totalDffs1 + dffs2;
+  const grandTotal    = balance + totalInterest + totalDffs1 + dffs2 + totalDeliveryFee;
 
   if (loading) {
     return (
@@ -305,6 +305,10 @@ export default function ClientLedgerPage() {
                 <div className="flex justify-between">
                   <span className="text-gray-600">DFFS 2</span>
                   <span className="font-medium text-gray-900">{num(dffs2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Delivery Fee</span>
+                  <span className="font-medium text-gray-900">{num(totalDeliveryFee)}</span>
                 </div>
                 <div className="flex justify-between border-t border-gray-300 pt-2 mt-1">
                   <span className="font-bold text-gray-900">Total</span>
