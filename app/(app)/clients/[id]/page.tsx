@@ -40,7 +40,6 @@ interface Transaction {
   batch_no: string | null;
 }
 
-const DFFS1_RATE = 0.0115;
 const DFFS2_FIXED = 500;
 
 // Plain number, no ₱ symbol
@@ -121,13 +120,15 @@ export default function ClientLedgerPage() {
     const runningBalance = transactions
       .slice(0, i + 1)
       .reduce((s, t) => s + Number(t.debit) - Number(t.credit), 0);
-    const dffs1     = Math.round(Number(tx.debit) * DFFS1_RATE * 100) / 100;
-    const interest  = Math.round(dffs1 * 2 * 100) / 100;
+    const d        = Number(tx.debit);
+    const dffs1    = Math.round(d * 1.15) / 100;   // debit × 1.15% — integer multiply avoids 0.0115 drift
+    const interest = Math.round(d * 2.3)  / 100;   // debit × 2.3%  — from original debit, not rounded dffs1
     return { ...tx, runningBalance, dffs1, interest };
   });
 
-  const totalDffs1    = Math.round(withComputed.reduce((s, t) => s + t.dffs1, 0) * 100) / 100;
-  const totalInterest = Math.round(withComputed.reduce((s, t) => s + t.interest, 0) * 100) / 100;
+  // Totals computed from totalDebit directly for consistent rounding (matches reference)
+  const totalDffs1    = Math.round(totalDebit * 1.15) / 100;
+  const totalInterest = Math.round(totalDebit * 2.3)  / 100;
   const grandTotal    = balance + totalInterest + totalDffs1 + DFFS2_FIXED;
 
   if (loading) {
