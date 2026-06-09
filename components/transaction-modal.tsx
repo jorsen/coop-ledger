@@ -135,8 +135,8 @@ export default function TransactionModal({
   const autoDebit = pricePerBag !== null && Number(form.bags) > 0 ? Number(form.bags) * pricePerBag : null;
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-md">
+    <div className="fixed inset-0 bg-black/40 flex items-start justify-center z-50 p-4 pt-12 overflow-y-auto">
+      <div className="bg-white rounded-xl shadow-lg w-full max-w-md my-auto">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <h2 className="text-base font-semibold text-gray-900">
             {transaction ? 'Edit Transaction' : 'Add Transaction'}

@@ -44,7 +44,7 @@ function AddFeedTypeModal({ onClose, onSave }: { onClose: () => void; onSave: ()
   }
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/40 flex items-start justify-center z-50 p-4 pt-16">
       <div className="bg-white rounded-xl shadow-lg w-full max-w-sm">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <h2 className="text-base font-semibold text-gray-900">Add Feed Type</h2>
@@ -100,7 +100,7 @@ function AddPriceModal({ feedType, onClose, onSave }: { feedType: FeedType; onCl
   }
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/40 flex items-start justify-center z-50 p-4 pt-16">
       <div className="bg-white rounded-xl shadow-lg w-full max-w-sm">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <div>
