@@ -121,13 +121,28 @@ export default function BatchDetailPage() {
         <p className="text-xs text-gray-400 mt-2">Printed: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
       </div>
 
-      <button
-        onClick={() => batch.client_id ? router.push(`/clients/${batch.client_id}`) : router.push('/clients')}
-        className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-4 print:hidden"
-      >
-        <ArrowLeft className="w-4 h-4" /> Back to Caretaker
-      </button>
-
+      <div className="flex items-center justify-between mb-4 print:hidden">
+        <button
+          onClick={() => batch.client_id ? router.push(`/clients/${batch.client_id}`) : router.push('/clients')}
+          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700"
+        >
+          <ArrowLeft className="w-4 h-4" /> Back to Caretaker
+        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => window.print()}
+            className="flex items-center gap-2 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50"
+          >
+            <Printer className="w-4 h-4" /> Print
+          </button>
+          <button
+            onClick={() => setModal({})}
+            className="flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700"
+          >
+            <Plus className="w-4 h-4" /> Add Transaction
+          </button>
+        </div>
+      </div>
 
       {batch.client_name && (
         <div className="bg-white rounded-xl border border-gray-200 px-6 py-5 mb-4 text-sm">
@@ -168,25 +183,7 @@ export default function BatchDetailPage() {
         </div>
       )}
 
-      <div className="flex items-start justify-between mb-6 print:hidden">
-        <div>
-          {batch.notes && <p className="text-sm text-gray-500">{batch.notes}</p>}
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => window.print()}
-            className="flex items-center gap-2 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50"
-          >
-            <Printer className="w-4 h-4" /> Print
-          </button>
-          <button
-            onClick={() => setModal({})}
-            className="flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700"
-          >
-            <Plus className="w-4 h-4" /> Add Transaction
-          </button>
-        </div>
-      </div>
+      {batch.notes && <p className="text-sm text-gray-500 mb-4">{batch.notes}</p>}
 
       {/* Transactions table */}
       <div className="bg-white rounded-xl border border-gray-200">
