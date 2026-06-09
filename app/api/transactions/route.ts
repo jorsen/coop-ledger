@@ -16,7 +16,8 @@ export async function GET(req: NextRequest) {
 
   if (clientId) {
     transactions = await sql`
-      SELECT t.*, c.name AS client_name
+      SELECT t.*, c.name AS client_name,
+        CASE WHEN t.bags > 0 THEN ROUND(t.debit / t.bags, 2) ELSE NULL END AS price_per_bag
       FROM transactions t
       JOIN clients c ON c.id = t.client_id
       WHERE t.client_id = ${clientId}
@@ -24,7 +25,8 @@ export async function GET(req: NextRequest) {
     `;
   } else if (from || to || search) {
     transactions = await sql`
-      SELECT t.*, c.name AS client_name
+      SELECT t.*, c.name AS client_name,
+        CASE WHEN t.bags > 0 THEN ROUND(t.debit / t.bags, 2) ELSE NULL END AS price_per_bag
       FROM transactions t
       JOIN clients c ON c.id = t.client_id
       WHERE (${from}::date IS NULL OR t.date >= ${from}::date)
@@ -34,7 +36,8 @@ export async function GET(req: NextRequest) {
     `;
   } else {
     transactions = await sql`
-      SELECT t.*, c.name AS client_name
+      SELECT t.*, c.name AS client_name,
+        CASE WHEN t.bags > 0 THEN ROUND(t.debit / t.bags, 2) ELSE NULL END AS price_per_bag
       FROM transactions t
       JOIN clients c ON c.id = t.client_id
       ORDER BY t.date DESC, t.created_at DESC

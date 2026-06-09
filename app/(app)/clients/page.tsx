@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus, Eye, Pencil, Trash2, Search } from 'lucide-react';
 import ClientModal from '@/components/client-modal';
+import { usePoll } from '@/hooks/use-poll';
 
 interface Client {
   id: number;
@@ -27,13 +28,14 @@ export default function ClientsPage() {
   const [modal, setModal] = useState<{ mode: 'add' | 'edit'; client?: Client } | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
-  async function fetchClients() {
+  const fetchClients = useCallback(async () => {
     const res = await fetch('/api/clients');
     setClients(await res.json());
     setLoading(false);
-  }
+  }, []);
 
-  useEffect(() => { fetchClients(); }, []);
+  useEffect(() => { fetchClients(); }, [fetchClients]);
+  usePoll(fetchClients);
 
   const filtered = clients.filter(
     (c) =>

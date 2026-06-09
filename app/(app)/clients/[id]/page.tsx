@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Plus, Pencil, Trash2, Printer } from 'lucide-react';
 import TransactionModal from '@/components/transaction-modal';
+import { usePoll } from '@/hooks/use-poll';
 
 interface Client {
   id: number;
@@ -24,6 +25,7 @@ interface Transaction {
   debit: number;
   credit: number;
   notes: string;
+  price_per_bag: number | null;
 }
 
 const peso = (n: number) =>
@@ -40,7 +42,7 @@ export default function ClientLedgerPage() {
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<{ tx?: Transaction } | null>(null);
 
-  async function fetchData() {
+  const fetchData = useCallback(async () => {
     const res = await fetch(`/api/clients/${id}`);
     if (!res.ok) { router.push('/clients'); return; }
     const data = await res.json();
@@ -48,9 +50,10 @@ export default function ClientLedgerPage() {
     setClient(clientData);
     setTransactions(txs);
     setLoading(false);
-  }
+  }, [id, router]);
 
-  useEffect(() => { fetchData(); }, [id]);
+  useEffect(() => { fetchData(); }, [fetchData]);
+  usePoll(fetchData);
 
   async function handleDelete(txId: number) {
     if (!confirm('Delete this transaction?')) return;
@@ -150,6 +153,7 @@ export default function ClientLedgerPage() {
                 <th className="text-left text-xs font-medium text-gray-500 px-6 py-3">Date</th>
                 <th className="text-left text-xs font-medium text-gray-500 px-6 py-3">Feed</th>
                 <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Bags</th>
+                <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Price/Bag</th>
                 <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Total Price</th>
                 <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Credit</th>
                 <th className="px-6 py-3 print:hidden" />
@@ -174,6 +178,9 @@ export default function ClientLedgerPage() {
                     )}
                   </td>
                   <td className="px-6 py-3 text-sm text-gray-700 text-right">{tx.bags}</td>
+                  <td className="px-6 py-3 text-sm text-gray-600 text-right">
+                    {tx.price_per_bag ? peso(tx.price_per_bag) : '—'}
+                  </td>
                   <td className="px-6 py-3 text-sm font-medium text-gray-900 text-right">{peso(tx.debit)}</td>
                   <td className="px-6 py-3 text-sm text-green-600 text-right">{peso(tx.credit)}</td>
                   <td className="px-6 py-3 print:hidden">

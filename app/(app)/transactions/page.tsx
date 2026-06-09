@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Plus, Pencil, Trash2, Search, Printer } from 'lucide-react';
 import TransactionModal from '@/components/transaction-modal';
+import { usePoll } from '@/hooks/use-poll';
 
 interface Client { id: number; name: string }
 
@@ -16,6 +17,7 @@ interface Transaction {
   debit: number;
   credit: number;
   notes: string;
+  price_per_bag: number | null;
 }
 
 const peso = (n: number) =>
@@ -53,6 +55,7 @@ export default function TransactionsPage() {
   }, []);
 
   useEffect(() => { fetchTransactions(); }, [fetchTransactions]);
+  usePoll(fetchTransactions);
 
   async function handleDelete(id: number) {
     if (!confirm('Delete this transaction?')) return;
@@ -165,6 +168,7 @@ export default function TransactionsPage() {
                 <th className="text-left text-xs font-medium text-gray-500 px-6 py-3">Caretaker</th>
                 <th className="text-left text-xs font-medium text-gray-500 px-6 py-3">Feed</th>
                 <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Bags</th>
+                <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Price/Bag</th>
                 <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Total Price</th>
                 <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Credit</th>
                 <th className="px-6 py-3 print:hidden" />
@@ -197,6 +201,9 @@ export default function TransactionsPage() {
                     )}
                   </td>
                   <td className="px-6 py-3 text-sm text-gray-700 text-right">{tx.bags}</td>
+                  <td className="px-6 py-3 text-sm text-gray-600 text-right">
+                    {tx.price_per_bag ? peso(tx.price_per_bag) : '—'}
+                  </td>
                   <td className="px-6 py-3 text-sm font-medium text-gray-900 text-right">{peso(tx.debit)}</td>
                   <td className="px-6 py-3 text-sm text-green-600 text-right">{peso(tx.credit)}</td>
                   <td className="px-6 py-3 print:hidden">

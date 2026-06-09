@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { Users, FileText, TrendingUp, Package, ArrowRight } from 'lucide-react';
 import StatCard from '@/components/stat-card';
+import { usePoll } from '@/hooks/use-poll';
 
 interface DashboardStats {
   active_clients: number;
@@ -34,7 +35,7 @@ export default function DashboardPage() {
   const [recent, setRecent] = useState<RecentTransaction[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchData = useCallback(() => {
     fetch('/api/dashboard')
       .then((r) => r.json())
       .then(({ stats, recent }) => {
@@ -43,6 +44,9 @@ export default function DashboardPage() {
       })
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+  usePoll(fetchData);
 
   if (loading) {
     return (
