@@ -5,6 +5,7 @@ import { X, Info } from 'lucide-react';
 
 interface Client { id: number; name: string }
 interface FeedType { id: number; name: string; current_price: number | null }
+interface BatchOption { id: number; batch_number: string }
 
 interface Transaction {
   id?: number;
@@ -55,6 +56,7 @@ export default function TransactionModal({
     transaction ? transaction : { ...EMPTY, client_id: defaultClientId ?? '', batch_id: defaultBatchId ?? null }
   );
   const [feedTypes, setFeedTypes] = useState<FeedType[]>([]);
+  const [batches, setBatches] = useState<BatchOption[]>([]);
   const [pricePerBag, setPricePerBag] = useState<number | null>(null);
   const [priceDate, setPriceDate] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -63,6 +65,14 @@ export default function TransactionModal({
   useEffect(() => {
     fetch('/api/feed-types').then((r) => r.json()).then(setFeedTypes);
   }, []);
+
+  // Load batches whenever the selected client changes
+  useEffect(() => {
+    if (!form.client_id) { setBatches([]); return; }
+    fetch(`/api/batches?client_id=${form.client_id}`)
+      .then((r) => r.json())
+      .then((data) => setBatches(Array.isArray(data) ? data : []));
+  }, [form.client_id]);
 
   useEffect(() => {
     if (transaction) setForm(transaction);
@@ -155,6 +165,31 @@ export default function TransactionModal({
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
+            )}
+          </div>
+
+          {/* Batch */}
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Batch *</label>
+            {defaultBatchId ? (
+              <div className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 text-gray-700">
+                {batches.find((b) => b.id === defaultBatchId)?.batch_number ?? `Batch #${defaultBatchId}`}
+              </div>
+            ) : (
+              <select
+                value={form.batch_id ?? ''}
+                onChange={(e) => set('batch_id', e.target.value ? Number(e.target.value) : null)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                required
+              >
+                <option value="">Select batch…</option>
+                {batches.map((b) => (
+                  <option key={b.id} value={b.id}>{b.batch_number}</option>
+                ))}
+              </select>
+            )}
+            {!defaultBatchId && form.client_id && batches.length === 0 && (
+              <p className="mt-1 text-xs text-amber-600">No batches yet. Create a batch first from the caretaker page.</p>
             )}
           </div>
 
