@@ -22,6 +22,12 @@ interface Client {
 const peso = (n: number) =>
   new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP', maximumFractionDigits: 0 }).format(n);
 
+const fmtDate = (d: string | null) => {
+  if (!d) return '—';
+  const [y, m, day] = d.split('-');
+  return `${parseInt(m)}/${parseInt(day)}/${y}`;
+};
+
 export default function ClientsPage() {
   const router = useRouter();
   const [clients, setClients] = useState<Client[]>([]);
@@ -112,15 +118,22 @@ export default function ClientsPage() {
             <p className="text-xs text-gray-400 mb-3">{client.transaction_count} transaction(s)</p>
 
             {/* Stats */}
-            <div className="flex items-center gap-4 py-3 border-t border-gray-100 mb-3">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2 py-3 border-t border-gray-100 mb-3 text-xs">
               <div>
-                <p className="text-xs text-gray-500">Heads</p>
-                <p className="text-sm font-semibold text-green-700">{client.heads}</p>
+                <p className="text-gray-400">Heads</p>
+                <p className="font-semibold text-green-700">{client.heads || '—'}</p>
               </div>
-              <div className="w-px h-8 bg-gray-200" />
               <div>
-                <p className="text-xs text-gray-500">Allocation</p>
-                <p className="text-sm font-semibold text-gray-900">{peso(client.allocation)}</p>
+                <p className="text-gray-400">Allocation</p>
+                <p className="font-semibold text-gray-900">{peso(client.allocation)}</p>
+              </div>
+              <div>
+                <p className="text-gray-400">Date of Application</p>
+                <p className="font-semibold text-gray-900">{fmtDate(client.date_of_application)}</p>
+              </div>
+              <div>
+                <p className="text-gray-400">Date of Hauling</p>
+                <p className="font-semibold text-gray-900">{fmtDate(client.date_of_hauling)}</p>
               </div>
             </div>
 
