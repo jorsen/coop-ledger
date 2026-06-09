@@ -151,7 +151,7 @@ export default function ClientLedgerPage() {
         <ArrowLeft className="w-4 h-4" /> Back to Caretakers
       </button>
 
-      <div className="flex items-start justify-between mb-6 print:hidden">
+      <div className="flex flex-col sm:flex-row sm:items-start gap-4 mb-6 print:hidden">
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-semibold text-gray-900">{client.name}</h1>
@@ -167,7 +167,7 @@ export default function ClientLedgerPage() {
             ID: {client.client_code} · Batch #{client.batch_number} · {client.heads} heads · Allocation: {peso(client.allocation)}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 sm:ml-auto">
           <button
             onClick={() => window.print()}
             className="flex items-center gap-2 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50"
@@ -334,18 +334,18 @@ export default function ClientLedgerPage() {
         ) : (
           <div className="divide-y divide-gray-50">
             {batches.map((b) => (
-              <div key={b.id} className="px-6 py-3 flex items-center gap-4 hover:bg-gray-50/50">
+              <div key={b.id} className="px-4 sm:px-6 py-3 flex flex-wrap items-center gap-x-4 gap-y-2 hover:bg-gray-50/50">
                 <span className="bg-green-800 text-white text-xs font-bold px-2 py-0.5 rounded shrink-0">
                   {b.batch_number}
                 </span>
                 <span className="text-sm text-gray-500 shrink-0">
                   {new Date(b.batch_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                 </span>
-                {b.notes && <span className="text-xs text-gray-400 truncate">{b.notes}</span>}
-                <div className="ml-auto flex items-center gap-4 shrink-0 text-sm text-gray-500">
+                {b.notes && <span className="text-xs text-gray-400 truncate max-w-xs">{b.notes}</span>}
+                <div className="ml-auto flex items-center gap-3 shrink-0 text-sm text-gray-500">
                   <span>{b.transaction_count} tx</span>
                   <span>{b.total_bags} bags</span>
-                  <span className="font-medium text-gray-700">
+                  <span className="font-medium text-gray-700 hidden sm:inline">
                     {new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(b.total_debit)}
                   </span>
                   <button

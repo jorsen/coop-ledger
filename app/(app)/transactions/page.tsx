@@ -81,12 +81,12 @@ export default function TransactionsPage() {
         </p>
       </div>
 
-      <div className="flex items-start justify-between mb-6 print:hidden">
+      <div className="flex flex-col sm:flex-row sm:items-start gap-4 mb-6 print:hidden">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Transactions</h1>
           <p className="text-sm text-gray-500 mt-0.5">All cooperative transactions</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 sm:ml-auto">
           <button
             onClick={() => window.print()}
             className="flex items-center gap-2 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50"
@@ -124,7 +124,7 @@ export default function TransactionsPage() {
             <option key={c.id} value={c.id}>{c.name}</option>
           ))}
         </select>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <input
             type="date"
             value={fromDate}

@@ -188,8 +188,8 @@ function FeedTypeCard({
   return (
     <div className="bg-white rounded-xl border border-gray-200">
       {/* Header row */}
-      <div className="flex items-center justify-between px-5 py-4">
-        <div>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 px-5 py-4">
+        <div className="flex-1 min-w-0">
           <p className="font-medium text-gray-900 text-sm">{feedType.name}</p>
           <p className="text-xs text-gray-500 mt-0.5">
             {feedType.current_price
@@ -197,7 +197,7 @@ function FeedTypeCard({
               : <span className="text-amber-600">No price set yet</span>}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={() => setAddPrice(true)}
             className="flex items-center gap-1.5 bg-green-800 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-green-700"
@@ -286,14 +286,14 @@ export default function FeedsPage() {
 
   return (
     <div>
-      <div className="flex items-start justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-start gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Feed Types</h1>
           <p className="text-sm text-gray-500 mt-0.5">Manage feed types and price history</p>
         </div>
         <button
           onClick={() => setAddModal(true)}
-          className="flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700"
+          className="flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 sm:ml-auto"
         >
           <Plus className="w-4 h-4" /> Add Feed Type
         </button>
