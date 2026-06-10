@@ -13,6 +13,8 @@ interface Batch {
   notes: string;
   date_of_application: string | null;
   date_of_hauling: string | null;
+  heads: number | null;
+  allocation: number | null;
   transaction_count: number;
   total_bags: number;
   total_debit: number;
@@ -70,10 +72,11 @@ export default function ClientLedgerPage() {
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<{ tx?: Transaction } | null>(null);
   const [batchModal, setBatchModal] = useState(false);
-  const [batchForm, setBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '' });
+  const [batchForm, setBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', heads: '', allocation: '' });
   const [savingBatch, setSavingBatch] = useState(false);
   const [editBatch, setEditBatch] = useState<Batch | null>(null);
-  const [editBatchForm, setEditBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '' });
+  const [editBatchForm, setEditBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', heads: '', allocation: '' });
+  const [pricePerBag, setPricePerBag] = useState(0);
   const [savingEditBatch, setSavingEditBatch] = useState(false);
 
   const fetchData = useCallback(async () => {
@@ -94,6 +97,10 @@ export default function ClientLedgerPage() {
   useEffect(() => { fetchData(); }, [fetchData]);
   usePoll(fetchData);
 
+  useEffect(() => {
+    fetch('/api/settings').then(r => r.json()).then(d => setPricePerBag(Number(d.price_per_bag ?? 0)));
+  }, []);
+
   async function handleCreateBatch() {
     setSavingBatch(true);
     await fetch('/api/batches', {
@@ -103,7 +110,7 @@ export default function ClientLedgerPage() {
     });
     setSavingBatch(false);
     setBatchModal(false);
-    setBatchForm({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '' });
+    setBatchForm({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', heads: '', allocation: '' });
     fetchData();
   }
 
@@ -397,7 +404,7 @@ export default function ClientLedgerPage() {
                     <Eye className="w-3.5 h-3.5" /> View
                   </button>
                   <button
-                    onClick={() => { setEditBatch(b); setEditBatchForm({ batch_number: b.batch_number, batch_date: b.batch_date, notes: b.notes, date_of_application: b.date_of_application ?? '', date_of_hauling: b.date_of_hauling ?? '' }); }}
+                    onClick={() => { setEditBatch(b); setEditBatchForm({ batch_number: b.batch_number, batch_date: b.batch_date, notes: b.notes, date_of_application: b.date_of_application ?? '', date_of_hauling: b.date_of_hauling ?? '', heads: b.heads ? String(b.heads) : '', allocation: b.allocation ? String(b.allocation) : '' }); }}
                     className="text-gray-400 hover:text-gray-600"
                   >
                     <Pencil className="w-3.5 h-3.5" />
@@ -453,6 +460,34 @@ export default function ClientLedgerPage() {
                   style={{ backgroundColor: '#ffffff', height: '42px', WebkitAppearance: 'none', appearance: 'none' }}
                   required
                 />
+              </div>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <div style={{ flex: 1 }}>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Heads</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={batchForm.heads}
+                    onChange={(e) => {
+                      const h = e.target.value;
+                      const alloc = pricePerBag > 0 && Number(h) > 0 ? String(Number(h) * 5 * pricePerBag) : '';
+                      setBatchForm((f) => ({ ...f, heads: h, allocation: alloc }));
+                    }}
+                    placeholder="0"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Allocation (₱)</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={batchForm.allocation}
+                    onChange={(e) => setBatchForm((f) => ({ ...f, allocation: e.target.value }))}
+                    placeholder="0"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                  />
+                </div>
               </div>
               <div style={{ display: 'flex', gap: '12px' }}>
                 <div style={{ flex: 1 }}>
@@ -535,6 +570,34 @@ export default function ClientLedgerPage() {
                   style={{ backgroundColor: '#ffffff', height: '42px', WebkitAppearance: 'none', appearance: 'none' }}
                   required
                 />
+              </div>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <div style={{ flex: 1 }}>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Heads</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={editBatchForm.heads}
+                    onChange={(e) => {
+                      const h = e.target.value;
+                      const alloc = pricePerBag > 0 && Number(h) > 0 ? String(Number(h) * 5 * pricePerBag) : '';
+                      setEditBatchForm((f) => ({ ...f, heads: h, allocation: alloc }));
+                    }}
+                    placeholder="0"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Allocation (₱)</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={editBatchForm.allocation}
+                    onChange={(e) => setEditBatchForm((f) => ({ ...f, allocation: e.target.value }))}
+                    placeholder="0"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                  />
+                </div>
               </div>
               <div style={{ display: 'flex', gap: '12px' }}>
                 <div style={{ flex: 1 }}>

@@ -102,30 +102,7 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
         </div>
 
         <form onSubmit={handleSubmit} className="p-6" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {/* Batch # + Client ID (edit only) */}
-          <div style={{ display: 'flex', gap: '16px' }}>
-            <div style={{ flex: 1 }}>
-              <label className="block text-xs font-medium text-gray-700 mb-2">Batch #</label>
-              <input
-                value={form.batch_number}
-                onChange={(e) => set('batch_number', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-                placeholder="e.g. 1"
-              />
-            </div>
-            {mode === 'edit' && (
-              <div style={{ flex: 1 }}>
-                <label className="block text-xs font-medium text-gray-700 mb-2">Client ID</label>
-                <input
-                  value={form.client_code}
-                  onChange={(e) => set('client_code', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-                />
-              </div>
-            )}
-          </div>
-
-          {/* Full Name — full width */}
+          {/* Full Name — always visible */}
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-2">Full Name *</label>
             <input
@@ -137,57 +114,80 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
             />
           </div>
 
-          {/* Heads + Allocation */}
-          <div style={{ display: 'flex', gap: '16px' }}>
-            <div style={{ flex: 1 }}>
-              <label className="block text-xs font-medium text-gray-700 mb-2">Heads</label>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={form.heads}
-                onChange={(e) => handleHeadsChange(e.target.value)}
-                placeholder="0"
-                className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-              />
-            </div>
-            <div style={{ flex: 1 }}>
-              <label className="block text-xs font-medium text-gray-700 mb-2">Allocation (₱)</label>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={form.allocation}
-                onChange={(e) => set('allocation', e.target.value)}
-                placeholder="0"
-                className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-              />
-            </div>
-          </div>
+          {/* Edit mode — show all fields */}
+          {mode === 'edit' && (
+            <>
+              <div style={{ display: 'flex', gap: '16px' }}>
+                <div style={{ flex: 1 }}>
+                  <label className="block text-xs font-medium text-gray-700 mb-2">Batch #</label>
+                  <input
+                    value={form.batch_number}
+                    onChange={(e) => set('batch_number', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                    placeholder="e.g. 1"
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label className="block text-xs font-medium text-gray-700 mb-2">Client ID</label>
+                  <input
+                    value={form.client_code}
+                    onChange={(e) => set('client_code', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                  />
+                </div>
+              </div>
 
-          {/* Date of Application + Date of Hauling */}
-          <div style={{ display: 'flex', gap: '16px' }}>
-            <div style={{ flex: 1 }}>
-              <label className="block text-xs font-medium text-gray-700 mb-2">Date of Application</label>
-              <input
-                type="date"
-                value={form.date_of_application}
-                onChange={(e) => set('date_of_application', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-                style={{ backgroundColor: '#ffffff', height: '46px', WebkitAppearance: 'none', appearance: 'none' }}
-              />
-            </div>
-            <div style={{ flex: 1 }}>
-              <label className="block text-xs font-medium text-gray-700 mb-2">Date of Hauling</label>
-              <input
-                type="date"
-                value={form.date_of_hauling}
-                onChange={(e) => set('date_of_hauling', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-                style={{ backgroundColor: '#ffffff', height: '46px', WebkitAppearance: 'none', appearance: 'none' }}
-              />
-            </div>
-          </div>
+              <div style={{ display: 'flex', gap: '16px' }}>
+                <div style={{ flex: 1 }}>
+                  <label className="block text-xs font-medium text-gray-700 mb-2">Heads</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={form.heads}
+                    onChange={(e) => handleHeadsChange(e.target.value)}
+                    placeholder="0"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label className="block text-xs font-medium text-gray-700 mb-2">Allocation (₱)</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={form.allocation}
+                    onChange={(e) => set('allocation', e.target.value)}
+                    placeholder="0"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                  />
+                </div>
+              </div>
 
-          {/* Status — full width */}
+              <div style={{ display: 'flex', gap: '16px' }}>
+                <div style={{ flex: 1 }}>
+                  <label className="block text-xs font-medium text-gray-700 mb-2">Date of Application</label>
+                  <input
+                    type="date"
+                    value={form.date_of_application}
+                    onChange={(e) => set('date_of_application', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                    style={{ backgroundColor: '#ffffff', height: '46px', WebkitAppearance: 'none', appearance: 'none' }}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label className="block text-xs font-medium text-gray-700 mb-2">Date of Hauling</label>
+                  <input
+                    type="date"
+                    value={form.date_of_hauling}
+                    onChange={(e) => set('date_of_hauling', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                    style={{ backgroundColor: '#ffffff', height: '46px', WebkitAppearance: 'none', appearance: 'none' }}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Status — always visible */}
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-2">Status</label>
             <select

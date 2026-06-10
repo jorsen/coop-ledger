@@ -14,10 +14,10 @@ interface Batch {
   notes: string;
   date_of_application: string | null;
   date_of_hauling: string | null;
+  heads: number | null;
+  allocation: number | null;
   client_name: string | null;
   client_code: string | null;
-  client_heads: number | null;
-  client_allocation: number | null;
 }
 
 interface Transaction {
@@ -165,11 +165,11 @@ export default function BatchDetailPage() {
             </div>
             <div>
               <p className="text-xs font-medium text-gray-400 mb-0.5"># OF HEADS</p>
-              <p className="font-semibold text-gray-900">{batch.client_heads ?? '—'}</p>
+              <p className="font-semibold text-gray-900">{batch.heads ?? '—'}</p>
             </div>
             <div>
               <p className="text-xs font-medium text-gray-400 mb-0.5">ALLOCATION</p>
-              <p className="font-semibold text-gray-900">₱{num(Number(batch.client_allocation ?? 0))}</p>
+              <p className="font-semibold text-gray-900">{batch.allocation ? `₱${num(Number(batch.allocation))}` : '—'}</p>
             </div>
             <div>
               <p className="text-xs font-medium text-gray-400 mb-0.5">DATE OF APPLICATION</p>

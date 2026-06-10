@@ -42,10 +42,12 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   const { error } = await requireAuth();
   if (error) return error;
 
-  const { batch_number, batch_date, notes, date_of_application, date_of_hauling } = await req.json();
+  const { batch_number, batch_date, notes, date_of_application, date_of_hauling, heads, allocation } = await req.json();
 
   await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS date_of_application DATE`;
   await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS date_of_hauling DATE`;
+  await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS heads INTEGER`;
+  await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS allocation DECIMAL(12,2)`;
 
   const [updated] = await sql`
     UPDATE batches
@@ -53,7 +55,9 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         batch_date          = ${batch_date},
         notes               = ${notes || ''},
         date_of_application = ${date_of_application || null},
-        date_of_hauling     = ${date_of_hauling || null}
+        date_of_hauling     = ${date_of_hauling || null},
+        heads               = ${heads ? Number(heads) : null},
+        allocation          = ${allocation ? Number(allocation) : null}
     WHERE id = ${params.id}
     RETURNING *
   `;
