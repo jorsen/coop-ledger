@@ -450,17 +450,6 @@ export default function ClientLedgerPage() {
                   className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
                 />
               </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Batch Date *</label>
-                <input
-                  type="date"
-                  value={batchForm.batch_date}
-                  onChange={(e) => setBatchForm((f) => ({ ...f, batch_date: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-                  style={{ backgroundColor: '#ffffff', height: '42px', WebkitAppearance: 'none', appearance: 'none' }}
-                  required
-                />
-              </div>
               <div style={{ display: 'flex', gap: '12px' }}>
                 <div style={{ flex: 1 }}>
                   <label className="block text-xs font-medium text-gray-700 mb-1">Heads</label>
@@ -557,17 +546,6 @@ export default function ClientLedgerPage() {
                   onChange={(e) => setEditBatchForm((f) => ({ ...f, batch_number: e.target.value }))}
                   placeholder="e.g. BT-001"
                   className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Batch Date *</label>
-                <input
-                  type="date"
-                  value={editBatchForm.batch_date}
-                  onChange={(e) => setEditBatchForm((f) => ({ ...f, batch_date: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-                  style={{ backgroundColor: '#ffffff', height: '42px', WebkitAppearance: 'none', appearance: 'none' }}
                   required
                 />
               </div>

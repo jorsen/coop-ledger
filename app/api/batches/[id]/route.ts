@@ -52,7 +52,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   const [updated] = await sql`
     UPDATE batches
     SET batch_number        = ${batch_number},
-        batch_date          = ${batch_date},
+        batch_date          = COALESCE(${batch_date || null}::date, batch_date),
         notes               = ${notes || ''},
         date_of_application = ${date_of_application || null},
         date_of_hauling     = ${date_of_hauling || null},

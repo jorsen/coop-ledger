@@ -52,18 +52,31 @@ export async function POST(req: NextRequest) {
     await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS heads INTEGER`;
     await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS allocation DECIMAL(12,2)`;
 
-    const [inserted] = await sql`
-      INSERT INTO batches (batch_number, client_id, batch_date, notes, date_of_application, date_of_hauling, heads, allocation)
-      VALUES ('TMP', ${client_id || null}, ${batch_date || new Date().toISOString().split('T')[0]}, ${notes || ''},
-        ${date_of_application || null}, ${date_of_hauling || null},
-        ${heads ? Number(heads) : null}, ${allocation ? Number(allocation) : null})
-      RETURNING id
-    `;
+    const dateVal = batch_date || new Date().toISOString().split('T')[0];
 
-    const batchNumber = batch_number?.trim() || `BT-${String(inserted.id).padStart(3, '0')}`;
-    const [batch] = await sql`
-      UPDATE batches SET batch_number = ${batchNumber} WHERE id = ${inserted.id} RETURNING *
-    `;
+    let batch;
+    if (batch_number?.trim()) {
+      const [b] = await sql`
+        INSERT INTO batches (batch_number, client_id, batch_date, notes, date_of_application, date_of_hauling, heads, allocation)
+        VALUES (${batch_number.trim()}, ${client_id || null}, ${dateVal}, ${notes || ''},
+          ${date_of_application || null}, ${date_of_hauling || null},
+          ${heads ? Number(heads) : null}, ${allocation ? Number(allocation) : null})
+        RETURNING *
+      `;
+      batch = b;
+    } else {
+      const tmpName = `__TMP__${Date.now()}`;
+      const [inserted] = await sql`
+        INSERT INTO batches (batch_number, client_id, batch_date, notes, date_of_application, date_of_hauling, heads, allocation)
+        VALUES (${tmpName}, ${client_id || null}, ${dateVal}, ${notes || ''},
+          ${date_of_application || null}, ${date_of_hauling || null},
+          ${heads ? Number(heads) : null}, ${allocation ? Number(allocation) : null})
+        RETURNING id
+      `;
+      const autoNumber = `BT-${String(inserted.id).padStart(3, '0')}`;
+      const [b] = await sql`UPDATE batches SET batch_number = ${autoNumber} WHERE id = ${inserted.id} RETURNING *`;
+      batch = b;
+    }
 
     return NextResponse.json(batch, { status: 201 });
   } catch (err) {
