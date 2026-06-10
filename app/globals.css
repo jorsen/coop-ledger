@@ -9,10 +9,13 @@
   }
 
   body {
+    font-family: Arial, Helvetica, sans-serif !important;
     font-size: 9px !important;
+    color: #000 !important;
   }
 
   table {
+    font-family: Arial, Helvetica, sans-serif !important;
     font-size: 8px !important;
   }
 
