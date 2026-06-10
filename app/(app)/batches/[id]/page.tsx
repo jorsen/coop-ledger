@@ -204,7 +204,7 @@ export default function BatchDetailPage() {
                 <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Debit</th>
                 <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden">Delivery Fee</th>
                 <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Balance</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">DFFS</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden">DFFS</th>
                 <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Interest</th>
                 <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3"># of Days</th>
                 <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Date Maturity</th>
@@ -230,7 +230,7 @@ export default function BatchDetailPage() {
                   <td className="px-4 py-3 text-gray-900 text-right">{num(tx.debit)}</td>
                   <td className="px-4 py-3 text-gray-600 text-right print:hidden">{num(Number(tx.delivery_fee ?? 0))}</td>
                   <td className="px-4 py-3 font-semibold text-gray-900 text-right">{num(tx.runningBalance)}</td>
-                  <td className="px-4 py-3 text-gray-600 text-right">{num(tx.dffs1)}</td>
+                  <td className="px-4 py-3 text-gray-600 text-right print:hidden">{num(tx.dffs1)}</td>
                   <td className="px-4 py-3 text-gray-600 text-right">{num(tx.interest)}</td>
                   <td className="px-4 py-3 text-gray-500 text-right">{tx.days}</td>
                   <td className="px-4 py-3 text-green-700 text-right whitespace-nowrap">{maturityDate ? fmtDate(maturityDate) : '—'}</td>
@@ -255,7 +255,7 @@ export default function BatchDetailPage() {
                   <td className="px-4 py-3 text-right text-gray-900">{num(totalDebit)}</td>
                   <td className="px-4 py-3 text-right text-gray-600 print:hidden">{num(totalDeliveryFee)}</td>
                   <td className="px-4 py-3 text-right text-gray-900">{num(balance)}</td>
-                  <td className="px-4 py-3 text-right text-gray-700">{num(totalDffs1)}</td>
+                  <td className="px-4 py-3 text-right text-gray-700 print:hidden">{num(totalDffs1)}</td>
                   <td className="px-4 py-3 text-right text-gray-700">{num(totalInterest)}</td>
                   <td colSpan={2} className="px-4 py-3" />
                   <td className="print:hidden" />
