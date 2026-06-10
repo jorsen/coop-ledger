@@ -204,7 +204,7 @@ export default function CaretakerLedgerPage() {
       </div>
 
       {/* ── Caretaker info card ───────────────────────────────────────── */}
-      <div className="bg-white border border-gray-200 rounded-xl px-6 py-5 mb-6 print:border-0 print:px-0 print:py-0 print:hidden">
+      <div className="bg-white border border-gray-200 rounded-xl px-6 py-5 mb-6 print:border-0 print:px-0 print:py-2">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-4 text-sm">
           <div>
             <p className="text-xs font-medium text-gray-400 mb-0.5">NAME</p>
