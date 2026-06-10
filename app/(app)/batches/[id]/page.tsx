@@ -194,7 +194,7 @@ export default function BatchDetailPage() {
       {/* Transactions table */}
       <div className="bg-white rounded-xl border border-gray-200">
         <div className="overflow-x-auto">
-          <table className="w-full text-lg">
+          <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
                 <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3">FEEDS</th>
