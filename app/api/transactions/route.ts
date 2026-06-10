@@ -21,9 +21,11 @@ export async function GET(req: NextRequest) {
     ORDER BY t.date DESC, t.created_at DESC
   `;
 
+  const toYMD = (d: unknown) => new Date(d as string).toISOString().slice(0, 10);
+
   if (clientId) transactions = transactions.filter((t) => String(t.client_id) === clientId);
-  if (from)     transactions = transactions.filter((t) => t.date >= from);
-  if (to)       transactions = transactions.filter((t) => t.date <= to);
+  if (from)     transactions = transactions.filter((t) => toYMD(t.date) >= from);
+  if (to)       transactions = transactions.filter((t) => toYMD(t.date) <= to);
   if (search) {
     const q = search.toLowerCase();
     transactions = transactions.filter((t) => t.client_name.toLowerCase().includes(q));

@@ -1,3 +1,23 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 8mm;
+  }
+
+  body {
+    font-size: 9px !important;
+  }
+
+  table {
+    font-size: 8px !important;
+  }
+
+  table th,
+  table td {
+    padding: 2px 4px !important;
+  }
+}
