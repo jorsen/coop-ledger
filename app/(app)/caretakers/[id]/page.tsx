@@ -167,19 +167,15 @@ export default function CaretakerLedgerPage() {
   return (
     <div>
       {/* ── Print header ─────────────────────────────────────────────── */}
-      <div className="hidden print:flex print:justify-between mb-4 border-b border-gray-300 pb-3">
-        <div className="space-y-1 text-sm">
-          <p className="text-xs text-gray-500">NAME</p>
-          <p className="font-bold">{client.name}</p>
-          <p className="text-xs text-gray-500 mt-1">BATCH #</p>
-          <p className="font-semibold">{batches[0]?.batch_number || '—'}</p>
-          <p className="text-xs text-gray-500 mt-1">CARETAKER ID</p>
-          <p className="font-semibold">{client.client_code}</p>
+      <div className="hidden print:flex print:items-center print:justify-between mb-2 border-b border-gray-400 pb-1 text-xs">
+        <div className="flex items-center gap-4">
+          <span><span className="text-gray-500">NAME: </span><strong>{client.name}</strong></span>
+          <span><span className="text-gray-500">BATCH #: </span><strong>{batches[0]?.batch_number || '—'}</strong></span>
+          <span><span className="text-gray-500">CLIENT ID: </span><strong>{client.client_code}</strong></span>
         </div>
-        <div className="space-y-1 text-sm text-right">
-          <p className="text-xs text-gray-500"># of Heads</p>
-          <p className="font-semibold">{batches[0]?.heads ?? '—'}</p>
-          <p className="text-xs text-gray-400 mt-2">Printed: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+        <div className="flex items-center gap-4 text-right">
+          <span><span className="text-gray-500"># of Heads: </span><strong>{batches[0]?.heads ?? '—'}</strong></span>
+          <span className="text-gray-400">Printed: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
         </div>
       </div>
 

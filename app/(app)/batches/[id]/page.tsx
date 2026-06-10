@@ -117,14 +117,14 @@ export default function BatchDetailPage() {
   return (
     <div>
       {/* Print header */}
-      <div className="hidden print:flex print:justify-between mb-4 border-b border-gray-300 pb-3">
-        <div className="space-y-1 text-sm">
-          <p className="text-xs text-gray-500">BATCH</p>
-          <p className="font-bold">{batch.batch_number}</p>
-          <p className="text-xs text-gray-500 mt-1">DATE</p>
-          <p className="font-semibold">{fmtDate(batch.batch_date)}</p>
+      <div className="hidden print:flex print:items-center print:justify-between mb-2 border-b border-gray-400 pb-1 text-xs">
+        <div className="flex items-center gap-4">
+          {batch.client_name && <span><span className="text-gray-500">NAME: </span><strong>{batch.client_name}</strong></span>}
+          <span><span className="text-gray-500">BATCH #: </span><strong>{batch.batch_number}</strong></span>
+          {batch.client_code && <span><span className="text-gray-500">CLIENT ID: </span><strong>{batch.client_code}</strong></span>}
+          <span><span className="text-gray-500"># of Heads: </span><strong>{batch.heads ?? '—'}</strong></span>
         </div>
-        <p className="text-xs text-gray-400 mt-2">Printed: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+        <span className="text-gray-400">Printed: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
       </div>
 
       <div className="flex items-center justify-between mb-4 print:hidden">
