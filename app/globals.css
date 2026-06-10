@@ -22,10 +22,26 @@
   table {
     font-family: Arial, Helvetica, sans-serif !important;
     font-size: 11px !important;
+    border-collapse: collapse !important;
+    width: 100% !important;
   }
 
   table th,
   table td {
-    padding: 1px 4px !important;
+    padding: 3px 8px !important;
+    border: 1px solid #999 !important;
+  }
+
+  table thead tr {
+    background-color: #f3f4f6 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .print-card {
+    border: 1px solid #ccc !important;
+    border-radius: 4px !important;
+    padding: 10px !important;
+    margin-bottom: 10px !important;
   }
 }

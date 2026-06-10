@@ -151,7 +151,7 @@ export default function BatchDetailPage() {
       </div>
 
       {batch.client_name && (
-        <div className="bg-white rounded-xl border border-gray-200 px-6 py-5 mb-4 text-sm print:border-0 print:rounded-none print:px-0 print:py-1 print:mb-2">
+        <div className="bg-white rounded-xl border border-gray-200 px-6 py-5 mb-4 text-sm print:rounded-none print:px-0 print:py-0 print:mb-0 print-card">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-4 print:grid-cols-4 print:gap-x-6 print:gap-y-1 print:text-xs">
             <div>
               <p className="text-xs font-medium text-gray-600 mb-0.5">NAME</p>
@@ -192,7 +192,7 @@ export default function BatchDetailPage() {
       {batch.notes && <p className="text-sm text-gray-500 mb-4">{batch.notes}</p>}
 
       {/* Transactions table */}
-      <div className="bg-white rounded-xl border border-gray-200">
+      <div className="bg-white rounded-xl border border-gray-200 print-card print:mb-0">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
