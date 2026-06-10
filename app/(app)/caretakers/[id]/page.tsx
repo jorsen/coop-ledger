@@ -339,7 +339,10 @@ export default function CaretakerLedgerPage() {
                   <div className="font-bold text-gray-900 underline">{num(grandTotal)}</div>
                 </div>
                 <div className="flex justify-between border-t border-gray-300 pt-2 mt-1">
-                  <span className="font-bold text-gray-900">Grand Total</span>
+                  <div>
+                    <div className="font-bold text-gray-900">Grand Total</div>
+                    <div className="text-xs text-gray-400 mt-0.5">Principal + Interest + Del. Fee</div>
+                  </div>
                   <div className="font-bold text-gray-900 underline">{num(grandTotal + totalDeliveryFee)}</div>
                 </div>
               </div>
