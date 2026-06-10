@@ -344,46 +344,6 @@ export default function SettingsPage() {
       <h1 className="text-2xl font-semibold text-gray-900 mb-1">Settings</h1>
       <p className="text-sm text-gray-500 mb-6">Feed prices and app configuration</p>
 
-      {/* ── Price per Bag (Allocation) ──────────────────────────────────── */}
-      <div className="bg-white rounded-xl border border-gray-200 mb-6">
-        <div className="px-6 py-5">
-          <h2 className="text-sm font-semibold text-gray-800 mb-1">Price per Bag (Allocation)</h2>
-          <p className="text-xs text-gray-500 mb-1">
-            Used to auto-compute Allocation = Heads × 5 bags × price.
-          </p>
-          {!settingsLoading && currentPricePerBag !== null && (
-            <p className="text-xs text-gray-400 mb-4">
-              Current: <span className="font-medium text-gray-600">₱{currentPricePerBag}</span>
-            </p>
-          )}
-          {settingsLoading ? (
-            <div className="h-9 w-32 bg-gray-100 rounded-lg animate-pulse" />
-          ) : (
-            <form onSubmit={handleSavePricePerBag} className="flex items-end gap-3">
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">New Price / Bag (₱)</label>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={pricePerBag}
-                  onChange={e => setPricePerBag(e.target.value)}
-                  placeholder="e.g. 1800"
-                  className="w-36 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={savingPrice}
-                className="flex items-center gap-1.5 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50"
-              >
-                <Save className="w-3.5 h-3.5" />
-                {savingPrice ? 'Saving…' : savedPrice ? 'Saved!' : 'Save'}
-              </button>
-            </form>
-          )}
-        </div>
-      </div>
-
       {/* ── Delivery fee ────────────────────────────────────────────────── */}
       <div className="bg-white rounded-xl border border-gray-200 mb-6">
         <div className="px-6 py-5">

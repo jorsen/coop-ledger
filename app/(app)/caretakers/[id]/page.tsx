@@ -14,7 +14,6 @@ interface Batch {
   date_of_application: string | null;
   date_of_hauling: string | null;
   heads: number | null;
-  allocation: number | null;
   transaction_count: number;
   total_bags: number;
   total_debit: number;
@@ -27,7 +26,6 @@ interface Client {
   batch_number: string;
   status: string;
   heads: number;
-  allocation: number;
   date_of_hauling: string | null;
   date_of_application: string | null;
 }
@@ -47,23 +45,17 @@ interface Transaction {
   batch_no: string | null;
 }
 
-const DFFS2_RATE = 0.007; // 0.7% of principal
+const DFFS2_RATE = 0.007;
 
-// Plain number, no ₱ symbol
 const num = (n: number) =>
   new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
 
-// With ₱ symbol (billing summary only)
-const peso = (n: number) =>
-  new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(n);
-
-// M/D/YYYY  e.g. 2/23/2026
 const fmtDate = (d: string) => {
   const [y, m, day] = d.split('-');
   return `${parseInt(m)}/${parseInt(day)}/${y}`;
 };
 
-export default function ClientLedgerPage() {
+export default function CaretakerLedgerPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const [client, setClient] = useState<Client | null>(null);
@@ -72,11 +64,10 @@ export default function ClientLedgerPage() {
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<{ tx?: Transaction } | null>(null);
   const [batchModal, setBatchModal] = useState(false);
-  const [batchForm, setBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', heads: '', allocation: '' });
+  const [batchForm, setBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', heads: '' });
   const [savingBatch, setSavingBatch] = useState(false);
   const [editBatch, setEditBatch] = useState<Batch | null>(null);
-  const [editBatchForm, setEditBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', heads: '', allocation: '' });
-  const [pricePerBag, setPricePerBag] = useState(0);
+  const [editBatchForm, setEditBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', heads: '' });
   const [savingEditBatch, setSavingEditBatch] = useState(false);
 
   const fetchData = useCallback(async () => {
@@ -84,7 +75,7 @@ export default function ClientLedgerPage() {
       fetch(`/api/clients/${id}`),
       fetch(`/api/batches?client_id=${id}`),
     ]);
-    if (!clientRes.ok) { router.push('/clients'); return; }
+    if (!clientRes.ok) { router.push('/caretakers'); return; }
     const data = await clientRes.json();
     const { transactions: txs, ...clientData } = data;
     setClient(clientData);
@@ -97,10 +88,6 @@ export default function ClientLedgerPage() {
   useEffect(() => { fetchData(); }, [fetchData]);
   usePoll(fetchData);
 
-  useEffect(() => {
-    fetch('/api/settings').then(r => r.json()).then(d => setPricePerBag(Number(d.price_per_bag ?? 0)));
-  }, []);
-
   async function handleCreateBatch() {
     setSavingBatch(true);
     await fetch('/api/batches', {
@@ -110,7 +97,7 @@ export default function ClientLedgerPage() {
     });
     setSavingBatch(false);
     setBatchModal(false);
-    setBatchForm({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', heads: '', allocation: '' });
+    setBatchForm({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', heads: '' });
     fetchData();
   }
 
@@ -177,16 +164,14 @@ export default function ClientLedgerPage() {
         <div className="space-y-1 text-sm">
           <p className="text-xs text-gray-500">NAME</p>
           <p className="font-bold">{client.name}</p>
-          <p className="text-xs text-gray-500 mt-1">LOAN #</p>
-          <p className="font-semibold">{client.batch_number || '—'}</p>
-          <p className="text-xs text-gray-500 mt-1">CLIENT ID</p>
+          <p className="text-xs text-gray-500 mt-1">BATCH #</p>
+          <p className="font-semibold">{batches[0]?.batch_number || '—'}</p>
+          <p className="text-xs text-gray-500 mt-1">CARETAKER ID</p>
           <p className="font-semibold">{client.client_code}</p>
         </div>
         <div className="space-y-1 text-sm text-right">
           <p className="text-xs text-gray-500"># of Heads</p>
-          <p className="font-semibold">{client.heads}</p>
-          <p className="text-xs text-gray-500 mt-1">Allocation</p>
-          <p className="font-semibold">{num(client.allocation)}</p>
+          <p className="font-semibold">{batches[0]?.heads ?? '—'}</p>
           <p className="text-xs text-gray-400 mt-2">Printed: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
         </div>
       </div>
@@ -194,7 +179,7 @@ export default function ClientLedgerPage() {
       {/* ── Top bar ──────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between mb-4 print:hidden">
         <button
-          onClick={() => router.push('/clients')}
+          onClick={() => router.push('/caretakers')}
           className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Caretakers
@@ -215,7 +200,7 @@ export default function ClientLedgerPage() {
         </div>
       </div>
 
-      {/* ── Client info card ─────────────────────────────────────────── */}
+      {/* ── Caretaker info card ───────────────────────────────────────── */}
       <div className="bg-white border border-gray-200 rounded-xl px-6 py-5 mb-6 print:border-0 print:px-0 print:py-0 print:hidden">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-4 text-sm">
           <div>
@@ -239,10 +224,6 @@ export default function ClientLedgerPage() {
           <div>
             <p className="text-xs font-medium text-gray-400 mb-0.5"># OF HEADS</p>
             <p className="font-semibold text-gray-900">{batches[0]?.heads ?? '—'}</p>
-          </div>
-          <div>
-            <p className="text-xs font-medium text-gray-400 mb-0.5">ALLOCATION</p>
-            <p className="font-semibold text-gray-900">{batches[0]?.allocation ? `₱${num(Number(batches[0].allocation))}` : '—'}</p>
           </div>
           <div>
             <p className="text-xs font-medium text-gray-400 mb-0.5">DATE OF APPLICATION</p>
@@ -307,7 +288,6 @@ export default function ClientLedgerPage() {
                 </tr>
               ))}
 
-              {/* Column totals row */}
               {withComputed.length > 0 && (
                 <tr className="border-t-2 border-gray-300 bg-gray-50 font-semibold text-sm">
                   <td colSpan={2} className="px-4 py-3" />
@@ -338,6 +318,10 @@ export default function ClientLedgerPage() {
                   <span className="text-gray-600">Interest</span>
                   <span className="font-medium text-gray-900">{num(totalInterest)}</span>
                 </div>
+                <div className="hidden print:flex justify-between border-t border-gray-200 pt-1.5">
+                  <span className="text-gray-600">Total (P + I)</span>
+                  <span className="font-medium text-gray-900">{num(balance + totalInterest)}</span>
+                </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">DFFS 1</span>
                   <span className="font-medium text-gray-900">{num(totalDffs1)}</span>
@@ -346,13 +330,16 @@ export default function ClientLedgerPage() {
                   <span className="text-gray-600">DFFS 2</span>
                   <span className="font-medium text-gray-900">{num(dffs2)}</span>
                 </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Del Fee</span>
+                  <span className="font-medium text-gray-900">{num(totalDeliveryFee)}</span>
+                </div>
                 <div className="flex justify-between border-t border-gray-300 pt-2 mt-1">
                   <span className="font-bold text-gray-900">Total</span>
-                  <span className="font-bold text-gray-900 underline">{num(grandTotal)}</span>
-                </div>
-                <div className="flex justify-between pt-1">
-                  <span className="text-xs text-gray-400">Del Fee</span>
-                  <span className="text-xs text-gray-500">{num(totalDeliveryFee)}</span>
+                  <div className="text-right">
+                    <div className="font-bold text-gray-900 underline">{num(grandTotal)}</div>
+                    <div className="text-xs text-gray-400 mt-0.5">+ Del Fee {num(totalDeliveryFee)}</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -407,7 +394,7 @@ export default function ClientLedgerPage() {
                     <Eye className="w-3.5 h-3.5" /> View
                   </button>
                   <button
-                    onClick={() => { setEditBatch(b); setEditBatchForm({ batch_number: b.batch_number, batch_date: b.batch_date, notes: b.notes, date_of_application: b.date_of_application ?? '', date_of_hauling: b.date_of_hauling ?? '', heads: b.heads ? String(b.heads) : '', allocation: b.allocation ? String(b.allocation) : '' }); }}
+                    onClick={() => { setEditBatch(b); setEditBatchForm({ batch_number: b.batch_number, batch_date: b.batch_date, notes: b.notes, date_of_application: b.date_of_application ?? '', date_of_hauling: b.date_of_hauling ?? '', heads: b.heads ? String(b.heads) : '' }); }}
                     className="text-gray-400 hover:text-gray-600"
                   >
                     <Pencil className="w-3.5 h-3.5" />
@@ -437,7 +424,7 @@ export default function ClientLedgerPage() {
 
       {/* New Batch Modal */}
       {batchModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-start justify-center z-50 p-4 pt-16">
+        <div className="fixed inset-0 bg-black/40 flex items-start justify-center z-50 p-4 pt-16 overflow-y-auto">
           <div className="bg-white rounded-xl shadow-lg w-full max-w-sm">
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
               <h2 className="text-base font-semibold text-gray-900">New Batch</h2>
@@ -518,7 +505,7 @@ export default function ClientLedgerPage() {
 
       {/* Edit Batch Modal */}
       {editBatch && (
-        <div className="fixed inset-0 bg-black/40 flex items-start justify-center z-50 p-4 pt-16">
+        <div className="fixed inset-0 bg-black/40 flex items-start justify-center z-50 p-4 pt-16 overflow-y-auto">
           <div className="bg-white rounded-xl shadow-lg w-full max-w-sm">
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
               <h2 className="text-base font-semibold text-gray-900">Edit Batch</h2>
@@ -535,18 +522,16 @@ export default function ClientLedgerPage() {
                   required
                 />
               </div>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <div style={{ flex: 1 }}>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Heads</label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={editBatchForm.heads}
-                    onChange={(e) => setEditBatchForm((f) => ({ ...f, heads: e.target.value }))}
-                    placeholder="0"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-                  />
-                </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Heads</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={editBatchForm.heads}
+                  onChange={(e) => setEditBatchForm((f) => ({ ...f, heads: e.target.value }))}
+                  placeholder="0"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                />
               </div>
               <div style={{ display: 'flex', gap: '12px' }}>
                 <div style={{ flex: 1 }}>

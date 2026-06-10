@@ -8,7 +8,7 @@ import clsx from 'clsx';
 
 const NAV_LINKS = [
   { href: '/dashboard',    label: 'Dashboard',    icon: LayoutDashboard },
-  { href: '/clients',      label: 'Caretakers',   icon: Users },
+  { href: '/caretakers',   label: 'Caretakers',   icon: Users },
   { href: '/transactions', label: 'Transactions', icon: FileText },
   { href: '/settings',     label: 'Settings',     icon: Settings },
 ];

@@ -10,7 +10,6 @@ interface Client {
   batch_number: string;
   status: string;
   heads: number | string;
-  allocation: number | string;
   date_of_hauling: string;
   date_of_application: string;
 }
@@ -28,7 +27,6 @@ const EMPTY: Client = {
   batch_number: '',
   status: 'active',
   heads: '',
-  allocation: '',
   date_of_hauling: '',
   date_of_application: '',
 };
@@ -54,9 +52,7 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
   }
 
   function handleHeadsChange(value: string) {
-    const heads = Number(value);
-    const allocation = pricePerBag > 0 && heads > 0 ? heads * 5 * pricePerBag : '';
-    setForm((f) => ({ ...f, heads: value, allocation: allocation === '' ? '' : String(allocation) }));
+    setForm((f) => ({ ...f, heads: value }));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -145,17 +141,6 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
                     inputMode="numeric"
                     value={form.heads}
                     onChange={(e) => handleHeadsChange(e.target.value)}
-                    placeholder="0"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label className="block text-xs font-medium text-gray-700 mb-2">Allocation (₱)</label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={form.allocation}
-                    onChange={(e) => set('allocation', e.target.value)}
                     placeholder="0"
                     className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
                   />

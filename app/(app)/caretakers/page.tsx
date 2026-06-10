@@ -13,19 +13,14 @@ interface Client {
   batch_number: string;
   status: string;
   heads: number;
-  allocation: number;
   date_of_hauling: string;
   date_of_application: string;
   transaction_count: number;
   current_batch_number: string | null;
   current_heads: number | null;
-  current_allocation: number | null;
   current_date_of_application: string | null;
   current_date_of_hauling: string | null;
 }
-
-const peso = (n: number) =>
-  new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP', maximumFractionDigits: 0 }).format(n);
 
 const fmtDate = (d: string | null) => {
   if (!d) return '—';
@@ -33,13 +28,12 @@ const fmtDate = (d: string | null) => {
   return `${parseInt(m)}/${parseInt(day)}/${y}`;
 };
 
-export default function ClientsPage() {
+export default function CaretakersPage() {
   const router = useRouter();
   const [clients, setClients] = useState<Client[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<{ mode: 'add' | 'edit'; client?: Client } | null>(null);
-  const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const fetchClients = useCallback(async () => {
     const res = await fetch('/api/clients');
@@ -57,7 +51,7 @@ export default function ClientsPage() {
   );
 
   async function handleDelete(id: number) {
-    if (!confirm('Delete this client and all their transactions? This cannot be undone.')) return;
+    if (!confirm('Delete this caretaker and all their transactions? This cannot be undone.')) return;
     await fetch(`/api/clients/${id}`, { method: 'DELETE' });
     fetchClients();
   }
@@ -124,14 +118,10 @@ export default function ClientsPage() {
             <p className="text-xs text-gray-400 mb-3">{client.transaction_count} transaction(s)</p>
 
             {/* Current batch stats */}
-            <div className="grid grid-cols-2 gap-x-4 gap-y-3 py-3 border-t border-gray-100 mb-3">
+            <div className="grid grid-cols-3 gap-x-4 gap-y-3 py-3 border-t border-gray-100 mb-3">
               <div>
                 <p className="text-xs text-gray-500">Heads</p>
                 <p className="text-sm font-semibold text-green-700">{client.current_heads ?? '—'}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500">Allocation</p>
-                <p className="text-sm font-semibold text-gray-900">{client.current_allocation ? peso(Number(client.current_allocation)) : '—'}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500">App. Date</p>
@@ -146,7 +136,7 @@ export default function ClientsPage() {
             {/* Actions */}
             <div className="flex items-center gap-2">
               <button
-                onClick={() => router.push(`/clients/${client.id}`)}
+                onClick={() => router.push(`/caretakers/${client.id}`)}
                 className="flex-1 flex items-center justify-center gap-2 border border-gray-200 text-gray-700 py-1.5 rounded-lg text-sm hover:bg-gray-50 transition-colors"
               >
                 <Eye className="w-4 h-4" />
