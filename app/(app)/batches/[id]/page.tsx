@@ -93,7 +93,7 @@ export default function BatchDetailPage() {
 
   const totalDffs1    = totalDebit * 0.0003;
   const totalInterest = totalDebit * 0.0006;
-  const dffs2         = 50 * totalBags;
+  const dffs2         = 50 * (batch?.heads ?? 0);
   const grandTotal    = balance + totalInterest + totalDffs1 + dffs2;
 
   if (loading) {

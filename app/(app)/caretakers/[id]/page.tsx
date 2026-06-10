@@ -143,7 +143,7 @@ export default function CaretakerLedgerPage() {
 
   const totalDffs1    = totalDebit * 0.0003;
   const totalInterest = totalDebit * 0.0006;
-  const dffs2         = 50 * totalBags;
+  const dffs2         = 50 * (batches[0]?.heads ?? 0);
   const grandTotal    = balance + totalInterest + totalDffs1 + dffs2;
 
   if (loading) {
