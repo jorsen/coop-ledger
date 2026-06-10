@@ -131,18 +131,29 @@ export default function CaretakerLedgerPage() {
   const totalDeliveryFee = transactions.reduce((s, t) => s + Number(t.delivery_fee ?? 0), 0);
   const balance          = totalDebit - totalCredit;
 
+  const batchHaulMap = new Map(batches.map(b => [b.batch_number, b.date_of_hauling]));
+
   const withComputed = transactions.map((tx, i) => {
     const runningBalance = transactions
       .slice(0, i + 1)
       .reduce((s, t) => s + Number(t.debit) - Number(t.credit), 0);
-    const d        = Number(tx.debit);
-    const dffs1    = d * 0.0003;
-    const interest = d * 0.0006;
+    const d = Number(tx.debit);
+    const haulDate = tx.batch_no ? (batchHaulMap.get(tx.batch_no) ?? null) : null;
+    let dffs1: number;
+    let interest: number;
+    if (haulDate) {
+      const months = (new Date(haulDate).getTime() - new Date(tx.date).getTime()) / (1000 * 60 * 60 * 24 * 30);
+      dffs1    = d * 0.003 * Math.max(0, months);
+      interest = d * 0.006 * Math.max(0, months);
+    } else {
+      dffs1    = d * 0.0003;
+      interest = d * 0.0006;
+    }
     return { ...tx, runningBalance, dffs1, interest };
   });
 
-  const totalDffs1    = totalDebit * 0.0003;
-  const totalInterest = totalDebit * 0.0006;
+  const totalDffs1    = withComputed.reduce((s, tx) => s + tx.dffs1, 0);
+  const totalInterest = withComputed.reduce((s, tx) => s + tx.interest, 0);
   const dffs2         = 50 * (batches[0]?.heads ?? 0);
   const grandTotal    = balance + totalInterest + totalDffs1 + dffs2;
 
