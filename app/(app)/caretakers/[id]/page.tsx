@@ -131,23 +131,13 @@ export default function CaretakerLedgerPage() {
   const totalDeliveryFee = transactions.reduce((s, t) => s + Number(t.delivery_fee ?? 0), 0);
   const balance          = totalDebit - totalCredit;
 
-  const currentHaulDate = batches[0]?.date_of_hauling ?? null;
-
   const withComputed = transactions.map((tx, i) => {
     const runningBalance = transactions
       .slice(0, i + 1)
       .reduce((s, t) => s + Number(t.debit) - Number(t.credit), 0);
     const d = Number(tx.debit);
-    let dffs1: number;
-    let interest: number;
-    if (currentHaulDate) {
-      const months = (new Date(currentHaulDate).getTime() - new Date(tx.date).getTime()) / (1000 * 60 * 60 * 24 * 30);
-      dffs1    = Math.round(d * 0.003 * Math.max(0, months) * 100) / 100;
-      interest = Math.round(d * 0.006 * Math.max(0, months) * 100) / 100;
-    } else {
-      dffs1    = Math.round(d * 0.0003 * 100) / 100;
-      interest = Math.round(d * 0.0006 * 100) / 100;
-    }
+    const dffs1    = Math.round(d * 0.003 * 100) / 100;
+    const interest = Math.round(d * 0.006 * 100) / 100;
     return { ...tx, runningBalance, dffs1, interest };
   });
 
