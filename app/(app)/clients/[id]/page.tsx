@@ -223,11 +223,11 @@ export default function ClientLedgerPage() {
             <p className="font-bold text-gray-900">{client.name}</p>
           </div>
           <div>
-            <p className="text-xs font-medium text-gray-400 mb-0.5">BATCH #</p>
-            <p className="font-semibold text-blue-600">{client.batch_number || '—'}</p>
+            <p className="text-xs font-medium text-gray-400 mb-0.5">CURRENT BATCH #</p>
+            <p className="font-semibold text-blue-600">{batches[0]?.batch_number || '—'}</p>
           </div>
           <div>
-            <p className="text-xs font-medium text-gray-400 mb-0.5">CLIENT ID</p>
+            <p className="text-xs font-medium text-gray-400 mb-0.5">CARETAKER ID</p>
             <p className="font-semibold text-gray-700">{client.client_code}</p>
           </div>
           <div>
@@ -238,19 +238,19 @@ export default function ClientLedgerPage() {
           </div>
           <div>
             <p className="text-xs font-medium text-gray-400 mb-0.5"># OF HEADS</p>
-            <p className="font-semibold text-gray-900">{client.heads || '—'}</p>
+            <p className="font-semibold text-gray-900">{batches[0]?.heads ?? '—'}</p>
           </div>
           <div>
             <p className="text-xs font-medium text-gray-400 mb-0.5">ALLOCATION</p>
-            <p className="font-semibold text-gray-900">₱{num(client.allocation)}</p>
+            <p className="font-semibold text-gray-900">{batches[0]?.allocation ? `₱${num(Number(batches[0].allocation))}` : '—'}</p>
           </div>
           <div>
             <p className="text-xs font-medium text-gray-400 mb-0.5">DATE OF APPLICATION</p>
-            <p className="font-semibold text-gray-900">{client.date_of_application ? fmtDate(client.date_of_application) : '—'}</p>
+            <p className="font-semibold text-gray-900">{batches[0]?.date_of_application ? fmtDate(batches[0].date_of_application) : '—'}</p>
           </div>
           <div>
             <p className="text-xs font-medium text-gray-400 mb-0.5">DATE OF HAULING</p>
-            <p className="font-semibold text-gray-900">{client.date_of_hauling ? fmtDate(client.date_of_hauling) : '—'}</p>
+            <p className="font-semibold text-red-600">{batches[0]?.date_of_hauling ? fmtDate(batches[0].date_of_hauling) : '—'}</p>
           </div>
         </div>
       </div>
@@ -382,11 +382,14 @@ export default function ClientLedgerPage() {
           <p className="text-sm text-gray-400 text-center py-8">No batches yet. Create one to group transactions.</p>
         ) : (
           <div className="divide-y divide-gray-50">
-            {batches.map((b) => (
+            {batches.map((b, i) => (
               <div key={b.id} className="px-4 sm:px-6 py-3 flex flex-wrap items-center gap-x-4 gap-y-2 hover:bg-gray-50/50">
                 <span className="bg-green-800 text-white text-xs font-bold px-2 py-0.5 rounded shrink-0">
                   {b.batch_number}
                 </span>
+                {i === 0 && (
+                  <span className="bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-0.5 rounded shrink-0">Current</span>
+                )}
                 <span className="text-sm text-gray-500 shrink-0">
                   {fmtDate(b.batch_date)}
                 </span>
@@ -450,33 +453,16 @@ export default function ClientLedgerPage() {
                   className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
                 />
               </div>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <div style={{ flex: 1 }}>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Heads</label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={batchForm.heads}
-                    onChange={(e) => {
-                      const h = e.target.value;
-                      const alloc = pricePerBag > 0 && Number(h) > 0 ? String(Number(h) * 5 * pricePerBag) : '';
-                      setBatchForm((f) => ({ ...f, heads: h, allocation: alloc }));
-                    }}
-                    placeholder="0"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Allocation (₱)</label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={batchForm.allocation}
-                    onChange={(e) => setBatchForm((f) => ({ ...f, allocation: e.target.value }))}
-                    placeholder="0"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-                  />
-                </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Heads</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={batchForm.heads}
+                  onChange={(e) => setBatchForm((f) => ({ ...f, heads: e.target.value }))}
+                  placeholder="0"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                />
               </div>
               <div style={{ display: 'flex', gap: '12px' }}>
                 <div style={{ flex: 1 }}>
@@ -556,22 +542,7 @@ export default function ClientLedgerPage() {
                     type="text"
                     inputMode="numeric"
                     value={editBatchForm.heads}
-                    onChange={(e) => {
-                      const h = e.target.value;
-                      const alloc = pricePerBag > 0 && Number(h) > 0 ? String(Number(h) * 5 * pricePerBag) : '';
-                      setEditBatchForm((f) => ({ ...f, heads: h, allocation: alloc }));
-                    }}
-                    placeholder="0"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Allocation (₱)</label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={editBatchForm.allocation}
-                    onChange={(e) => setEditBatchForm((f) => ({ ...f, allocation: e.target.value }))}
+                    onChange={(e) => setEditBatchForm((f) => ({ ...f, heads: e.target.value }))}
                     placeholder="0"
                     className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
                   />

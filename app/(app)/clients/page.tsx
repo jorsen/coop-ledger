@@ -17,6 +17,11 @@ interface Client {
   date_of_hauling: string;
   date_of_application: string;
   transaction_count: number;
+  current_batch_number: string | null;
+  current_heads: number | null;
+  current_allocation: number | null;
+  current_date_of_application: string | null;
+  current_date_of_hauling: string | null;
 }
 
 const peso = (n: number) =>
@@ -93,7 +98,7 @@ export default function ClientsPage() {
       </div>
 
       {filtered.length === 0 && (
-        <p className="text-gray-400 text-sm text-center py-16">No clients found.</p>
+        <p className="text-gray-400 text-sm text-center py-16">No caretakers found.</p>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -113,27 +118,28 @@ export default function ClientsPage() {
               </span>
             </div>
             <p className="text-xs text-gray-500">
-              ID: {client.client_code} · Batch #{client.batch_number}
+              ID: {client.client_code}
+              {client.current_batch_number && <> · Batch <span className="font-medium text-green-700">#{client.current_batch_number}</span></>}
             </p>
             <p className="text-xs text-gray-400 mb-3">{client.transaction_count} transaction(s)</p>
 
-            {/* Stats */}
+            {/* Current batch stats */}
             <div className="grid grid-cols-2 gap-x-4 gap-y-3 py-3 border-t border-gray-100 mb-3">
               <div>
                 <p className="text-xs text-gray-500">Heads</p>
-                <p className="text-sm font-semibold text-green-700">{client.heads || '—'}</p>
+                <p className="text-sm font-semibold text-green-700">{client.current_heads ?? '—'}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500">Allocation</p>
-                <p className="text-sm font-semibold text-gray-900">{peso(client.allocation)}</p>
+                <p className="text-sm font-semibold text-gray-900">{client.current_allocation ? peso(Number(client.current_allocation)) : '—'}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500">App. Date</p>
-                <p className="text-sm font-semibold text-gray-900">{fmtDate(client.date_of_application)}</p>
+                <p className="text-sm font-semibold text-gray-900">{fmtDate(client.current_date_of_application)}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500">Hauling Date</p>
-                <p className="text-sm font-semibold text-red-600">{fmtDate(client.date_of_hauling)}</p>
+                <p className="text-sm font-semibold text-red-600">{fmtDate(client.current_date_of_hauling)}</p>
               </div>
             </div>
 

@@ -9,10 +9,22 @@ export async function GET() {
   const clients = await sql`
     SELECT
       c.*,
-      COUNT(t.id)::int AS transaction_count
+      COUNT(t.id)::int AS transaction_count,
+      lb.batch_number        AS current_batch_number,
+      lb.heads               AS current_heads,
+      lb.allocation          AS current_allocation,
+      lb.date_of_application AS current_date_of_application,
+      lb.date_of_hauling     AS current_date_of_hauling
     FROM clients c
     LEFT JOIN transactions t ON t.client_id = c.id
-    GROUP BY c.id
+    LEFT JOIN LATERAL (
+      SELECT b.batch_number, b.heads, b.allocation, b.date_of_application, b.date_of_hauling
+      FROM batches b
+      WHERE b.client_id = c.id
+      ORDER BY b.created_at DESC
+      LIMIT 1
+    ) lb ON true
+    GROUP BY c.id, lb.batch_number, lb.heads, lb.allocation, lb.date_of_application, lb.date_of_hauling
     ORDER BY c.name ASC
   `;
 
