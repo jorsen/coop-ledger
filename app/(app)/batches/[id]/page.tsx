@@ -117,7 +117,7 @@ export default function BatchDetailPage() {
   return (
     <div>
       {/* Print header */}
-      <div className="hidden print:flex print:items-center print:justify-between mb-2 border-b border-gray-400 pb-1 text-xs">
+      <div className="hidden print:hidden print:items-center print:justify-between mb-2 border-b border-gray-400 pb-1 text-xs">
         <div className="flex items-center gap-4">
           {batch.client_name && <span><span className="text-gray-500">NAME: </span><strong>{batch.client_name}</strong></span>}
           <span><span className="text-gray-500">BATCH #: </span><strong>{batch.batch_number}</strong></span>
@@ -151,8 +151,8 @@ export default function BatchDetailPage() {
       </div>
 
       {batch.client_name && (
-        <div className="bg-white rounded-xl border border-gray-200 px-6 py-5 mb-4 text-sm">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-4">
+        <div className="bg-white rounded-xl border border-gray-200 px-6 py-5 mb-4 text-sm print:border-0 print:rounded-none print:px-0 print:py-1 print:mb-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-4 print:grid-cols-4 print:gap-x-6 print:gap-y-1 print:text-xs">
             <div>
               <p className="text-xs font-medium text-gray-600 mb-0.5">NAME</p>
               <p className="font-bold text-gray-900">{batch.client_name}</p>
@@ -267,9 +267,9 @@ export default function BatchDetailPage() {
 
         {/* Billing summary */}
         {withComputed.length > 0 && (
-          <div className="border-t border-gray-200 px-6 py-4">
+          <div className="border-t border-gray-200 px-6 py-4 print:px-2 print:py-2">
             <div className="flex justify-end">
-              <div className="w-72 space-y-1.5 text-sm">
+              <div className="w-72 space-y-1.5 text-sm print:text-xs print:w-56">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Principal</span>
                   <span className="font-medium text-gray-900">{num(balance)}</span>
