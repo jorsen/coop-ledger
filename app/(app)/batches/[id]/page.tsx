@@ -151,7 +151,7 @@ export default function BatchDetailPage() {
       </div>
 
       {batch.client_name && (
-        <div className="bg-white rounded-xl border border-gray-200 px-6 py-5 mb-4 text-sm print:rounded-none print:px-0 print:py-0 print:mb-0 print-card">
+        <div className="bg-white rounded-xl border border-gray-200 px-6 py-5 mb-4 text-sm print:rounded-sm print-card">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-4 print:grid-cols-4 print:gap-x-6 print:gap-y-1 print:text-xs">
             <div>
               <p className="text-xs font-medium text-gray-600 mb-0.5">NAME</p>
@@ -257,7 +257,7 @@ export default function BatchDetailPage() {
                   <td className="px-4 py-3 text-right text-gray-900">{num(balance)}</td>
                   <td className="px-4 py-3 text-right text-gray-700 print:hidden">{num(totalDffs1)}</td>
                   <td className="px-4 py-3 text-right text-gray-700">{num(totalInterest)}</td>
-                  <td colSpan={2} className="px-4 py-3" />
+                  <td colSpan={2} className="px-4 py-3 print:hidden" />
                   <td className="print:hidden" />
                 </tr>
               )}
