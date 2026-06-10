@@ -285,7 +285,7 @@ export default function BatchDetailPage() {
                   </div>
                   <div className="font-bold text-gray-900 underline">{num(grandTotal)}</div>
                 </div>
-                <div className="flex justify-between border-t border-gray-300 pt-2 mt-1">
+                <div className="flex print:hidden justify-between border-t border-gray-300 pt-2 mt-1">
                   <span className="font-bold text-gray-900">Grand Total</span>
                   <div className="font-bold text-gray-900 underline">{num(grandTotal + totalDeliveryFee)}</div>
                 </div>
