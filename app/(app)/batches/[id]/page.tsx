@@ -278,11 +278,11 @@ export default function BatchDetailPage() {
                   <span className="text-gray-600">Interest</span>
                   <span className="font-medium text-gray-900">{num(totalInterest)}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex print:hidden justify-between">
                   <span className="text-gray-600">DFFS 1</span>
                   <span className="font-medium text-gray-900">{num(totalDffs1)}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex print:hidden justify-between">
                   <span className="text-gray-600">DFFS 2</span>
                   <span className="font-medium text-gray-900">{num(dffs2)}</span>
                 </div>
