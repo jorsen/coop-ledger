@@ -14,6 +14,7 @@ interface Batch {
   notes: string;
   date_of_application: string | null;
   date_of_hauling: string | null;
+  maturity_date: string | null;
   heads: number | null;
   client_name: string | null;
   client_code: string | null;
@@ -174,6 +175,10 @@ export default function BatchDetailPage() {
             <div>
               <p className="text-xs font-medium text-gray-400 mb-0.5">DATE OF HAULING</p>
               <p className="font-semibold text-red-600">{batch.date_of_hauling ? fmtDate(batch.date_of_hauling) : '—'}</p>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-gray-400 mb-0.5">MATURITY DATE</p>
+              <p className="font-semibold text-green-700">{batch.maturity_date ? fmtDate(batch.maturity_date) : '—'}</p>
             </div>
           </div>
         </div>

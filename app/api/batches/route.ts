@@ -45,10 +45,11 @@ export async function POST(req: NextRequest) {
   if (error) return error;
 
   try {
-    const { batch_date, notes, client_id, batch_number, date_of_application, date_of_hauling, heads, allocation } = await req.json();
+    const { batch_date, notes, client_id, batch_number, date_of_application, date_of_hauling, maturity_date, heads, allocation } = await req.json();
 
     await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS date_of_application DATE`;
     await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS date_of_hauling DATE`;
+    await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS maturity_date DATE`;
     await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS heads INTEGER`;
     await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS allocation DECIMAL(12,2)`;
 
@@ -57,9 +58,9 @@ export async function POST(req: NextRequest) {
     let batch;
     if (batch_number?.trim()) {
       const [b] = await sql`
-        INSERT INTO batches (batch_number, client_id, batch_date, notes, date_of_application, date_of_hauling, heads, allocation)
+        INSERT INTO batches (batch_number, client_id, batch_date, notes, date_of_application, date_of_hauling, maturity_date, heads, allocation)
         VALUES (${batch_number.trim()}, ${client_id || null}, ${dateVal}, ${notes || ''},
-          ${date_of_application || null}, ${date_of_hauling || null},
+          ${date_of_application || null}, ${date_of_hauling || null}, ${maturity_date || null},
           ${heads ? Number(heads) : null}, ${allocation ? Number(allocation) : null})
         RETURNING *
       `;
@@ -67,9 +68,9 @@ export async function POST(req: NextRequest) {
     } else {
       const tmpName = `__TMP__${Date.now()}`;
       const [inserted] = await sql`
-        INSERT INTO batches (batch_number, client_id, batch_date, notes, date_of_application, date_of_hauling, heads, allocation)
+        INSERT INTO batches (batch_number, client_id, batch_date, notes, date_of_application, date_of_hauling, maturity_date, heads, allocation)
         VALUES (${tmpName}, ${client_id || null}, ${dateVal}, ${notes || ''},
-          ${date_of_application || null}, ${date_of_hauling || null},
+          ${date_of_application || null}, ${date_of_hauling || null}, ${maturity_date || null},
           ${heads ? Number(heads) : null}, ${allocation ? Number(allocation) : null})
         RETURNING id
       `;

@@ -13,6 +13,7 @@ interface Batch {
   notes: string;
   date_of_application: string | null;
   date_of_hauling: string | null;
+  maturity_date: string | null;
   heads: number | null;
   transaction_count: number;
   total_bags: number;
@@ -63,10 +64,10 @@ export default function CaretakerLedgerPage() {
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<{ tx?: Transaction } | null>(null);
   const [batchModal, setBatchModal] = useState(false);
-  const [batchForm, setBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', heads: '' });
+  const [batchForm, setBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', maturity_date: '', heads: '' });
   const [savingBatch, setSavingBatch] = useState(false);
   const [editBatch, setEditBatch] = useState<Batch | null>(null);
-  const [editBatchForm, setEditBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', heads: '' });
+  const [editBatchForm, setEditBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', maturity_date: '', heads: '' });
   const [savingEditBatch, setSavingEditBatch] = useState(false);
 
   const fetchData = useCallback(async () => {
@@ -96,7 +97,7 @@ export default function CaretakerLedgerPage() {
     });
     setSavingBatch(false);
     setBatchModal(false);
-    setBatchForm({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', heads: '' });
+    setBatchForm({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', maturity_date: '', heads: '' });
     fetchData();
   }
 
@@ -233,6 +234,10 @@ export default function CaretakerLedgerPage() {
           <div>
             <p className="text-xs font-medium text-gray-400 mb-0.5">DATE OF HAULING</p>
             <p className="font-semibold text-red-600">{batches[0]?.date_of_hauling ? fmtDate(batches[0].date_of_hauling) : '—'}</p>
+          </div>
+          <div>
+            <p className="text-xs font-medium text-gray-400 mb-0.5">MATURITY DATE</p>
+            <p className="font-semibold text-green-700">{batches[0]?.maturity_date ? fmtDate(batches[0].maturity_date) : '—'}</p>
           </div>
         </div>
       </div>
@@ -377,7 +382,7 @@ export default function CaretakerLedgerPage() {
                     <Eye className="w-3.5 h-3.5" /> View
                   </button>
                   <button
-                    onClick={() => { setEditBatch(b); setEditBatchForm({ batch_number: b.batch_number, batch_date: b.batch_date, notes: b.notes, date_of_application: b.date_of_application ?? '', date_of_hauling: b.date_of_hauling ?? '', heads: b.heads ? String(b.heads) : '' }); }}
+                    onClick={() => { setEditBatch(b); setEditBatchForm({ batch_number: b.batch_number, batch_date: b.batch_date, notes: b.notes, date_of_application: b.date_of_application ?? '', date_of_hauling: b.date_of_hauling ?? '', maturity_date: b.maturity_date ?? '', heads: b.heads ? String(b.heads) : '' }); }}
                     className="text-gray-400 hover:text-gray-600"
                   >
                     <Pencil className="w-3.5 h-3.5" />
@@ -455,6 +460,16 @@ export default function CaretakerLedgerPage() {
                     style={{ backgroundColor: '#ffffff', height: '42px', WebkitAppearance: 'none', appearance: 'none' }}
                   />
                 </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1 text-green-700">Maturity Date</label>
+                <input
+                  type="date"
+                  value={batchForm.maturity_date}
+                  onChange={(e) => setBatchForm((f) => ({ ...f, maturity_date: e.target.value }))}
+                  className="w-full border border-green-300 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                  style={{ backgroundColor: '#ffffff', height: '42px', WebkitAppearance: 'none', appearance: 'none' }}
+                />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Notes</label>
@@ -537,6 +552,16 @@ export default function CaretakerLedgerPage() {
                     style={{ backgroundColor: '#ffffff', height: '42px', WebkitAppearance: 'none', appearance: 'none' }}
                   />
                 </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1 text-green-700">Maturity Date</label>
+                <input
+                  type="date"
+                  value={editBatchForm.maturity_date}
+                  onChange={(e) => setEditBatchForm((f) => ({ ...f, maturity_date: e.target.value }))}
+                  className="w-full border border-green-300 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                  style={{ backgroundColor: '#ffffff', height: '42px', WebkitAppearance: 'none', appearance: 'none' }}
+                />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Notes</label>
