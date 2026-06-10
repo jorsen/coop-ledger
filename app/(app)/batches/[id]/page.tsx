@@ -91,11 +91,11 @@ export default function BatchDetailPage() {
     let interest: number;
     if (haulDate) {
       const months = (new Date(haulDate).getTime() - new Date(tx.date).getTime()) / (1000 * 60 * 60 * 24 * 30);
-      dffs1    = d * 0.003 * Math.max(0, months);
-      interest = d * 0.006 * Math.max(0, months);
+      dffs1    = Math.round(d * 0.003 * Math.max(0, months) * 100) / 100;
+      interest = Math.round(d * 0.006 * Math.max(0, months) * 100) / 100;
     } else {
-      dffs1    = d * 0.0003;
-      interest = d * 0.0006;
+      dffs1    = Math.round(d * 0.0003 * 100) / 100;
+      interest = Math.round(d * 0.0006 * 100) / 100;
     }
     return { ...tx, runningBalance, dffs1, interest };
   });
