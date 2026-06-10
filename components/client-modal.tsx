@@ -37,13 +37,26 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
   const [form, setForm] = useState<Client>(client ?? EMPTY);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [pricePerBag, setPricePerBag] = useState(0);
 
   useEffect(() => {
     setForm(client ?? EMPTY);
   }, [client]);
 
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(r => r.json())
+      .then(data => setPricePerBag(Number(data.price_per_bag ?? 0)));
+  }, []);
+
   function set(key: keyof Client, value: string | number) {
     setForm((f) => ({ ...f, [key]: value }));
+  }
+
+  function handleHeadsChange(value: string) {
+    const heads = Number(value);
+    const allocation = pricePerBag > 0 && heads > 0 ? heads * 5 * pricePerBag : '';
+    setForm((f) => ({ ...f, heads: value, allocation: allocation === '' ? '' : String(allocation) }));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -132,7 +145,7 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
                 type="text"
                 inputMode="numeric"
                 value={form.heads}
-                onChange={(e) => set('heads', e.target.value)}
+                onChange={(e) => handleHeadsChange(e.target.value)}
                 placeholder="0"
                 className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
               />
