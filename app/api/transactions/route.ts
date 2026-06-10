@@ -12,39 +12,21 @@ export async function GET(req: NextRequest) {
   const to = searchParams.get('to');
   const search = searchParams.get('search');
 
-  let transactions;
+  let transactions = await sql`
+    SELECT t.*, c.name AS client_name,
+      CASE WHEN t.bags > 0 THEN ROUND(t.debit / t.bags, 2) ELSE NULL END AS price_per_bag,
+      0 AS delivery_fee
+    FROM transactions t
+    JOIN clients c ON c.id = t.client_id
+    ORDER BY t.date DESC, t.created_at DESC
+  `;
 
-  if (clientId) {
-    transactions = await sql`
-      SELECT t.*, c.name AS client_name,
-        CASE WHEN t.bags > 0 THEN ROUND(t.debit / t.bags, 2) ELSE NULL END AS price_per_bag,
-        0 AS delivery_fee
-      FROM transactions t
-      JOIN clients c ON c.id = t.client_id
-      WHERE t.client_id = ${clientId}
-      ORDER BY t.date DESC, t.created_at DESC
-    `;
-  } else if (from || to || search) {
-    transactions = await sql`
-      SELECT t.*, c.name AS client_name,
-        CASE WHEN t.bags > 0 THEN ROUND(t.debit / t.bags, 2) ELSE NULL END AS price_per_bag,
-        0 AS delivery_fee
-      FROM transactions t
-      JOIN clients c ON c.id = t.client_id
-      WHERE (${from}::date IS NULL OR t.date >= ${from}::date)
-        AND (${to}::date   IS NULL OR t.date <= ${to}::date)
-        AND (${search} IS NULL OR ${search} = '' OR c.name ILIKE ${'%' + (search ?? '') + '%'})
-      ORDER BY t.date DESC, t.created_at DESC
-    `;
-  } else {
-    transactions = await sql`
-      SELECT t.*, c.name AS client_name,
-        CASE WHEN t.bags > 0 THEN ROUND(t.debit / t.bags, 2) ELSE NULL END AS price_per_bag,
-        0 AS delivery_fee
-      FROM transactions t
-      JOIN clients c ON c.id = t.client_id
-      ORDER BY t.date DESC, t.created_at DESC
-    `;
+  if (clientId) transactions = transactions.filter((t) => String(t.client_id) === clientId);
+  if (from)     transactions = transactions.filter((t) => t.date >= from);
+  if (to)       transactions = transactions.filter((t) => t.date <= to);
+  if (search) {
+    const q = search.toLowerCase();
+    transactions = transactions.filter((t) => t.client_name.toLowerCase().includes(q));
   }
 
   return NextResponse.json(transactions);

@@ -85,25 +85,8 @@ export default function BatchDetailPage() {
     const runningBalance = transactions
       .slice(0, i + 1)
       .reduce((s, t) => s + Number(t.debit) - Number(t.credit), 0);
-    const d = Number(tx.debit);
-    const haulDate = batch?.date_of_hauling ?? null;
-    let dffs1: number;
-    let interest: number;
-    if (haulDate) {
-      const months = (new Date(haulDate).getTime() - new Date(tx.date).getTime()) / (1000 * 60 * 60 * 24 * 30);
-      dffs1    = Math.round(d * 0.003 * Math.max(0, months) * 100) / 100;
-      interest = Math.round(d * 0.006 * Math.max(0, months) * 100) / 100;
-    } else {
-      dffs1    = Math.round(d * 0.003 * 100) / 100;
-      interest = Math.round(d * 0.006 * 100) / 100;
-    }
-    return { ...tx, runningBalance, dffs1, interest };
+    return { ...tx, runningBalance };
   });
-
-  const totalDffs1    = withComputed.reduce((s, tx) => s + tx.dffs1, 0);
-  const totalInterest = withComputed.reduce((s, tx) => s + tx.interest, 0);
-  const dffs2         = 50 * (batch?.heads ?? 0);
-  const grandTotal    = balance + totalInterest + totalDffs1 + dffs2;
 
   if (loading) {
     return (
@@ -201,15 +184,13 @@ export default function BatchDetailPage() {
                 <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Debit</th>
                 <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Delivery Fee</th>
                 <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Balance</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">DFFS 1</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">INTEREST</th>
                 <th className="px-4 py-3 print:hidden" />
               </tr>
             </thead>
             <tbody>
               {withComputed.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="text-center text-sm text-gray-400 py-10">
+                  <td colSpan={8} className="text-center text-sm text-gray-400 py-10">
                     No transactions in this batch yet.
                   </td>
                 </tr>
@@ -225,8 +206,6 @@ export default function BatchDetailPage() {
                   <td className="px-4 py-3 text-gray-900 text-right">{num(tx.debit)}</td>
                   <td className="px-4 py-3 text-gray-600 text-right">{num(Number(tx.delivery_fee ?? 0))}</td>
                   <td className="px-4 py-3 font-semibold text-gray-900 text-right">{num(tx.runningBalance)}</td>
-                  <td className="px-4 py-3 text-gray-600 text-right">{tx.dffs1.toFixed(2)}</td>
-                  <td className="px-4 py-3 text-gray-600 text-right">{tx.interest.toFixed(2)}</td>
                   <td className="px-4 py-3 print:hidden">
                     <div className="flex items-center justify-end gap-2">
                       <button onClick={() => setModal({ tx })} className="p-1 text-gray-400 hover:text-gray-600">
@@ -248,8 +227,6 @@ export default function BatchDetailPage() {
                   <td className="px-4 py-3 text-right text-gray-900">{num(totalDebit)}</td>
                   <td className="px-4 py-3 text-right text-gray-600">{num(totalDeliveryFee)}</td>
                   <td className="px-4 py-3 text-right text-gray-900">{num(balance)}</td>
-                  <td className="px-4 py-3 text-right text-gray-700">{totalDffs1.toFixed(2)}</td>
-                  <td className="px-4 py-3 text-right text-gray-700">{totalInterest.toFixed(2)}</td>
                   <td className="print:hidden" />
                 </tr>
               )}
@@ -267,35 +244,12 @@ export default function BatchDetailPage() {
                   <span className="font-medium text-gray-900">{num(balance)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Interest</span>
-                  <span className="font-medium text-gray-900">{num(totalInterest)}</span>
-                </div>
-                <div className="flex print:hidden justify-between">
-                  <span className="text-gray-600">DFFS 1</span>
-                  <span className="font-medium text-gray-900">{num(totalDffs1)}</span>
-                </div>
-                <div className="flex print:hidden justify-between">
-                  <span className="text-gray-600">DFFS 2</span>
-                  <span className="font-medium text-gray-900">{num(dffs2)}</span>
-                </div>
-                <div className="flex justify-between">
                   <span className="text-gray-600">Del Fee</span>
                   <span className="font-medium text-gray-900">{num(totalDeliveryFee)}</span>
                 </div>
-                <div className="hidden print:flex justify-between border-t border-gray-200 pt-1.5">
-                  <span className="text-gray-600">Total</span>
-                  <span className="font-medium text-gray-900">{num(balance + totalInterest + totalDeliveryFee)}</span>
-                </div>
-                <div className="flex print:hidden justify-between border-t border-gray-300 pt-2 mt-1">
-                  <div>
-                    <div className="font-bold text-gray-900">Total</div>
-                    <div className="text-xs text-gray-400 mt-0.5">Principal + Interest + Del. Fee</div>
-                  </div>
-                  <div className="font-bold text-gray-900 underline">{num(grandTotal)}</div>
-                </div>
-                <div className="flex print:hidden justify-between border-t border-gray-300 pt-2 mt-1">
-                  <span className="font-bold text-gray-900">Grand Total</span>
-                  <div className="font-bold text-gray-900 underline">{num(grandTotal + totalDeliveryFee)}</div>
+                <div className="flex justify-between border-t border-gray-200 pt-1.5 mt-1">
+                  <span className="font-bold text-gray-900">Total</span>
+                  <span className="font-bold text-gray-900 underline">{num(balance + totalDeliveryFee)}</span>
                 </div>
               </div>
             </div>
