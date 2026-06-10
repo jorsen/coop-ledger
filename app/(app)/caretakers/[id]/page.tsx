@@ -204,40 +204,40 @@ export default function CaretakerLedgerPage() {
       </div>
 
       {/* ── Caretaker info card ───────────────────────────────────────── */}
-      <div className="bg-white border border-gray-200 rounded-xl px-6 py-5 mb-6 print:border-0 print:px-0 print:py-2">
+      <div className="bg-white border border-gray-200 rounded-xl px-6 py-5 mb-6 print:hidden">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-4 text-sm">
           <div>
-            <p className="text-xs font-medium text-gray-400 mb-0.5">NAME</p>
+            <p className="text-xs font-medium text-gray-600 mb-0.5">NAME</p>
             <p className="font-bold text-gray-900">{client.name}</p>
           </div>
           <div>
-            <p className="text-xs font-medium text-gray-400 mb-0.5">CURRENT BATCH #</p>
+            <p className="text-xs font-medium text-gray-600 mb-0.5">CURRENT BATCH #</p>
             <p className="font-semibold text-blue-600">{batches[0]?.batch_number || '—'}</p>
           </div>
           <div>
-            <p className="text-xs font-medium text-gray-400 mb-0.5">CARETAKER ID</p>
+            <p className="text-xs font-medium text-gray-600 mb-0.5">CARETAKER ID</p>
             <p className="font-semibold text-gray-700">{client.client_code}</p>
           </div>
           <div>
-            <p className="text-xs font-medium text-gray-400 mb-0.5">STATUS</p>
+            <p className="text-xs font-medium text-gray-600 mb-0.5">STATUS</p>
             <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${client.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-500'}`}>
               {client.status.charAt(0).toUpperCase() + client.status.slice(1)}
             </span>
           </div>
           <div>
-            <p className="text-xs font-medium text-gray-400 mb-0.5"># OF HEADS</p>
+            <p className="text-xs font-medium text-gray-600 mb-0.5"># OF HEADS</p>
             <p className="font-semibold text-gray-900">{batches[0]?.heads ?? '—'}</p>
           </div>
           <div>
-            <p className="text-xs font-medium text-gray-400 mb-0.5">DATE OF APPLICATION</p>
+            <p className="text-xs font-medium text-gray-600 mb-0.5">DATE OF APPLICATION</p>
             <p className="font-semibold text-gray-900">{batches[0]?.date_of_application ? fmtDate(batches[0].date_of_application) : '—'}</p>
           </div>
           <div>
-            <p className="text-xs font-medium text-gray-400 mb-0.5">DATE OF HAULING</p>
+            <p className="text-xs font-medium text-gray-600 mb-0.5">DATE OF HAULING</p>
             <p className="font-semibold text-red-600">{batches[0]?.date_of_hauling ? fmtDate(batches[0].date_of_hauling) : '—'}</p>
           </div>
           <div>
-            <p className="text-xs font-medium text-gray-400 mb-0.5">MATURITY DATE</p>
+            <p className="text-xs font-medium text-gray-600 mb-0.5">MATURITY DATE</p>
             <p className="font-semibold text-green-700">{batches[0]?.maturity_date ? fmtDate(batches[0].maturity_date) : '—'}</p>
           </div>
         </div>

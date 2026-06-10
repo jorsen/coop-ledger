@@ -154,35 +154,35 @@ export default function BatchDetailPage() {
         <div className="bg-white rounded-xl border border-gray-200 px-6 py-5 mb-4 text-sm">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-4">
             <div>
-              <p className="text-xs font-medium text-gray-400 mb-0.5">NAME</p>
+              <p className="text-xs font-medium text-gray-600 mb-0.5">NAME</p>
               <p className="font-bold text-gray-900">{batch.client_name}</p>
             </div>
             <div>
-              <p className="text-xs font-medium text-gray-400 mb-0.5">BATCH #</p>
+              <p className="text-xs font-medium text-gray-600 mb-0.5">BATCH #</p>
               <p className="font-semibold text-blue-600">{batch.batch_number}</p>
             </div>
             <div>
-              <p className="text-xs font-medium text-gray-400 mb-0.5">CLIENT ID</p>
+              <p className="text-xs font-medium text-gray-600 mb-0.5">CLIENT ID</p>
               <p className="font-semibold text-gray-700">{batch.client_code ?? '—'}</p>
             </div>
             <div>
-              <p className="text-xs font-medium text-gray-400 mb-0.5">STATUS</p>
+              <p className="text-xs font-medium text-gray-600 mb-0.5">STATUS</p>
               <span className="inline-block text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-800">Active</span>
             </div>
             <div>
-              <p className="text-xs font-medium text-gray-400 mb-0.5"># OF HEADS</p>
+              <p className="text-xs font-medium text-gray-600 mb-0.5"># OF HEADS</p>
               <p className="font-semibold text-gray-900">{batch.heads ?? '—'}</p>
             </div>
             <div>
-              <p className="text-xs font-medium text-gray-400 mb-0.5">DATE OF APPLICATION</p>
+              <p className="text-xs font-medium text-gray-600 mb-0.5">DATE OF APPLICATION</p>
               <p className="font-semibold text-gray-900">{batch.date_of_application ? fmtDate(batch.date_of_application) : '—'}</p>
             </div>
             <div>
-              <p className="text-xs font-medium text-gray-400 mb-0.5">DATE OF HAULING</p>
+              <p className="text-xs font-medium text-gray-600 mb-0.5">DATE OF HAULING</p>
               <p className="font-semibold text-red-600">{batch.date_of_hauling ? fmtDate(batch.date_of_hauling) : '—'}</p>
             </div>
             <div>
-              <p className="text-xs font-medium text-gray-400 mb-0.5">MATURITY DATE</p>
+              <p className="text-xs font-medium text-gray-600 mb-0.5">MATURITY DATE</p>
               <p className="font-semibold text-green-700">{batch.maturity_date ? fmtDate(batch.maturity_date) : '—'}</p>
             </div>
           </div>
