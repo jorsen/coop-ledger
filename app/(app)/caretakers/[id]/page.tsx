@@ -132,22 +132,27 @@ export default function CaretakerLedgerPage() {
   const totalDeliveryFee = transactions.reduce((s, t) => s + Number(t.delivery_fee ?? 0), 0);
   const balance          = totalDebit - totalCredit;
 
-  const haulDate = batches[0]?.date_of_hauling ?? null;
+  const maturityDate = batches[0]?.maturity_date ?? null;
 
   const withComputed = transactions.map((tx, i) => {
     const runningBalance = transactions
       .slice(0, i + 1)
       .reduce((s, t) => s + Number(t.debit) - Number(t.credit), 0);
     const d = Number(tx.debit);
+    let days = 0;
+    let dffs1 = 0;
     let interest = 0;
-    if (haulDate) {
-      const days = (new Date(haulDate).getTime() - new Date(tx.date).getTime()) / (1000 * 60 * 60 * 24);
-      interest = Math.round(d * 0.06 * Math.max(0, days) / 360 * 100) / 100;
+    if (maturityDate) {
+      days     = Math.max(0, Math.round((new Date(maturityDate).getTime() - new Date(tx.date).getTime()) / (1000 * 60 * 60 * 24)));
+      dffs1    = Math.round(d * 0.03 * days / 360 * 100) / 100;
+      interest = Math.round(d * 0.06 * days / 360 * 100) / 100;
     }
-    return { ...tx, runningBalance, interest };
+    return { ...tx, runningBalance, days, dffs1, interest };
   });
 
+  const totalDffs1    = withComputed.reduce((s, tx) => s + tx.dffs1, 0);
   const totalInterest = withComputed.reduce((s, tx) => s + tx.interest, 0);
+  const dffs2         = 50 * (batches[0]?.heads ?? 0);
 
   if (loading) {
     return (
@@ -255,14 +260,17 @@ export default function CaretakerLedgerPage() {
                 <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Debit</th>
                 <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Delivery Fee</th>
                 <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Balance</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">DFFS</th>
                 <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Interest</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3"># of Days</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Date Maturity</th>
                 <th className="px-4 py-3 print:hidden" />
               </tr>
             </thead>
             <tbody>
               {withComputed.length === 0 && (
                 <tr>
-                  <td colSpan={9} className="text-center text-sm text-gray-400 py-10">
+                  <td colSpan={11} className="text-center text-sm text-gray-400 py-10">
                     No transactions yet.
                   </td>
                 </tr>
@@ -278,7 +286,10 @@ export default function CaretakerLedgerPage() {
                   <td className="px-4 py-3 text-gray-900 text-right">{num(tx.debit)}</td>
                   <td className="px-4 py-3 text-gray-600 text-right">{num(Number(tx.delivery_fee ?? 0))}</td>
                   <td className="px-4 py-3 font-semibold text-gray-900 text-right">{num(tx.runningBalance)}</td>
+                  <td className="px-4 py-3 text-gray-600 text-right">{num(tx.dffs1)}</td>
                   <td className="px-4 py-3 text-gray-600 text-right">{num(tx.interest)}</td>
+                  <td className="px-4 py-3 text-gray-500 text-right">{tx.days}</td>
+                  <td className="px-4 py-3 text-green-700 text-right whitespace-nowrap">{maturityDate ? fmtDate(maturityDate) : '—'}</td>
                   <td className="px-4 py-3 print:hidden">
                     <div className="flex items-center justify-end gap-2">
                       <button onClick={() => setModal({ tx })} className="p-1 text-gray-400 hover:text-gray-600">
@@ -300,7 +311,9 @@ export default function CaretakerLedgerPage() {
                   <td className="px-4 py-3 text-right text-gray-900">{num(totalDebit)}</td>
                   <td className="px-4 py-3 text-right text-gray-600">{num(totalDeliveryFee)}</td>
                   <td className="px-4 py-3 text-right text-gray-900">{num(balance)}</td>
+                  <td className="px-4 py-3 text-right text-gray-700">{num(totalDffs1)}</td>
                   <td className="px-4 py-3 text-right text-gray-700">{num(totalInterest)}</td>
+                  <td colSpan={2} className="px-4 py-3" />
                   <td className="print:hidden" />
                 </tr>
               )}
@@ -322,12 +335,20 @@ export default function CaretakerLedgerPage() {
                   <span className="font-medium text-gray-900">{num(totalInterest)}</span>
                 </div>
                 <div className="flex justify-between">
+                  <span className="text-gray-600">DFFS 1</span>
+                  <span className="font-medium text-gray-900">{num(totalDffs1)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">DFFS 2</span>
+                  <span className="font-medium text-gray-900">{num(dffs2)}</span>
+                </div>
+                <div className="flex justify-between">
                   <span className="text-gray-600">Del Fee</span>
                   <span className="font-medium text-gray-900">{num(totalDeliveryFee)}</span>
                 </div>
                 <div className="flex justify-between border-t border-gray-200 pt-1.5 mt-1">
                   <span className="font-bold text-gray-900">Total</span>
-                  <span className="font-bold text-gray-900 underline">{num(balance + totalInterest + totalDeliveryFee)}</span>
+                  <span className="font-bold text-gray-900 underline">{num(balance + totalInterest + totalDffs1 + dffs2 + totalDeliveryFee)}</span>
                 </div>
               </div>
             </div>
