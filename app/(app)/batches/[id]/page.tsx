@@ -34,7 +34,6 @@ interface Transaction {
   delivery_fee: number;
 }
 
-const DFFS2_RATE = 0.007;
 
 const num = (n: number) =>
   new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
@@ -87,14 +86,14 @@ export default function BatchDetailPage() {
       .slice(0, i + 1)
       .reduce((s, t) => s + Number(t.debit) - Number(t.credit), 0);
     const d        = Number(tx.debit);
-    const dffs1    = Math.round(d * 1.15) / 100;
-    const interest = Math.round(d * 2.3)  / 100;
+    const dffs1    = d * 0.0003;
+    const interest = d * 0.0006;
     return { ...tx, runningBalance, dffs1, interest };
   });
 
-  const totalDffs1    = Math.round(totalDebit * 1.15) / 100;
-  const totalInterest = Math.round(totalDebit * 2.3)  / 100;
-  const dffs2         = Math.floor(balance * DFFS2_RATE);
+  const totalDffs1    = totalDebit * 0.0003;
+  const totalInterest = totalDebit * 0.0006;
+  const dffs2         = 50 * (batch.heads ?? 0);
   const grandTotal    = balance + totalInterest + totalDffs1 + dffs2;
 
   if (loading) {
