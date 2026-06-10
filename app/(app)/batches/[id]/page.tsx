@@ -264,7 +264,7 @@ export default function BatchDetailPage() {
                 </div>
                 <div className="hidden print:flex justify-between border-t border-gray-200 pt-1.5">
                   <span className="text-gray-600">Total</span>
-                  <span className="font-medium text-gray-900">{num(balance + totalInterest)}</span>
+                  <span className="font-medium text-gray-900">{num(balance + totalInterest + totalDeliveryFee)}</span>
                 </div>
                 <div className="flex print:hidden justify-between">
                   <span className="text-gray-600">DFFS 1</span>
