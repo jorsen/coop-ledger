@@ -270,10 +270,6 @@ export default function BatchDetailPage() {
                   <span className="text-gray-600">Interest</span>
                   <span className="font-medium text-gray-900">{num(totalInterest)}</span>
                 </div>
-                <div className="hidden print:flex justify-between border-t border-gray-200 pt-1.5">
-                  <span className="text-gray-600">Total</span>
-                  <span className="font-medium text-gray-900">{num(balance + totalInterest + totalDeliveryFee)}</span>
-                </div>
                 <div className="flex print:hidden justify-between">
                   <span className="text-gray-600">DFFS 1</span>
                   <span className="font-medium text-gray-900">{num(totalDffs1)}</span>
@@ -285,6 +281,10 @@ export default function BatchDetailPage() {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Del Fee</span>
                   <span className="font-medium text-gray-900">{num(totalDeliveryFee)}</span>
+                </div>
+                <div className="hidden print:flex justify-between border-t border-gray-200 pt-1.5">
+                  <span className="text-gray-600">Total</span>
+                  <span className="font-medium text-gray-900">{num(balance + totalInterest + totalDeliveryFee)}</span>
                 </div>
                 <div className="flex print:hidden justify-between border-t border-gray-300 pt-2 mt-1">
                   <div>
