@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { LayoutDashboard, Users, FileText, Settings, LogOut, Menu, X } from 'lucide-react';
@@ -17,6 +17,11 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/auth/session').then(r => r.json()).then(d => setIsLoggedIn(d.isLoggedIn));
+  }, [pathname]);
 
   async function handleLogout() {
     await fetch('/api/auth/logout', { method: 'POST' });
@@ -56,19 +61,21 @@ export default function Navbar() {
         </nav>
 
         {/* Desktop right */}
-        <div className="hidden sm:flex items-center gap-4 shrink-0 ml-auto">
-          <span className="flex items-center gap-1.5 text-sm text-gray-600">
-            <span className="w-2 h-2 bg-green-500 rounded-full" />
-            1 online
-          </span>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900"
-          >
-            <LogOut className="w-4 h-4" />
-            Logout
-          </button>
-        </div>
+        {isLoggedIn && (
+          <div className="hidden sm:flex items-center gap-4 shrink-0 ml-auto">
+            <span className="flex items-center gap-1.5 text-sm text-gray-600">
+              <span className="w-2 h-2 bg-green-500 rounded-full" />
+              1 online
+            </span>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900"
+            >
+              <LogOut className="w-4 h-4" />
+              Logout
+            </button>
+          </div>
+        )}
 
         {/* Mobile: active label + hamburger */}
         <span className="sm:hidden flex-1 text-sm font-medium text-gray-700">
@@ -102,15 +109,17 @@ export default function Navbar() {
               </Link>
             );
           })}
-          <div className="pt-2 border-t border-gray-100">
-            <button
-              onClick={() => { setOpen(false); handleLogout(); }}
-              className="flex items-center gap-3 px-3 py-2.5 w-full text-left rounded-lg text-sm text-gray-600 hover:bg-gray-100"
-            >
-              <LogOut className="w-4 h-4" />
-              Logout
-            </button>
-          </div>
+          {isLoggedIn && (
+            <div className="pt-2 border-t border-gray-100">
+              <button
+                onClick={() => { setOpen(false); handleLogout(); }}
+                className="flex items-center gap-3 px-3 py-2.5 w-full text-left rounded-lg text-sm text-gray-600 hover:bg-gray-100"
+              >
+                <LogOut className="w-4 h-4" />
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       )}
     </header>
