@@ -3,15 +3,16 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Users, FileText, Settings, LogOut, Menu, X, Moon, Sun } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, Settings, LogOut, Menu, X, Moon, Sun, CalendarDays } from 'lucide-react';
 import clsx from 'clsx';
 import { useTheme } from '@/components/theme-provider';
 
 const NAV_LINKS = [
-  { href: '/dashboard',    label: 'Dashboard',    icon: LayoutDashboard },
-  { href: '/caretakers',   label: 'Caretakers',   icon: Users },
-  { href: '/transactions', label: 'Transactions', icon: FileText },
-  { href: '/settings',     label: 'Settings',     icon: Settings },
+  { href: '/dashboard',    label: 'Dashboard',    icon: LayoutDashboard, public: false },
+  { href: '/caretakers',   label: 'Caretakers',   icon: Users,           public: true  },
+  { href: '/calendar',     label: 'Calendar',     icon: CalendarDays,    public: true  },
+  { href: '/transactions', label: 'Transactions', icon: FileText,        public: false },
+  { href: '/settings',     label: 'Settings',     icon: Settings,        public: false },
 ];
 
 export default function Navbar() {
@@ -44,7 +45,7 @@ export default function Navbar() {
 
         {/* Desktop nav */}
         <nav className="hidden sm:flex items-center gap-1 flex-1">
-          {NAV_LINKS.filter(l => isLoggedIn || l.href === '/caretakers').map(({ href, label, icon: Icon }) => {
+          {NAV_LINKS.filter(l => isLoggedIn || l.public).map(({ href, label, icon: Icon }) => {
             const active = pathname.startsWith(href);
             return (
               <Link
@@ -103,7 +104,7 @@ export default function Navbar() {
       {/* Mobile dropdown */}
       {open && (
         <div className="sm:hidden border-t border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3 space-y-1">
-          {NAV_LINKS.filter(l => isLoggedIn || l.href === '/caretakers').map(({ href, label, icon: Icon }) => {
+          {NAV_LINKS.filter(l => isLoggedIn || l.public).map(({ href, label, icon: Icon }) => {
             const active = pathname.startsWith(href);
             return (
               <Link
