@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Plus, Pencil, Trash2, Printer } from 'lucide-react';
+import { ArrowLeft, Plus, Pencil, Trash2, Printer, ChevronLeft, ChevronRight, ClipboardList, Eye } from 'lucide-react';
 import TransactionModal from '@/components/transaction-modal';
 import { usePoll } from '@/hooks/use-poll';
 
@@ -26,6 +26,17 @@ interface Expense {
   quantity: number;
   price: number;
 }
+
+interface BatchSummary {
+  id: number;
+  batch_number: string;
+  batch_date: string;
+  transaction_count: number;
+  total_bags: number;
+  total_debit: number;
+}
+
+const PAGE_SIZE = 10;
 
 interface Transaction {
   id: number;
@@ -64,6 +75,10 @@ export default function BatchDetailPage() {
   const [expenseModal, setExpenseModal] = useState(false);
   const [expenseForm, setExpenseForm] = useState({ item: '', quantity: '1', price: '' });
   const [savingExpense, setSavingExpense] = useState(false);
+  const [allBatches, setAllBatches] = useState<BatchSummary[]>([]);
+  const [txPage, setTxPage] = useState(0);
+  const [expPage, setExpPage] = useState(0);
+  const [batchPage, setBatchPage] = useState(0);
 
   const fetchData = useCallback(async () => {
     const res = await fetch(`/api/batches/${id}`);
@@ -72,6 +87,11 @@ export default function BatchDetailPage() {
     const { transactions: txs, ...batchData } = data;
     setBatch(batchData);
     setTransactions(Array.isArray(txs) ? txs : []);
+    setTxPage(0);
+    if (batchData.client_id) {
+      const br = await fetch(`/api/batches?client_id=${batchData.client_id}`);
+      if (br.ok) setAllBatches(await br.json());
+    }
     setLoading(false);
   }, [id, router]);
 
@@ -144,6 +164,13 @@ export default function BatchDetailPage() {
   const totalInterest = withComputed.reduce((s, tx) => s + tx.interest, 0);
   const dffs2         = 50 * (batch?.heads ?? 0);
   const totalOtherExpenses = expenses.reduce((s, e) => s + Number(e.quantity) * Number(e.price), 0);
+
+  const txTotalPages = Math.ceil(withComputed.length / PAGE_SIZE);
+  const pagedTx = withComputed.slice(txPage * PAGE_SIZE, (txPage + 1) * PAGE_SIZE);
+  const expTotalPages = Math.ceil(expenses.length / PAGE_SIZE);
+  const pagedExp = expenses.slice(expPage * PAGE_SIZE, (expPage + 1) * PAGE_SIZE);
+  const batchTotalPages = Math.ceil(allBatches.length / PAGE_SIZE);
+  const pagedBatches = allBatches.slice(batchPage * PAGE_SIZE, (batchPage + 1) * PAGE_SIZE);
 
   if (loading) {
     return (
@@ -262,7 +289,7 @@ export default function BatchDetailPage() {
                   </td>
                 </tr>
               )}
-              {withComputed.map((tx) => (
+              {pagedTx.map((tx) => (
                 <tr key={tx.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 dark:border-gray-700 dark:hover:bg-gray-700/50">
                   <td className="px-4 py-3 text-gray-800 dark:text-gray-200">{tx.feed_type || '—'}</td>
                   <td className="px-4 py-3 text-blue-600 whitespace-nowrap">{fmtDate(tx.date)}</td>
@@ -309,6 +336,24 @@ export default function BatchDetailPage() {
             </tbody>
           </table>
         </div>
+
+        {/* Tx pagination */}
+        {txTotalPages > 1 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-gray-700 print:hidden">
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {txPage * PAGE_SIZE + 1}–{Math.min((txPage + 1) * PAGE_SIZE, withComputed.length)} of {withComputed.length}
+            </span>
+            <div className="flex items-center gap-1">
+              <button onClick={() => setTxPage(p => p - 1)} disabled={txPage === 0} className="p-1.5 rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30">
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <span className="text-xs text-gray-600 dark:text-gray-400 px-1">{txPage + 1} / {txTotalPages}</span>
+              <button onClick={() => setTxPage(p => p + 1)} disabled={txPage >= txTotalPages - 1} className="p-1.5 rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30">
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Billing summary */}
         {withComputed.length > 0 && (
@@ -384,7 +429,7 @@ export default function BatchDetailPage() {
               </tr>
             </thead>
             <tbody>
-              {expenses.map(e => (
+              {pagedExp.map(e => (
                 <tr key={e.id} className="border-b border-gray-50 dark:border-gray-700 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-700/30">
                   <td className="px-6 py-3 text-gray-800 dark:text-gray-200">{e.item}</td>
                   <td className="px-6 py-3 text-gray-700 dark:text-gray-300 text-right">{Number(e.quantity).toFixed(2)}</td>
@@ -407,7 +452,80 @@ export default function BatchDetailPage() {
             </tbody>
           </table>
         )}
+        {expTotalPages > 1 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-gray-700">
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {expPage * PAGE_SIZE + 1}–{Math.min((expPage + 1) * PAGE_SIZE, expenses.length)} of {expenses.length}
+            </span>
+            <div className="flex items-center gap-1">
+              <button onClick={() => setExpPage(p => p - 1)} disabled={expPage === 0} className="p-1.5 rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30">
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <span className="text-xs text-gray-600 dark:text-gray-400 px-1">{expPage + 1} / {expTotalPages}</span>
+              <button onClick={() => setExpPage(p => p + 1)} disabled={expPage >= expTotalPages - 1} className="p-1.5 rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30">
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* ── All batches for this caretaker ── */}
+      {allBatches.length > 0 && (
+        <div className="mt-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 print:hidden">
+          <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center gap-2">
+            <ClipboardList className="w-4 h-4 text-gray-500" />
+            <h2 className="font-semibold text-gray-900 dark:text-white">Batches</h2>
+            <span className="text-xs text-gray-400 dark:text-gray-500">— {batch.client_name}</span>
+            <span className="ml-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full">{allBatches.length}</span>
+          </div>
+          <div className="divide-y divide-gray-50 dark:divide-gray-700">
+            {pagedBatches.map((b) => {
+              const isViewing = b.id === Number(id);
+              return (
+                <div key={b.id} className={`px-4 sm:px-6 py-3 flex flex-wrap items-center gap-x-4 gap-y-2 ${isViewing ? 'bg-green-50 dark:bg-green-900/10' : 'hover:bg-gray-50/50 dark:hover:bg-gray-700/50'}`}>
+                  <span className="bg-green-800 text-white text-xs font-bold px-2 py-0.5 rounded shrink-0">
+                    {b.batch_number}
+                  </span>
+                  {isViewing && (
+                    <span className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 text-xs font-semibold px-2 py-0.5 rounded shrink-0">Viewing</span>
+                  )}
+                  <span className="text-sm text-gray-500 dark:text-gray-400 shrink-0">{fmtDate(b.batch_date)}</span>
+                  <div className="ml-auto flex items-center gap-3 shrink-0 text-sm text-gray-500 dark:text-gray-400">
+                    <span>{b.transaction_count} tx</span>
+                    <span>{b.total_bags} bags</span>
+                    <span className="font-medium text-gray-700 dark:text-gray-300 hidden sm:inline">{num(Number(b.total_debit))}</span>
+                    {!isViewing && (
+                      <button
+                        onClick={() => router.push(`/batches/${b.id}`)}
+                        className="flex items-center gap-1 text-green-700 dark:text-green-400 hover:text-green-600"
+                      >
+                        <Eye className="w-3.5 h-3.5" /> View
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {batchTotalPages > 1 && (
+            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-gray-700">
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                {batchPage * PAGE_SIZE + 1}–{Math.min((batchPage + 1) * PAGE_SIZE, allBatches.length)} of {allBatches.length}
+              </span>
+              <div className="flex items-center gap-1">
+                <button onClick={() => setBatchPage(p => p - 1)} disabled={batchPage === 0} className="p-1.5 rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30">
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <span className="text-xs text-gray-600 dark:text-gray-400 px-1">{batchPage + 1} / {batchTotalPages}</span>
+                <button onClick={() => setBatchPage(p => p + 1)} disabled={batchPage >= batchTotalPages - 1} className="p-1.5 rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30">
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Add Expense Modal */}
       {expenseModal && (

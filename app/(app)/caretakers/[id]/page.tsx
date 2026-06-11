@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Plus, Pencil, Trash2, Printer, ClipboardList, Eye } from 'lucide-react';
+import { ArrowLeft, Plus, Pencil, Trash2, Printer, ClipboardList, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
 import TransactionModal from '@/components/transaction-modal';
 import { usePoll } from '@/hooks/use-poll';
 
@@ -55,6 +55,8 @@ interface Expense {
 }
 
 
+const PAGE_SIZE = 10;
+
 const num = (n: number) =>
   new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
 
@@ -82,6 +84,8 @@ export default function CaretakerLedgerPage() {
   const [expenseModal, setExpenseModal] = useState(false);
   const [expenseForm, setExpenseForm] = useState({ item: '', quantity: '1', price: '' });
   const [savingExpense, setSavingExpense] = useState(false);
+  const [txPage, setTxPage] = useState(0);
+  const [batchPage, setBatchPage] = useState(0);
 
   const fetchData = useCallback(async () => {
     const [clientRes, batchRes] = await Promise.all([
@@ -198,6 +202,11 @@ export default function CaretakerLedgerPage() {
   const totalInterest      = withComputed.reduce((s, tx) => s + tx.interest, 0);
   const dffs2              = 50 * (batches[0]?.heads ?? 0);
   const totalOtherExpenses = expenses.reduce((s, e) => s + Number(e.quantity) * Number(e.price), 0);
+
+  const txTotalPages = Math.ceil(withComputed.length / PAGE_SIZE);
+  const pagedTx = withComputed.slice(txPage * PAGE_SIZE, (txPage + 1) * PAGE_SIZE);
+  const batchTotalPages = Math.ceil(batches.length / PAGE_SIZE);
+  const pagedBatches = batches.slice(batchPage * PAGE_SIZE, (batchPage + 1) * PAGE_SIZE);
 
   if (loading) {
     return (
@@ -324,7 +333,7 @@ export default function CaretakerLedgerPage() {
                   </td>
                 </tr>
               )}
-              {withComputed.map((tx) => (
+              {pagedTx.map((tx) => (
                 <tr key={tx.id} className="border-b border-gray-50 dark:border-gray-700 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-700/50">
                   <td className="px-4 py-3 text-gray-800 dark:text-gray-200">{tx.feed_type || '—'}</td>
                   <td className="px-4 py-3 text-blue-600 dark:text-blue-400 whitespace-nowrap">{fmtDate(tx.date)}</td>
@@ -371,6 +380,24 @@ export default function CaretakerLedgerPage() {
             </tbody>
           </table>
         </div>
+
+        {/* Tx pagination */}
+        {txTotalPages > 1 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-gray-700 print:hidden">
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {txPage * PAGE_SIZE + 1}–{Math.min((txPage + 1) * PAGE_SIZE, withComputed.length)} of {withComputed.length}
+            </span>
+            <div className="flex items-center gap-1">
+              <button onClick={() => setTxPage(p => p - 1)} disabled={txPage === 0} className="p-1.5 rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30">
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <span className="text-xs text-gray-600 dark:text-gray-400 px-1">{txPage + 1} / {txTotalPages}</span>
+              <button onClick={() => setTxPage(p => p + 1)} disabled={txPage >= txTotalPages - 1} className="p-1.5 rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30">
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Billing summary */}
         {withComputed.length > 0 && (
@@ -562,14 +589,11 @@ export default function CaretakerLedgerPage() {
           <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">No batches yet. Create one to group transactions.</p>
         ) : (
           <div className="divide-y divide-gray-50 dark:divide-gray-700">
-            {batches.map((b, i) => (
+            {pagedBatches.map((b) => (
               <div key={b.id} className="px-4 sm:px-6 py-3 flex flex-wrap items-center gap-x-4 gap-y-2 hover:bg-gray-50/50 dark:hover:bg-gray-700/50">
                 <span className="bg-green-800 text-white text-xs font-bold px-2 py-0.5 rounded shrink-0">
                   {b.batch_number}
                 </span>
-                {i === 0 && (
-                  <span className="bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-0.5 rounded shrink-0">Current</span>
-                )}
                 <span className="text-sm text-gray-500 dark:text-gray-400 shrink-0">
                   {fmtDate(b.batch_date)}
                 </span>
@@ -606,6 +630,22 @@ export default function CaretakerLedgerPage() {
               </div>
             ))}
           </div>
+          {batchTotalPages > 1 && (
+            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-gray-700">
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                {batchPage * PAGE_SIZE + 1}–{Math.min((batchPage + 1) * PAGE_SIZE, batches.length)} of {batches.length}
+              </span>
+              <div className="flex items-center gap-1">
+                <button onClick={() => setBatchPage(p => p - 1)} disabled={batchPage === 0} className="p-1.5 rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30">
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <span className="text-xs text-gray-600 dark:text-gray-400 px-1">{batchPage + 1} / {batchTotalPages}</span>
+                <button onClick={() => setBatchPage(p => p + 1)} disabled={batchPage >= batchTotalPages - 1} className="p-1.5 rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30">
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
         )}
       </div>
 
