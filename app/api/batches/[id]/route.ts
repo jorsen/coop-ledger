@@ -3,9 +3,6 @@ import { requireAuth } from '@/lib/auth';
 import { sql } from '@/lib/db';
 
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
-  const { error } = await requireAuth();
-  if (error) return error;
-
   const [batch] = await sql`
     SELECT b.*,
       c.name        AS client_name,

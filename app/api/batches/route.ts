@@ -3,9 +3,6 @@ import { requireAuth } from '@/lib/auth';
 import { sql } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
-  const { error } = await requireAuth();
-  if (error) return error;
-
   const clientId = req.nextUrl.searchParams.get('client_id');
 
   try {
