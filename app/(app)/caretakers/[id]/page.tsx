@@ -596,11 +596,16 @@ export default function CaretakerLedgerPage() {
         ) : (
           <>
           <div className="divide-y divide-gray-50 dark:divide-gray-700 max-h-[60vh] overflow-y-auto">
-            {pagedBatches.map((b) => (
-              <div key={b.id} className="px-4 sm:px-6 py-3 flex flex-wrap items-center gap-x-4 gap-y-2 hover:bg-gray-50/50 dark:hover:bg-gray-700/50">
+            {pagedBatches.map((b, i) => {
+              const isViewing = batchPage === 0 && i === 0;
+              return (
+              <div key={b.id} className={`px-4 sm:px-6 py-3 flex flex-wrap items-center gap-x-4 gap-y-2 ${isViewing ? 'bg-green-50 dark:bg-green-900/10' : 'hover:bg-gray-50/50 dark:hover:bg-gray-700/50'}`}>
                 <span className="bg-green-800 text-white text-xs font-bold px-2 py-0.5 rounded shrink-0">
                   {b.batch_number}
                 </span>
+                {isViewing && (
+                  <span className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 text-xs font-semibold px-2 py-0.5 rounded shrink-0">Viewing</span>
+                )}
                 <span className="text-sm text-gray-500 dark:text-gray-400 shrink-0">
                   {fmtDate(b.batch_date)}
                 </span>
@@ -635,7 +640,8 @@ export default function CaretakerLedgerPage() {
                   )}
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
           {batchTotalPages > 1 && (
             <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-gray-700">
