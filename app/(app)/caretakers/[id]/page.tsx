@@ -331,14 +331,14 @@ export default function CaretakerLedgerPage() {
                 <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">FEEDS</th>
                 <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">TR_DATE</th>
                 <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">NO.OF BAGS</th>
-                <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">Price/Bag</th>
+                <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap hidden xl:table-cell">Price/Bag</th>
                 <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">Debit</th>
-                <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 print:hidden whitespace-nowrap">Delivery Fee</th>
+                <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 print:hidden whitespace-nowrap hidden xl:table-cell">Delivery Fee</th>
                 <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">Balance</th>
-                <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 print:hidden whitespace-nowrap">DFFS</th>
-                <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">Interest</th>
-                <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 print:hidden whitespace-nowrap"># of Days</th>
-                <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 print:hidden whitespace-nowrap">Date Maturity</th>
+                <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 print:hidden whitespace-nowrap hidden xl:table-cell">DFFS</th>
+                <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap hidden sm:table-cell">Interest</th>
+                <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 print:hidden whitespace-nowrap hidden xl:table-cell"># of Days</th>
+                <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 print:hidden whitespace-nowrap hidden xl:table-cell">Date Maturity</th>
                 <th className="px-4 py-3 print:hidden" />
               </tr>
             </thead>
@@ -355,16 +355,16 @@ export default function CaretakerLedgerPage() {
                   <td className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap">{tx.feed_type || '—'}</td>
                   <td className="px-4 py-3 text-blue-600 dark:text-blue-400 whitespace-nowrap">{fmtDate(tx.date)}</td>
                   <td className="px-4 py-3 text-gray-700 dark:text-gray-300 text-right">{Number(tx.bags).toFixed(2)}</td>
-                  <td className="px-4 py-3 text-gray-600 dark:text-gray-400 text-right">
+                  <td className="px-4 py-3 text-gray-600 dark:text-gray-400 text-right hidden xl:table-cell">
                     {tx.price_per_bag ? num(Number(tx.price_per_bag)) : '—'}
                   </td>
                   <td className="px-4 py-3 text-gray-900 dark:text-white text-right">{num(tx.debit)}</td>
-                  <td className="px-4 py-3 text-gray-600 dark:text-gray-400 text-right print:hidden">{num(Number(tx.delivery_fee ?? 0))}</td>
+                  <td className="px-4 py-3 text-gray-600 dark:text-gray-400 text-right print:hidden hidden xl:table-cell">{num(Number(tx.delivery_fee ?? 0))}</td>
                   <td className="px-4 py-3 font-semibold text-gray-900 dark:text-white text-right">{num(tx.runningBalance)}</td>
-                  <td className="px-4 py-3 text-gray-600 dark:text-gray-400 text-right print:hidden">{num(tx.dffs1)}</td>
-                  <td className="px-4 py-3 text-gray-600 dark:text-gray-400 text-right">{num(tx.interest)}</td>
-                  <td className="px-4 py-3 text-gray-500 dark:text-gray-400 text-right print:hidden">{tx.days}</td>
-                  <td className="px-4 py-3 text-green-700 dark:text-green-400 text-right whitespace-nowrap print:hidden">{maturityDate ? fmtDate(maturityDate) : '—'}</td>
+                  <td className="px-4 py-3 text-gray-600 dark:text-gray-400 text-right print:hidden hidden xl:table-cell">{num(tx.dffs1)}</td>
+                  <td className="px-4 py-3 text-gray-600 dark:text-gray-400 text-right hidden sm:table-cell">{num(tx.interest)}</td>
+                  <td className="px-4 py-3 text-gray-500 dark:text-gray-400 text-right print:hidden hidden xl:table-cell">{tx.days}</td>
+                  <td className="px-4 py-3 text-green-700 dark:text-green-400 text-right whitespace-nowrap print:hidden hidden xl:table-cell">{maturityDate ? fmtDate(maturityDate) : '—'}</td>
                   <td className="px-4 py-3 print:hidden">
                     {isLoggedIn && (
                       <div className="flex items-center justify-end gap-2">
@@ -384,13 +384,14 @@ export default function CaretakerLedgerPage() {
                 <tr className="border-t-2 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 font-semibold text-sm">
                   <td colSpan={2} className="px-4 py-3" />
                   <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{Number(totalBags).toFixed(2)}</td>
-                  <td className="px-4 py-3" />
+                  <td className="px-4 py-3 hidden xl:table-cell" />
                   <td className="px-4 py-3 text-right text-gray-900 dark:text-white">{num(totalDebit)}</td>
-                  <td className="px-4 py-3 text-right text-gray-600 dark:text-gray-400 print:hidden">{num(totalDeliveryFee)}</td>
+                  <td className="px-4 py-3 text-right text-gray-600 dark:text-gray-400 print:hidden hidden xl:table-cell">{num(totalDeliveryFee)}</td>
                   <td className="px-4 py-3 text-right text-gray-900 dark:text-white">{num(balance)}</td>
-                  <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300 print:hidden">{num(totalDffs1)}</td>
-                  <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{num(totalInterest)}</td>
-                  <td colSpan={2} className="px-4 py-3 print:hidden" />
+                  <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300 print:hidden hidden xl:table-cell">{num(totalDffs1)}</td>
+                  <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300 hidden sm:table-cell">{num(totalInterest)}</td>
+                  <td className="px-4 py-3 print:hidden hidden xl:table-cell" />
+                  <td className="px-4 py-3 print:hidden hidden xl:table-cell" />
                   <td className="print:hidden" />
                 </tr>
               )}
