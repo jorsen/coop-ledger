@@ -34,6 +34,11 @@ interface BatchSummary {
   transaction_count: number;
   total_bags: number;
   total_debit: number;
+  notes?: string;
+  date_of_application?: string | null;
+  date_of_hauling?: string | null;
+  maturity_date?: string | null;
+  heads?: number | null;
 }
 
 const PAGE_SIZE = 10;
@@ -79,6 +84,9 @@ export default function BatchDetailPage() {
   const [txPage, setTxPage] = useState(0);
   const [expPage, setExpPage] = useState(0);
   const [batchPage, setBatchPage] = useState(0);
+  const [editBatch, setEditBatch] = useState<BatchSummary | null>(null);
+  const [editBatchForm, setEditBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', maturity_date: '', heads: '' });
+  const [savingEditBatch, setSavingEditBatch] = useState(false);
 
   const fetchData = useCallback(async () => {
     const res = await fetch(`/api/batches/${id}`);
@@ -134,6 +142,39 @@ export default function BatchDetailPage() {
     if (!confirm('Delete this transaction?')) return;
     await fetch(`/api/transactions/${txId}`, { method: 'DELETE' });
     fetchData();
+  }
+
+  async function handleUpdateBatch() {
+    if (!editBatch) return;
+    setSavingEditBatch(true);
+    await fetch(`/api/batches/${editBatch.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(editBatchForm),
+    });
+    setSavingEditBatch(false);
+    setEditBatch(null);
+    fetchData();
+  }
+
+  async function handleDeleteBatch(batchId: number) {
+    if (!confirm('Delete this batch? Transactions will remain but lose their batch assignment.')) return;
+    await fetch(`/api/batches/${batchId}`, { method: 'DELETE' });
+    if (batchId === Number(id)) router.push(batch?.client_id ? `/caretakers/${batch.client_id}` : '/caretakers');
+    else fetchData();
+  }
+
+  function openEditBatch(b: BatchSummary) {
+    setEditBatch(b);
+    setEditBatchForm({
+      batch_number: b.batch_number,
+      batch_date: b.batch_date?.split('T')[0] ?? '',
+      notes: b.notes ?? '',
+      date_of_application: b.date_of_application?.split('T')[0] ?? '',
+      date_of_hauling: b.date_of_hauling?.split('T')[0] ?? '',
+      maturity_date: b.maturity_date?.split('T')[0] ?? '',
+      heads: b.heads != null ? String(b.heads) : '',
+    });
   }
 
   const totalDebit       = transactions.reduce((s, t) => s + Number(t.debit), 0);
@@ -508,11 +549,27 @@ export default function BatchDetailPage() {
                     <div className="ml-auto flex items-center gap-2">
                       {!isViewing && (
                         <button
-                          onClick={() => router.push(`/batches/${b.id}`)}
+                          onClick={(e) => { e.stopPropagation(); router.push(`/batches/${b.id}`); }}
                           className="flex items-center gap-1 text-green-700 dark:text-green-400 hover:text-green-600"
                         >
                           <Eye className="w-3.5 h-3.5" /> View
                         </button>
+                      )}
+                      {isLoggedIn && (
+                        <>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); openEditBatch(b); }}
+                            className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleDeleteBatch(b.id); }}
+                            className="p-1 text-red-400 hover:text-red-600"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </>
                       )}
                     </div>
                   </div>
@@ -617,6 +674,105 @@ export default function BatchDetailPage() {
           onClose={() => setModal(null)}
           onSave={() => { setModal(null); fetchData(); }}
         />
+      )}
+
+      {/* Edit Batch Modal */}
+      {editBatch && (
+        <div className="fixed inset-0 bg-black/40 flex items-start justify-center z-50 p-4 pt-16">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md">
+            <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+              <h2 className="text-base font-semibold text-gray-900 dark:text-white">Edit Batch {editBatch.batch_number}</h2>
+              <button onClick={() => setEditBatch(null)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Batch Number</label>
+                  <input
+                    value={editBatchForm.batch_number}
+                    onChange={e => setEditBatchForm(f => ({ ...f, batch_number: e.target.value }))}
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Batch Date</label>
+                  <input
+                    type="date"
+                    value={editBatchForm.batch_date}
+                    onChange={e => setEditBatchForm(f => ({ ...f, batch_date: e.target.value }))}
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Date of Application</label>
+                  <input
+                    type="date"
+                    value={editBatchForm.date_of_application}
+                    onChange={e => setEditBatchForm(f => ({ ...f, date_of_application: e.target.value }))}
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Date of Hauling</label>
+                  <input
+                    type="date"
+                    value={editBatchForm.date_of_hauling}
+                    onChange={e => setEditBatchForm(f => ({ ...f, date_of_hauling: e.target.value }))}
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Maturity Date</label>
+                  <input
+                    type="date"
+                    value={editBatchForm.maturity_date}
+                    onChange={e => setEditBatchForm(f => ({ ...f, maturity_date: e.target.value }))}
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1"># of Heads</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={editBatchForm.heads}
+                    onChange={e => setEditBatchForm(f => ({ ...f, heads: e.target.value }))}
+                    placeholder="0"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
+                <textarea
+                  value={editBatchForm.notes}
+                  onChange={e => setEditBatchForm(f => ({ ...f, notes: e.target.value }))}
+                  rows={2}
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white resize-none"
+                />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setEditBatch(null)}
+                  className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpdateBatch}
+                  disabled={savingEditBatch}
+                  className="flex-1 bg-green-800 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50"
+                >
+                  {savingEditBatch ? 'Saving…' : 'Save Changes'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
