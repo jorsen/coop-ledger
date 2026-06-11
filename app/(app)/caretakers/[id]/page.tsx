@@ -273,8 +273,8 @@ export default function CaretakerLedgerPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-start">
-      {/* ── Left column ── */}
-      <div className="md:col-span-2 min-w-0">
+      {/* ── Info card (order 1 on mobile) ── */}
+      <div className="md:col-span-2 min-w-0 order-1">
 
       {/* ── Caretaker info card ───────────────────────────────────────── */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-6 py-5 mb-6 print:rounded-sm print-card">
@@ -321,6 +321,10 @@ export default function CaretakerLedgerPage() {
           </div>
         </div>
       </div>
+      </div>{/* end info card column */}
+
+      {/* ── Main content (order 3 on mobile, row 2 on desktop) ── */}
+      <div className="md:col-span-2 min-w-0 order-3">
 
       {/* ── Transactions table ───────────────────────────────────────── */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 print-card print:mb-0">
@@ -583,10 +587,10 @@ export default function CaretakerLedgerPage() {
         </div>
       )}
 
-      </div>{/* end left column */}
+      </div>{/* end main content */}
 
-      {/* ── Right column: Batches ── */}
-      <div className="md:col-span-1 lg:sticky lg:top-[72px] bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 print:hidden">
+      {/* ── Batches sidebar (order 2 on mobile, spans both rows on desktop) ── */}
+      <div className="md:col-span-1 md:row-span-2 lg:sticky lg:top-[72px] order-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 print:hidden">
         <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ClipboardList className="w-4 h-4 text-gray-500" />

@@ -262,8 +262,8 @@ export default function BatchDetailPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-start">
-      {/* ── Left column ── */}
-      <div className="md:col-span-2 min-w-0">
+      {/* ── Info card (order 1 on mobile) ── */}
+      <div className="md:col-span-2 min-w-0 order-1">
 
       {batch.client_name && (
         <div className="bg-white rounded-xl border border-gray-200 px-6 py-5 mb-4 text-sm print:rounded-sm print-card dark:bg-gray-800 dark:border-gray-700">
@@ -303,6 +303,11 @@ export default function BatchDetailPage() {
           </div>
         </div>
       )}
+
+      </div>{/* end info card column */}
+
+      {/* ── Main content (order 3 on mobile, row 2 on desktop) ── */}
+      <div className="md:col-span-2 min-w-0 order-3">
 
       {batch.notes && <p className="text-sm text-gray-500 mb-4">{batch.notes}</p>}
 
@@ -518,11 +523,11 @@ export default function BatchDetailPage() {
         )}
       </div>
 
-      </div>{/* end left column */}
+      </div>{/* end main content */}
 
-      {/* ── Right column: batches panel ── */}
+      {/* ── Batches sidebar (order 2 on mobile, spans both rows on desktop) ── */}
       {allBatches.length > 0 && (
-        <div className="md:col-span-1 lg:sticky lg:top-[72px] bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 print:hidden">
+        <div className="md:col-span-1 md:row-span-2 lg:sticky lg:top-[72px] order-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 print:hidden">
           <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center gap-2">
             <ClipboardList className="w-4 h-4 text-gray-500" />
             <h2 className="font-semibold text-gray-900 dark:text-white">Batches</h2>
