@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Truck, User } from 'lucide-react';
 import { usePoll } from '@/hooks/use-poll';
 
 interface HaulingRecord {
@@ -19,8 +19,8 @@ const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
 const fmtDate = (d: string) => {
-  const [y, m, day] = d.split('-');
-  return `${parseInt(m)}/${parseInt(day)}/${y}`;
+  const date = new Date(d + 'T00:00:00');
+  return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 };
 
 export default function CalendarPage() {
@@ -41,7 +41,6 @@ export default function CalendarPage() {
   useEffect(() => { fetchRecords(); }, [fetchRecords]);
   usePoll(fetchRecords);
 
-  // Build lookup: date string → records
   const byDate = records.reduce<Record<string, HaulingRecord[]>>((acc, r) => {
     const key = r.date_of_hauling.slice(0, 10);
     if (!acc[key]) acc[key] = [];
@@ -49,14 +48,12 @@ export default function CalendarPage() {
     return acc;
   }, {});
 
-  // Calendar grid
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const cells: (number | null)[] = [
     ...Array(firstDay).fill(null),
     ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
   ];
-  // Pad to full weeks
   while (cells.length % 7 !== 0) cells.push(null);
 
   function prevMonth() {
@@ -69,6 +66,11 @@ export default function CalendarPage() {
     else setMonth(m => m + 1);
     setSelected(null);
   }
+  function goToday() {
+    setYear(today.getFullYear());
+    setMonth(today.getMonth());
+    setSelected(null);
+  }
 
   function dateKey(day: number) {
     return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -77,10 +79,9 @@ export default function CalendarPage() {
   const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
   const selectedRecords = selected ? (byDate[selected] ?? []) : [];
 
-  // All records in current month for the list below the calendar
-  const monthRecords = Object.entries(byDate)
-    .filter(([k]) => k.startsWith(`${year}-${String(month + 1).padStart(2, '0')}`))
-    .sort(([a], [b]) => a.localeCompare(b));
+  const monthHaulingCount = Object.keys(byDate).filter(k =>
+    k.startsWith(`${year}-${String(month + 1).padStart(2, '0')}`)
+  ).length;
 
   if (loading) {
     return (
@@ -91,71 +92,113 @@ export default function CalendarPage() {
   }
 
   return (
-    <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-          <CalendarDays className="w-6 h-6 text-green-700 dark:text-green-400" />
-          Hauling Calendar
-        </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">All caretaker hauling dates</p>
+    <div className="max-w-5xl mx-auto">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
+        <div className="flex-1">
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Hauling Calendar</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+            {monthHaulingCount > 0
+              ? <><span className="font-medium text-red-600 dark:text-red-400">{monthHaulingCount} hauling date{monthHaulingCount > 1 ? 's' : ''}</span> in {MONTHS[month]}</>
+              : <>No hauling dates in {MONTHS[month]}</>}
+          </p>
+        </div>
+        <button
+          onClick={goToday}
+          className="self-start sm:self-auto text-sm font-medium px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+        >
+          Today
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* ── Calendar ── */}
-        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
-          {/* Month nav */}
-          <div className="flex items-center justify-between mb-4">
-            <button onClick={prevMonth} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
-              <ChevronLeft className="w-5 h-5" />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        {/* ── Calendar panel ── */}
+        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+          {/* Month navigation */}
+          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-700">
+            <button
+              onClick={prevMonth}
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
             </button>
-            <h2 className="font-semibold text-gray-900 dark:text-white text-base">
+            <h2 className="text-base font-semibold text-gray-900 dark:text-white tracking-tight">
               {MONTHS[month]} {year}
             </h2>
-            <button onClick={nextMonth} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">
-              <ChevronRight className="w-5 h-5" />
+            <button
+              onClick={nextMonth}
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-colors"
+            >
+              <ChevronRight className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Day headers */}
-          <div className="grid grid-cols-7 mb-1">
+          {/* Day-of-week headers */}
+          <div className="grid grid-cols-7 border-b border-gray-100 dark:border-gray-700">
             {DAYS.map(d => (
-              <div key={d} className="text-center text-xs font-semibold text-gray-400 dark:text-gray-500 py-1">{d}</div>
+              <div key={d} className="text-center text-xs font-semibold text-gray-400 dark:text-gray-500 py-2.5 tracking-wide">
+                {d}
+              </div>
             ))}
           </div>
 
-          {/* Day cells */}
-          <div className="grid grid-cols-7 gap-1">
+          {/* Day grid */}
+          <div className="grid grid-cols-7">
             {cells.map((day, i) => {
-              if (!day) return <div key={i} />;
+              if (!day) {
+                return <div key={`empty-${i}`} className="border-b border-r border-gray-50 dark:border-gray-700/50 min-h-[72px]" />;
+              }
               const key = dateKey(day);
               const hits = byDate[key] ?? [];
               const isToday = key === todayKey;
               const isSelected = key === selected;
+              const hasHauling = hits.length > 0;
+              const isLastRow = i >= cells.length - 7;
+              const isLastCol = (i + 1) % 7 === 0;
 
               return (
                 <button
                   key={key}
                   onClick={() => setSelected(isSelected ? null : key)}
-                  className={`relative flex flex-col items-center justify-start pt-1.5 pb-1 rounded-lg min-h-[52px] text-sm transition-colors
-                    ${isSelected ? 'bg-green-800 text-white' :
-                      isToday ? 'bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-400 font-semibold' :
-                      'hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'}
+                  className={`relative flex flex-col min-h-[72px] p-1.5 text-left transition-all
+                    ${!isLastRow ? 'border-b' : ''} ${!isLastCol ? 'border-r' : ''}
+                    border-gray-100 dark:border-gray-700/50
+                    ${isSelected
+                      ? 'bg-green-800 dark:bg-green-700'
+                      : hasHauling
+                        ? 'bg-red-50/60 dark:bg-red-900/10 hover:bg-red-50 dark:hover:bg-red-900/20'
+                        : 'hover:bg-gray-50 dark:hover:bg-gray-700/40'
+                    }
                   `}
                 >
-                  <span className="text-xs font-medium leading-none">{day}</span>
-                  {hits.length > 0 && (
-                    <div className="mt-1 flex flex-col gap-0.5 w-full px-0.5">
+                  {/* Day number */}
+                  <span className={`text-xs font-semibold w-6 h-6 flex items-center justify-center rounded-full mb-1 leading-none
+                    ${isSelected ? 'bg-white text-green-800' :
+                      isToday ? 'bg-green-800 dark:bg-green-600 text-white' :
+                      hasHauling ? 'text-red-600 dark:text-red-400' :
+                      'text-gray-600 dark:text-gray-400'}
+                  `}>
+                    {day}
+                  </span>
+
+                  {/* Hauling chips */}
+                  {hasHauling && (
+                    <div className="flex flex-col gap-0.5 w-full">
                       {hits.slice(0, 2).map(r => (
                         <span
                           key={r.batch_id}
-                          className={`text-[9px] leading-tight truncate rounded px-0.5 font-medium
-                            ${isSelected ? 'bg-white/20 text-white' : 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-400'}`}
+                          className={`text-[10px] leading-tight truncate rounded-sm px-1 py-0.5 font-medium
+                            ${isSelected
+                              ? 'bg-white/25 text-white'
+                              : 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300'
+                            }`}
                         >
                           {r.client_name.split(',')[0]}
                         </span>
                       ))}
                       {hits.length > 2 && (
-                        <span className={`text-[9px] leading-tight px-0.5 ${isSelected ? 'text-white/70' : 'text-gray-400 dark:text-gray-500'}`}>
+                        <span className={`text-[10px] leading-tight px-1 font-medium
+                          ${isSelected ? 'text-white/70' : 'text-gray-400 dark:text-gray-500'}`}>
                           +{hits.length - 2} more
                         </span>
                       )}
@@ -167,67 +210,114 @@ export default function CalendarPage() {
           </div>
         </div>
 
-        {/* ── Side panel ── */}
-        <div className="space-y-4">
-          {/* Selected day detail */}
-          {selected && (
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-3 text-sm">
-                {fmtDate(selected)}
-              </h3>
-              {selectedRecords.length === 0 ? (
-                <p className="text-sm text-gray-400 dark:text-gray-500">No hauling on this date.</p>
-              ) : (
-                <div className="space-y-2">
-                  {selectedRecords.map(r => (
-                    <button
-                      key={r.batch_id}
-                      onClick={() => router.push(`/caretakers/${r.client_id}`)}
-                      className="w-full text-left p-3 rounded-lg border border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                    >
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white">{r.client_name}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                        ID: {r.client_code} · Batch <span className="font-medium text-green-700 dark:text-green-400">#{r.batch_number}</span>
-                        {r.heads != null && <> · {r.heads} heads</>}
-                      </p>
-                    </button>
-                  ))}
+        {/* ── Right panel ── */}
+        <div className="flex flex-col gap-4">
+          {/* Selected date card */}
+          <div className={`bg-white dark:bg-gray-800 rounded-2xl border overflow-hidden transition-all
+            ${selected && selectedRecords.length > 0
+              ? 'border-red-200 dark:border-red-800/50'
+              : 'border-gray-200 dark:border-gray-700'}`}
+          >
+            {selected ? (
+              <>
+                <div className={`px-5 py-3.5 border-b flex items-center gap-2
+                  ${selectedRecords.length > 0
+                    ? 'bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-800/50'
+                    : 'border-gray-100 dark:border-gray-700'}`}
+                >
+                  <Truck className={`w-4 h-4 shrink-0 ${selectedRecords.length > 0 ? 'text-red-500' : 'text-gray-400'}`} />
+                  <div>
+                    <p className="text-xs font-semibold text-gray-900 dark:text-white">{fmtDate(selected)}</p>
+                    <p className={`text-xs mt-0.5 ${selectedRecords.length > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-400'}`}>
+                      {selectedRecords.length > 0
+                        ? `${selectedRecords.length} caretaker${selectedRecords.length > 1 ? 's' : ''} hauling`
+                        : 'No hauling scheduled'}
+                    </p>
+                  </div>
                 </div>
+                {selectedRecords.length > 0 && (
+                  <div className="divide-y divide-gray-50 dark:divide-gray-700">
+                    {selectedRecords.map(r => (
+                      <button
+                        key={r.batch_id}
+                        onClick={() => router.push(`/caretakers/${r.client_id}`)}
+                        className="w-full text-left px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="w-7 h-7 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center shrink-0 mt-0.5">
+                            <User className="w-3.5 h-3.5 text-green-700 dark:text-green-400" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-green-700 dark:group-hover:text-green-400 transition-colors truncate">
+                              {r.client_name}
+                            </p>
+                            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                              <span className="text-xs text-gray-500 dark:text-gray-400">ID: {r.client_code}</span>
+                              <span className="text-xs bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-1.5 py-0.5 rounded font-medium">
+                                Batch #{r.batch_number}
+                              </span>
+                              {r.heads != null && (
+                                <span className="text-xs text-gray-400 dark:text-gray-500">{r.heads} heads</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="px-5 py-8 text-center">
+                <Truck className="w-8 h-8 text-gray-200 dark:text-gray-600 mx-auto mb-2" />
+                <p className="text-sm text-gray-400 dark:text-gray-500">Select a date to view hauling records</p>
+              </div>
+            )}
+          </div>
+
+          {/* Monthly summary */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{MONTHS[month]} Schedule</h3>
+              {monthHaulingCount > 0 && (
+                <span className="text-xs bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-full font-medium">
+                  {monthHaulingCount} date{monthHaulingCount > 1 ? 's' : ''}
+                </span>
               )}
             </div>
-          )}
 
-          {/* This month's hauling list */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-3 text-sm">
-              {MONTHS[month]} Hauling Dates
-            </h3>
-            {monthRecords.length === 0 ? (
-              <p className="text-sm text-gray-400 dark:text-gray-500">No hauling dates this month.</p>
+            {monthHaulingCount === 0 ? (
+              <div className="px-5 py-8 text-center">
+                <p className="text-sm text-gray-400 dark:text-gray-500">No hauling this month</p>
+              </div>
             ) : (
-              <div className="space-y-3">
-                {monthRecords.map(([date, recs]) => (
-                  <div key={date}>
+              <div className="divide-y divide-gray-50 dark:divide-gray-700 max-h-72 overflow-y-auto">
+                {Object.entries(byDate)
+                  .filter(([k]) => k.startsWith(`${year}-${String(month + 1).padStart(2, '0')}`))
+                  .sort(([a], [b]) => a.localeCompare(b))
+                  .map(([date, recs]) => (
                     <button
+                      key={date}
                       onClick={() => setSelected(selected === date ? null : date)}
-                      className="text-xs font-semibold text-red-600 dark:text-red-400 mb-1 hover:underline"
+                      className={`w-full text-left px-5 py-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50
+                        ${selected === date ? 'bg-green-50 dark:bg-green-900/20' : ''}`}
                     >
-                      {fmtDate(date)}
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
+                          <span className="text-xs font-semibold text-red-600 dark:text-red-400 shrink-0">
+                            {new Date(date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          </span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                            {recs.map(r => r.client_name.split(',')[0]).join(', ')}
+                          </span>
+                        </div>
+                        <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-1.5 py-0.5 rounded shrink-0">
+                          {recs.length}
+                        </span>
+                      </div>
                     </button>
-                    <div className="space-y-1">
-                      {recs.map(r => (
-                        <button
-                          key={r.batch_id}
-                          onClick={() => router.push(`/caretakers/${r.client_id}`)}
-                          className="w-full text-left flex items-center justify-between text-xs text-gray-700 dark:text-gray-300 hover:text-green-700 dark:hover:text-green-400 transition-colors"
-                        >
-                          <span className="truncate">{r.client_name}</span>
-                          <span className="text-gray-400 dark:text-gray-500 shrink-0 ml-2">Batch #{r.batch_number}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             )}
           </div>
