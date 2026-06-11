@@ -295,7 +295,7 @@ export default function BatchDetailPage() {
               )}
               {pagedTx.map((tx) => (
                 <tr key={tx.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 dark:border-gray-700 dark:hover:bg-gray-700/50">
-                  <td className="px-4 py-3 text-gray-800 dark:text-gray-200">{tx.feed_type || '—'}</td>
+                  <td className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap">{tx.feed_type || '—'}</td>
                   <td className="px-4 py-3 text-blue-600 whitespace-nowrap">{fmtDate(tx.date)}</td>
                   <td className="px-4 py-3 text-gray-700 text-right dark:text-gray-300">{Number(tx.bags).toFixed(2)}</td>
                   <td className="px-4 py-3 text-gray-600 text-right print:hidden dark:text-gray-400">

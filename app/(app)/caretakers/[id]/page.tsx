@@ -339,7 +339,7 @@ export default function CaretakerLedgerPage() {
               )}
               {pagedTx.map((tx) => (
                 <tr key={tx.id} className="border-b border-gray-50 dark:border-gray-700 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-700/50">
-                  <td className="px-4 py-3 text-gray-800 dark:text-gray-200">{tx.feed_type || '—'}</td>
+                  <td className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap">{tx.feed_type || '—'}</td>
                   <td className="px-4 py-3 text-blue-600 dark:text-blue-400 whitespace-nowrap">{fmtDate(tx.date)}</td>
                   <td className="px-4 py-3 text-gray-700 dark:text-gray-300 text-right">{Number(tx.bags).toFixed(2)}</td>
                   <td className="px-4 py-3 text-gray-600 dark:text-gray-400 text-right">
