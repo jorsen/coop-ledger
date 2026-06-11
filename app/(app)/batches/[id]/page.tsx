@@ -20,6 +20,13 @@ interface Batch {
   client_code: string | null;
 }
 
+interface Expense {
+  id: number;
+  item: string;
+  quantity: number;
+  price: number;
+}
+
 interface Transaction {
   id: number;
   client_id: number;
@@ -53,6 +60,10 @@ export default function BatchDetailPage() {
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [modal, setModal] = useState<{ tx?: Transaction } | null>(null);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [expenseModal, setExpenseModal] = useState(false);
+  const [expenseForm, setExpenseForm] = useState({ item: '', quantity: '1', price: '' });
+  const [savingExpense, setSavingExpense] = useState(false);
 
   const fetchData = useCallback(async () => {
     const res = await fetch(`/api/batches/${id}`);
@@ -68,10 +79,35 @@ export default function BatchDetailPage() {
     fetch('/api/clients').then((r) => r.json()).then(setClients);
   }, []);
 
+  const fetchExpenses = useCallback(async () => {
+    const res = await fetch(`/api/expenses?batch_id=${id}`);
+    if (res.ok) setExpenses(await res.json());
+  }, [id]);
+
   useEffect(() => {
     fetchData();
+    fetchExpenses();
     fetch('/api/auth/session').then(r => r.json()).then(d => setIsLoggedIn(d.isLoggedIn));
-  }, [fetchData]);
+  }, [fetchData, fetchExpenses]);
+
+  async function handleAddExpense() {
+    setSavingExpense(true);
+    await fetch('/api/expenses', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ batch_id: id, item: expenseForm.item, quantity: Number(expenseForm.quantity), price: Number(expenseForm.price) }),
+    });
+    setSavingExpense(false);
+    setExpenseModal(false);
+    setExpenseForm({ item: '', quantity: '1', price: '' });
+    fetchExpenses();
+  }
+
+  async function handleDeleteExpense(expId: number) {
+    if (!confirm('Remove this expense?')) return;
+    await fetch(`/api/expenses/${expId}`, { method: 'DELETE' });
+    fetchExpenses();
+  }
   usePoll(fetchData);
 
   async function handleDelete(txId: number) {
@@ -107,6 +143,7 @@ export default function BatchDetailPage() {
   const totalDffs1    = withComputed.reduce((s, tx) => s + tx.dffs1, 0);
   const totalInterest = withComputed.reduce((s, tx) => s + tx.interest, 0);
   const dffs2         = 50 * (batch?.heads ?? 0);
+  const totalOtherExpenses = expenses.reduce((s, e) => s + Number(e.quantity) * Number(e.price), 0);
 
   if (loading) {
     return (
@@ -298,15 +335,146 @@ export default function BatchDetailPage() {
                   <span className="text-gray-600 dark:text-gray-400">Del Fee</span>
                   <span className="font-medium text-gray-900 dark:text-white">{num(totalDeliveryFee)}</span>
                 </div>
+                {totalOtherExpenses > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">Other Expenses</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{num(totalOtherExpenses)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between border-t border-gray-200 pt-1.5 mt-1 dark:border-gray-700">
                   <span className="font-bold text-gray-900 dark:text-white">Total</span>
-                  <span className="font-bold text-gray-900 underline dark:text-white">{num(balance + totalInterest + totalDffs1 + dffs2 + totalDeliveryFee)}</span>
+                  <span className="font-bold text-gray-900 underline dark:text-white">{num(balance + totalInterest + totalDffs1 + dffs2 + totalDeliveryFee + totalOtherExpenses)}</span>
                 </div>
               </div>
             </div>
           </div>
         )}
       </div>
+
+      {/* ── Other Expenses ── */}
+      <div className="mt-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+          <div>
+            <h2 className="font-semibold text-gray-900 dark:text-white text-sm">Other Expenses</h2>
+            {expenses.length > 0 && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Total: <span className="font-semibold text-gray-700 dark:text-gray-300">{num(totalOtherExpenses)}</span></p>
+            )}
+          </div>
+          {isLoggedIn && (
+            <button
+              onClick={() => setExpenseModal(true)}
+              className="flex items-center gap-1.5 text-sm text-green-800 dark:text-green-400 font-medium hover:text-green-700"
+            >
+              <Plus className="w-4 h-4" /> Add Expense
+            </button>
+          )}
+        </div>
+
+        {expenses.length === 0 ? (
+          <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">No other expenses recorded.</p>
+        ) : (
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+                <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-6 py-3">Item</th>
+                <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-6 py-3">Quantity</th>
+                <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-6 py-3">Price</th>
+                <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-6 py-3">Total</th>
+                {isLoggedIn && <th className="px-6 py-3" />}
+              </tr>
+            </thead>
+            <tbody>
+              {expenses.map(e => (
+                <tr key={e.id} className="border-b border-gray-50 dark:border-gray-700 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-700/30">
+                  <td className="px-6 py-3 text-gray-800 dark:text-gray-200">{e.item}</td>
+                  <td className="px-6 py-3 text-gray-700 dark:text-gray-300 text-right">{Number(e.quantity).toFixed(2)}</td>
+                  <td className="px-6 py-3 text-gray-700 dark:text-gray-300 text-right">{num(Number(e.price))}</td>
+                  <td className="px-6 py-3 font-semibold text-gray-900 dark:text-white text-right">{num(Number(e.quantity) * Number(e.price))}</td>
+                  {isLoggedIn && (
+                    <td className="px-6 py-3">
+                      <button onClick={() => handleDeleteExpense(e.id)} className="float-right p-1 text-red-400 hover:text-red-600">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </td>
+                  )}
+                </tr>
+              ))}
+              <tr className="border-t-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 font-semibold">
+                <td colSpan={3} className="px-6 py-3 text-right text-xs text-gray-500 dark:text-gray-400">Total Other Expenses</td>
+                <td className="px-6 py-3 text-right text-gray-900 dark:text-white">{num(totalOtherExpenses)}</td>
+                {isLoggedIn && <td />}
+              </tr>
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {/* Add Expense Modal */}
+      {expenseModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-start justify-center z-50 p-4 pt-16">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-sm">
+            <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+              <h2 className="text-base font-semibold text-gray-900 dark:text-white">Add Expense</h2>
+              <button onClick={() => setExpenseModal(false)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Item *</label>
+                <input
+                  value={expenseForm.item}
+                  onChange={e => setExpenseForm(f => ({ ...f, item: e.target.value }))}
+                  placeholder="e.g. Veterinary fee"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Quantity</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={expenseForm.quantity}
+                    onChange={e => setExpenseForm(f => ({ ...f, quantity: e.target.value }))}
+                    placeholder="1"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Price (₱) *</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={expenseForm.price}
+                    onChange={e => setExpenseForm(f => ({ ...f, price: e.target.value }))}
+                    placeholder="0.00"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+              </div>
+              {expenseForm.item && expenseForm.price && (
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Total: <span className="font-semibold text-gray-700 dark:text-gray-300">{num(Number(expenseForm.quantity || 1) * Number(expenseForm.price || 0))}</span>
+                </p>
+              )}
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setExpenseModal(false)}
+                  className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddExpense}
+                  disabled={savingExpense || !expenseForm.item || !expenseForm.price}
+                  className="flex-1 bg-green-800 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50"
+                >
+                  {savingExpense ? 'Saving…' : 'Add'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {modal !== null && (
         <TransactionModal
