@@ -259,6 +259,10 @@ export default function CaretakerLedgerPage() {
         </div>
       </div>
 
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-start">
+      {/* ── Left column ── */}
+      <div className="lg:col-span-2 min-w-0">
+
       {/* ── Caretaker info card ───────────────────────────────────────── */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-6 py-5 mb-6 print:rounded-sm print-card">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-4 text-sm print:grid-cols-4 print:gap-x-6 print:gap-y-1 print:text-xs">
@@ -565,8 +569,10 @@ export default function CaretakerLedgerPage() {
         </div>
       )}
 
-      {/* ── Batches section ──────────────────────────────────────────── */}
-      <div className="mt-8 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 print:hidden">
+      </div>{/* end left column */}
+
+      {/* ── Right column: Batches ── */}
+      <div className="lg:col-span-1 lg:sticky lg:top-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 print:hidden">
         <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ClipboardList className="w-4 h-4 text-gray-500" />
@@ -650,6 +656,8 @@ export default function CaretakerLedgerPage() {
           </>
         )}
       </div>
+
+      </div>{/* end grid */}
 
       {modal !== null && (
         <TransactionModal
