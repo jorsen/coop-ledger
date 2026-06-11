@@ -464,6 +464,7 @@ export default function BatchDetailPage() {
         {expenses.length === 0 ? (
           <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">No other expenses recorded.</p>
         ) : (
+          <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
@@ -497,6 +498,7 @@ export default function BatchDetailPage() {
               </tr>
             </tbody>
           </table>
+          </div>
         )}
         {expTotalPages > 1 && (
           <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-gray-700">
