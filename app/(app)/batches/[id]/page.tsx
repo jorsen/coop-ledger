@@ -51,6 +51,7 @@ export default function BatchDetailPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [clients, setClients] = useState<{ id: number; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [modal, setModal] = useState<{ tx?: Transaction } | null>(null);
 
   const fetchData = useCallback(async () => {
@@ -67,7 +68,10 @@ export default function BatchDetailPage() {
     fetch('/api/clients').then((r) => r.json()).then(setClients);
   }, []);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => {
+    fetchData();
+    fetch('/api/auth/session').then(r => r.json()).then(d => setIsLoggedIn(d.isLoggedIn));
+  }, [fetchData]);
   usePoll(fetchData);
 
   async function handleDelete(txId: number) {
@@ -141,12 +145,14 @@ export default function BatchDetailPage() {
           >
             <Printer className="w-4 h-4" /> Print
           </button>
-          <button
-            onClick={() => setModal({})}
-            className="flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700"
-          >
-            <Plus className="w-4 h-4" /> Add Transaction
-          </button>
+          {isLoggedIn && (
+            <button
+              onClick={() => setModal({})}
+              className="flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700"
+            >
+              <Plus className="w-4 h-4" /> Add Transaction
+            </button>
+          )}
         </div>
       </div>
 
@@ -235,14 +241,16 @@ export default function BatchDetailPage() {
                   <td className="px-4 py-3 text-gray-500 text-right print:hidden">{tx.days}</td>
                   <td className="px-4 py-3 text-green-700 text-right whitespace-nowrap print:hidden">{maturityDate ? fmtDate(maturityDate) : '—'}</td>
                   <td className="px-4 py-3 print:hidden">
-                    <div className="flex items-center justify-end gap-2">
-                      <button onClick={() => setModal({ tx })} className="p-1 text-gray-400 hover:text-gray-600">
-                        <Pencil className="w-3.5 h-3.5" />
-                      </button>
-                      <button onClick={() => handleDelete(tx.id)} className="p-1 text-red-400 hover:text-red-600">
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
+                    {isLoggedIn && (
+                      <div className="flex items-center justify-end gap-2">
+                        <button onClick={() => setModal({ tx })} className="p-1 text-gray-400 hover:text-gray-600">
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => handleDelete(tx.id)} className="p-1 text-red-400 hover:text-red-600">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
