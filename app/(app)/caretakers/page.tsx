@@ -148,18 +148,22 @@ export default function CaretakersPage() {
                 <Eye className="w-4 h-4" />
                 Ledger
               </button>
-              <button
-                onClick={() => setModal({ mode: 'edit', client })}
-                className="p-1.5 border border-gray-200 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50"
-              >
-                <Pencil className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => handleDelete(client.id)}
-                className="p-1.5 border border-gray-200 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
+              {isLoggedIn && (
+                <>
+                  <button
+                    onClick={() => setModal({ mode: 'edit', client })}
+                    className="p-1.5 border border-gray-200 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(client.id)}
+                    className="p-1.5 border border-gray-200 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </>
+              )}
             </div>
           </div>
         ))}

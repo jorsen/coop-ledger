@@ -62,6 +62,7 @@ export default function CaretakerLedgerPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [batches, setBatches] = useState<Batch[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [modal, setModal] = useState<{ tx?: Transaction } | null>(null);
   const [batchModal, setBatchModal] = useState(false);
   const [batchForm, setBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', maturity_date: '', heads: '' });
@@ -85,7 +86,10 @@ export default function CaretakerLedgerPage() {
     setLoading(false);
   }, [id, router]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => {
+    fetchData();
+    fetch('/api/auth/session').then(r => r.json()).then(d => setIsLoggedIn(d.isLoggedIn));
+  }, [fetchData]);
   usePoll(fetchData);
 
   async function handleCreateBatch() {
@@ -194,12 +198,14 @@ export default function CaretakerLedgerPage() {
           >
             <Printer className="w-4 h-4" /> Print
           </button>
-          <button
-            onClick={() => setModal({})}
-            className="flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700"
-          >
-            <Plus className="w-4 h-4" /> Add Transaction
-          </button>
+          {isLoggedIn && (
+            <button
+              onClick={() => setModal({})}
+              className="flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700"
+            >
+              <Plus className="w-4 h-4" /> Add Transaction
+            </button>
+          )}
         </div>
       </div>
 
@@ -287,14 +293,16 @@ export default function CaretakerLedgerPage() {
                   <td className="px-4 py-3 text-gray-500 text-right print:hidden">{tx.days}</td>
                   <td className="px-4 py-3 text-green-700 text-right whitespace-nowrap print:hidden">{maturityDate ? fmtDate(maturityDate) : '—'}</td>
                   <td className="px-4 py-3 print:hidden">
-                    <div className="flex items-center justify-end gap-2">
-                      <button onClick={() => setModal({ tx })} className="p-1 text-gray-400 hover:text-gray-600">
-                        <Pencil className="w-3.5 h-3.5" />
-                      </button>
-                      <button onClick={() => handleDelete(tx.id)} className="p-1 text-red-400 hover:text-red-600">
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
+                    {isLoggedIn && (
+                      <div className="flex items-center justify-end gap-2">
+                        <button onClick={() => setModal({ tx })} className="p-1 text-gray-400 hover:text-gray-600">
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => handleDelete(tx.id)} className="p-1 text-red-400 hover:text-red-600">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -362,12 +370,14 @@ export default function CaretakerLedgerPage() {
               <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">{batches.length}</span>
             )}
           </div>
-          <button
-            onClick={() => setBatchModal(true)}
-            className="flex items-center gap-1.5 text-sm text-green-800 font-medium hover:text-green-700"
-          >
-            <Plus className="w-4 h-4" /> New Batch
-          </button>
+          {isLoggedIn && (
+            <button
+              onClick={() => setBatchModal(true)}
+              className="flex items-center gap-1.5 text-sm text-green-800 font-medium hover:text-green-700"
+            >
+              <Plus className="w-4 h-4" /> New Batch
+            </button>
+          )}
         </div>
 
         {batches.length === 0 ? (
@@ -398,18 +408,22 @@ export default function CaretakerLedgerPage() {
                   >
                     <Eye className="w-3.5 h-3.5" /> View
                   </button>
-                  <button
-                    onClick={() => { setEditBatch(b); setEditBatchForm({ batch_number: b.batch_number, batch_date: b.batch_date, notes: b.notes, date_of_application: b.date_of_application ?? '', date_of_hauling: b.date_of_hauling ?? '', maturity_date: b.maturity_date ?? '', heads: b.heads ? String(b.heads) : '' }); }}
-                    className="text-gray-400 hover:text-gray-600"
-                  >
-                    <Pencil className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteBatch(b.id)}
-                    className="text-red-400 hover:text-red-600"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  {isLoggedIn && (
+                    <>
+                      <button
+                        onClick={() => { setEditBatch(b); setEditBatchForm({ batch_number: b.batch_number, batch_date: b.batch_date, notes: b.notes, date_of_application: b.date_of_application ?? '', date_of_hauling: b.date_of_hauling ?? '', maturity_date: b.maturity_date ?? '', heads: b.heads ? String(b.heads) : '' }); }}
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteBatch(b.id)}
+                        className="text-red-400 hover:text-red-600"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             ))}
