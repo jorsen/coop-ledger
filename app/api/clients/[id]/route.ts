@@ -35,6 +35,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
   await sql`ALTER TABLE clients ADD COLUMN IF NOT EXISTS date_of_hauling DATE`;
   await sql`ALTER TABLE clients ADD COLUMN IF NOT EXISTS date_of_application DATE`;
+  await sql`ALTER TABLE clients DROP CONSTRAINT IF EXISTS clients_status_check`;
+  await sql`ALTER TABLE clients ADD CONSTRAINT clients_status_check CHECK (status IN ('active','inactive','paid','completed','on-going'))`;
 
   const [updated] = await sql`
     UPDATE clients
