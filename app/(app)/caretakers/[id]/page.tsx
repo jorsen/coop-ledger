@@ -588,6 +588,7 @@ export default function CaretakerLedgerPage() {
         {batches.length === 0 ? (
           <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">No batches yet. Create one to group transactions.</p>
         ) : (
+          <>
           <div className="divide-y divide-gray-50 dark:divide-gray-700">
             {pagedBatches.map((b) => (
               <div key={b.id} className="px-4 sm:px-6 py-3 flex flex-wrap items-center gap-x-4 gap-y-2 hover:bg-gray-50/50 dark:hover:bg-gray-700/50">
@@ -646,6 +647,7 @@ export default function CaretakerLedgerPage() {
               </div>
             </div>
           )}
+          </>
         )}
       </div>
 
