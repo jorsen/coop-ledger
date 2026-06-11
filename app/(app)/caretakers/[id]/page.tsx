@@ -572,7 +572,7 @@ export default function CaretakerLedgerPage() {
       </div>{/* end left column */}
 
       {/* ── Right column: Batches ── */}
-      <div className="lg:col-span-1 lg:sticky lg:top-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 print:hidden">
+      <div className="lg:col-span-1 lg:sticky lg:top-[72px] bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 print:hidden">
         <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ClipboardList className="w-4 h-4 text-gray-500" />
