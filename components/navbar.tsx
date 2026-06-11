@@ -42,7 +42,7 @@ export default function Navbar() {
 
         {/* Desktop nav */}
         <nav className="hidden sm:flex items-center gap-1 flex-1">
-          {NAV_LINKS.map(({ href, label, icon: Icon }) => {
+          {NAV_LINKS.filter(l => isLoggedIn || l.href === '/caretakers').map(({ href, label, icon: Icon }) => {
             const active = pathname.startsWith(href);
             return (
               <Link
@@ -92,7 +92,7 @@ export default function Navbar() {
       {/* Mobile dropdown */}
       {open && (
         <div className="sm:hidden border-t border-gray-100 bg-white px-4 py-3 space-y-1">
-          {NAV_LINKS.map(({ href, label, icon: Icon }) => {
+          {NAV_LINKS.filter(l => isLoggedIn || l.href === '/caretakers').map(({ href, label, icon: Icon }) => {
             const active = pathname.startsWith(href);
             return (
               <Link
