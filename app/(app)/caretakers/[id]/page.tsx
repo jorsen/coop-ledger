@@ -573,7 +573,7 @@ export default function CaretakerLedgerPage() {
                 <span className="text-sm text-gray-500 dark:text-gray-400 shrink-0">
                   {fmtDate(b.batch_date)}
                 </span>
-                {b.notes && <span className="text-xs text-gray-400 dark:text-gray-500 truncate max-w-xs">{b.notes}</span>}
+                {b.notes && <span className="text-xs text-gray-900 dark:text-gray-500 truncate max-w-xs">{b.notes}</span>}
                 <div className="ml-auto flex items-center gap-3 shrink-0 text-sm text-gray-500 dark:text-gray-400">
                   <span>{b.transaction_count} tx</span>
                   <span>{b.total_bags} bags</span>

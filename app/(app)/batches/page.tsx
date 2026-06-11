@@ -100,7 +100,7 @@ export default function BatchesPage() {
                 <p className="text-sm text-gray-500">{fmtDate(b.batch_date)}</p>
               </div>
             </div>
-            {b.notes && <p className="text-xs text-gray-400 mb-3 line-clamp-2">{b.notes}</p>}
+            {b.notes && <p className="text-xs text-gray-900 dark:text-gray-400 mb-3 line-clamp-2">{b.notes}</p>}
 
             <div className="flex items-center gap-4 py-3 border-t border-gray-100 mb-3">
               <div>
