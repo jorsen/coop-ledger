@@ -33,6 +33,7 @@ export default function CaretakersPage() {
   const [clients, setClients] = useState<Client[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [modal, setModal] = useState<{ mode: 'add' | 'edit'; client?: Client } | null>(null);
 
   const fetchClients = useCallback(async () => {
@@ -41,7 +42,10 @@ export default function CaretakersPage() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { fetchClients(); }, [fetchClients]);
+  useEffect(() => {
+    fetchClients();
+    fetch('/api/auth/session').then(r => r.json()).then(d => setIsLoggedIn(d.isLoggedIn));
+  }, [fetchClients]);
   usePoll(fetchClients);
 
   const filtered = clients.filter(
@@ -71,13 +75,15 @@ export default function CaretakersPage() {
           <h1 className="text-2xl font-semibold text-gray-900">Caretakers</h1>
           <p className="text-sm text-gray-500 mt-0.5">Manage cooperative members</p>
         </div>
-        <button
-          onClick={() => setModal({ mode: 'add' })}
-          className="flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors sm:ml-auto"
-        >
-          <Plus className="w-4 h-4" />
-          Add Caretaker
-        </button>
+        {isLoggedIn && (
+          <button
+            onClick={() => setModal({ mode: 'add' })}
+            className="flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors sm:ml-auto"
+          >
+            <Plus className="w-4 h-4" />
+            Add Caretaker
+          </button>
+        )}
       </div>
 
       {/* Search */}
