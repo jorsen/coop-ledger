@@ -250,7 +250,7 @@ export default function CaretakerLedgerPage() {
       <div className="flex items-center justify-between mb-4 print:hidden">
         <button
           onClick={() => router.push('/caretakers')}
-          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 py-2"
+          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 py-2 whitespace-nowrap"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Caretakers
         </button>
