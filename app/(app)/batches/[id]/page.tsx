@@ -261,9 +261,9 @@ export default function BatchDetailPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-start">
       {/* ── Left column ── */}
-      <div className="md:col-span-2 min-w-0">
+      <div className="lg:col-span-2 min-w-0">
 
       {batch.client_name && (
         <div className="bg-white rounded-xl border border-gray-200 px-6 py-5 mb-4 text-sm print:rounded-sm print-card dark:bg-gray-800 dark:border-gray-700">
@@ -519,7 +519,7 @@ export default function BatchDetailPage() {
 
       {/* ── Right column: batches panel ── */}
       {allBatches.length > 0 && (
-        <div className="md:col-span-1 md:sticky md:top-[72px] bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 print:hidden">
+        <div className="lg:col-span-1 lg:sticky lg:top-[72px] bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 print:hidden">
           <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center gap-2">
             <ClipboardList className="w-4 h-4 text-gray-500" />
             <h2 className="font-semibold text-gray-900 dark:text-white">Batches</h2>

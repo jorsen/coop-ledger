@@ -272,9 +272,9 @@ export default function CaretakerLedgerPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-start">
       {/* ── Left column ── */}
-      <div className="md:col-span-2 min-w-0">
+      <div className="lg:col-span-2 min-w-0">
 
       {/* ── Caretaker info card ───────────────────────────────────────── */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-6 py-5 mb-6 print:rounded-sm print-card">
@@ -585,7 +585,7 @@ export default function CaretakerLedgerPage() {
       </div>{/* end left column */}
 
       {/* ── Right column: Batches ── */}
-      <div className="md:col-span-1 md:sticky md:top-[72px] bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 print:hidden">
+      <div className="lg:col-span-1 lg:sticky lg:top-[72px] bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 print:hidden">
         <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ClipboardList className="w-4 h-4 text-gray-500" />
