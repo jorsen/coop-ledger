@@ -86,6 +86,7 @@ export default function CaretakerLedgerPage() {
   const [savingExpense, setSavingExpense] = useState(false);
   const [txPage, setTxPage] = useState(0);
   const [batchPage, setBatchPage] = useState(0);
+  const [selectedBatchId, setSelectedBatchId] = useState<number | null>(null);
 
   const fetchData = useCallback(async () => {
     const [clientRes, batchRes] = await Promise.all([
@@ -100,15 +101,22 @@ export default function CaretakerLedgerPage() {
     const batchData = await batchRes.json();
     if (Array.isArray(batchData)) {
       setBatches(batchData);
-      if (Array.isArray(batchData) && batchData.length > 0) {
-        const expRes = await fetch(`/api/expenses?batch_id=${batchData[0].id}`);
-        if (expRes.ok) setExpenses(await expRes.json());
-      } else {
-        setExpenses([]);
+      if (batchData.length > 0) {
+        setSelectedBatchId(prev => prev ?? batchData[0].id);
       }
     }
     setLoading(false);
   }, [id, router]);
+
+  const fetchExpenses = useCallback(async (batchId: number) => {
+    const res = await fetch(`/api/expenses?batch_id=${batchId}`);
+    if (res.ok) setExpenses(await res.json());
+    else setExpenses([]);
+  }, []);
+
+  useEffect(() => {
+    if (selectedBatchId) fetchExpenses(selectedBatchId);
+  }, [selectedBatchId, fetchExpenses]);
 
   useEffect(() => {
     fetchData();
@@ -155,35 +163,40 @@ export default function CaretakerLedgerPage() {
   }
 
   async function handleCreateExpense() {
-    if (!batches[0]) return;
+    if (!selectedBatchId) return;
     setSavingExpense(true);
     await fetch('/api/expenses', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ batch_id: batches[0].id, item: expenseForm.item, quantity: expenseForm.quantity, price: expenseForm.price }),
+      body: JSON.stringify({ batch_id: selectedBatchId, item: expenseForm.item, quantity: expenseForm.quantity, price: expenseForm.price }),
     });
     setSavingExpense(false);
     setExpenseModal(false);
     setExpenseForm({ item: '', quantity: '1', price: '' });
-    fetchData();
+    if (selectedBatchId) fetchExpenses(selectedBatchId);
   }
 
   async function handleDeleteExpense(expId: number) {
     if (!confirm('Delete this expense?')) return;
     await fetch(`/api/expenses/${expId}`, { method: 'DELETE' });
-    fetchData();
+    if (selectedBatchId) fetchExpenses(selectedBatchId);
   }
 
-  const totalDebit       = transactions.reduce((s, t) => s + Number(t.debit), 0);
-  const totalCredit      = transactions.reduce((s, t) => s + Number(t.credit), 0);
-  const totalBags        = transactions.reduce((s, t) => s + Number(t.bags), 0);
-  const totalDeliveryFee = transactions.reduce((s, t) => s + Number(t.delivery_fee ?? 0), 0);
+  const selectedBatch = batches.find(b => b.id === selectedBatchId) ?? batches[0] ?? null;
+  const batchTransactions = selectedBatch
+    ? transactions.filter(t => t.batch_no === selectedBatch.batch_number)
+    : transactions;
+
+  const totalDebit       = batchTransactions.reduce((s, t) => s + Number(t.debit), 0);
+  const totalCredit      = batchTransactions.reduce((s, t) => s + Number(t.credit), 0);
+  const totalBags        = batchTransactions.reduce((s, t) => s + Number(t.bags), 0);
+  const totalDeliveryFee = batchTransactions.reduce((s, t) => s + Number(t.delivery_fee ?? 0), 0);
   const balance          = totalDebit - totalCredit;
 
-  const maturityDate = batches[0]?.maturity_date ?? null;
+  const maturityDate = selectedBatch?.maturity_date ?? null;
 
-  const withComputed = transactions.map((tx, i) => {
-    const runningBalance = transactions
+  const withComputed = batchTransactions.map((tx, i) => {
+    const runningBalance = batchTransactions
       .slice(0, i + 1)
       .reduce((s, t) => s + Number(t.debit) - Number(t.credit), 0);
     const d = Number(tx.debit);
@@ -200,7 +213,7 @@ export default function CaretakerLedgerPage() {
 
   const totalDffs1         = withComputed.reduce((s, tx) => s + tx.dffs1, 0);
   const totalInterest      = withComputed.reduce((s, tx) => s + tx.interest, 0);
-  const dffs2              = 50 * (batches[0]?.heads ?? 0);
+  const dffs2              = 50 * (selectedBatch?.heads ?? 0);
   const totalOtherExpenses = expenses.reduce((s, e) => s + Number(e.quantity) * Number(e.price), 0);
 
   const txTotalPages = Math.ceil(withComputed.length / PAGE_SIZE);
@@ -271,8 +284,8 @@ export default function CaretakerLedgerPage() {
             <p className="font-bold text-gray-900 dark:text-white">{client.name}</p>
           </div>
           <div>
-            <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">CURRENT BATCH #</p>
-            <p className="font-semibold text-blue-600 dark:text-blue-400">{batches[0]?.batch_number || '—'}</p>
+            <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">BATCH #</p>
+            <p className="font-semibold text-blue-600 dark:text-blue-400">{selectedBatch?.batch_number || '—'}</p>
           </div>
           <div>
             <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">CARETAKER ID</p>
@@ -292,19 +305,19 @@ export default function CaretakerLedgerPage() {
           </div>
           <div>
             <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5"># OF HEADS</p>
-            <p className="font-semibold text-gray-900 dark:text-white">{batches[0]?.heads ?? '—'}</p>
+            <p className="font-semibold text-gray-900 dark:text-white">{selectedBatch?.heads ?? '—'}</p>
           </div>
           <div>
             <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">DATE OF APPLICATION</p>
-            <p className="font-semibold text-gray-900 dark:text-white">{batches[0]?.date_of_application ? fmtDate(batches[0].date_of_application) : '—'}</p>
+            <p className="font-semibold text-gray-900 dark:text-white">{selectedBatch?.date_of_application ? fmtDate(selectedBatch.date_of_application) : '—'}</p>
           </div>
           <div>
             <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">DATE OF HAULING</p>
-            <p className="font-semibold text-red-600">{batches[0]?.date_of_hauling ? fmtDate(batches[0].date_of_hauling) : '—'}</p>
+            <p className="font-semibold text-red-600">{selectedBatch?.date_of_hauling ? fmtDate(selectedBatch.date_of_hauling) : '—'}</p>
           </div>
           <div>
             <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">MATURITY DATE</p>
-            <p className="font-semibold text-green-700 dark:text-green-400">{batches[0]?.maturity_date ? fmtDate(batches[0].maturity_date) : '—'}</p>
+            <p className="font-semibold text-green-700 dark:text-green-400">{selectedBatch?.maturity_date ? fmtDate(selectedBatch.maturity_date) : '—'}</p>
           </div>
         </div>
       </div>
@@ -450,7 +463,7 @@ export default function CaretakerLedgerPage() {
           <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <h2 className="font-semibold text-gray-900 dark:text-white">Other Expenses</h2>
-              <span className="text-xs text-gray-400 dark:text-gray-500">Batch #{batches[0].batch_number}</span>
+              <span className="text-xs text-gray-400 dark:text-gray-500">Batch #{selectedBatch?.batch_number}</span>
               {expenses.length > 0 && (
                 <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full">{expenses.length}</span>
               )}
@@ -596,10 +609,14 @@ export default function CaretakerLedgerPage() {
         ) : (
           <>
           <div className="divide-y divide-gray-50 dark:divide-gray-700 max-h-[60vh] overflow-y-auto">
-            {pagedBatches.map((b, i) => {
-              const isViewing = batchPage === 0 && i === 0;
+            {pagedBatches.map((b) => {
+              const isViewing = b.id === selectedBatchId;
               return (
-              <div key={b.id} className={`px-4 sm:px-6 py-3 flex flex-wrap items-center gap-x-4 gap-y-2 ${isViewing ? 'bg-green-50 dark:bg-green-900/10' : 'hover:bg-gray-50/50 dark:hover:bg-gray-700/50'}`}>
+              <div
+                key={b.id}
+                onClick={() => { setSelectedBatchId(b.id); setTxPage(0); }}
+                className={`px-4 sm:px-6 py-3 flex flex-wrap items-center gap-x-4 gap-y-2 cursor-pointer ${isViewing ? 'bg-green-50 dark:bg-green-900/10' : 'hover:bg-gray-50/50 dark:hover:bg-gray-700/50'}`}
+              >
                 <span className="bg-green-800 text-white text-xs font-bold px-2 py-0.5 rounded shrink-0">
                   {b.batch_number}
                 </span>
@@ -610,7 +627,7 @@ export default function CaretakerLedgerPage() {
                   {fmtDate(b.batch_date)}
                 </span>
                 {b.notes && <span className="text-xs text-gray-900 dark:text-gray-500 truncate max-w-xs">{b.notes}</span>}
-                <div className="ml-auto flex items-center gap-3 shrink-0 text-sm text-gray-500 dark:text-gray-400">
+                <div className="ml-auto flex items-center gap-3 shrink-0 text-sm text-gray-500 dark:text-gray-400" onClick={e => e.stopPropagation()}>
                   <span>{b.transaction_count} tx</span>
                   <span>{b.total_bags} bags</span>
                   <span className="font-medium text-gray-700 dark:text-gray-300 hidden sm:inline">
