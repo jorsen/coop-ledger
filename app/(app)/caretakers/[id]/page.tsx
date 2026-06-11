@@ -249,17 +249,17 @@ export default function CaretakerLedgerPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3">FEEDS</th>
-                <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3">TR_DATE</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">NO.OF BAGS</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Price/Bag</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Debit</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden">Delivery Fee</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Balance</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden">DFFS</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Interest</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden"># of Days</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden">Date Maturity</th>
+                <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3 whitespace-nowrap">FEEDS</th>
+                <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3 whitespace-nowrap">TR_DATE</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 whitespace-nowrap">NO.OF BAGS</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 whitespace-nowrap">Price/Bag</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 whitespace-nowrap">Debit</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden whitespace-nowrap">Delivery Fee</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 whitespace-nowrap">Balance</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden whitespace-nowrap">DFFS</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 whitespace-nowrap">Interest</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden whitespace-nowrap"># of Days</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden whitespace-nowrap">Date Maturity</th>
                 <th className="px-4 py-3 print:hidden" />
               </tr>
             </thead>
