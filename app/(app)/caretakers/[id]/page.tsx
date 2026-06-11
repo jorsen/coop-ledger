@@ -46,6 +46,14 @@ interface Transaction {
   batch_no: string | null;
 }
 
+interface Expense {
+  id: number;
+  batch_id: number;
+  item: string;
+  quantity: number;
+  price: number;
+}
+
 
 const num = (n: number) =>
   new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
@@ -70,6 +78,10 @@ export default function CaretakerLedgerPage() {
   const [editBatch, setEditBatch] = useState<Batch | null>(null);
   const [editBatchForm, setEditBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', maturity_date: '', heads: '' });
   const [savingEditBatch, setSavingEditBatch] = useState(false);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [expenseModal, setExpenseModal] = useState(false);
+  const [expenseForm, setExpenseForm] = useState({ item: '', quantity: '1', price: '' });
+  const [savingExpense, setSavingExpense] = useState(false);
 
   const fetchData = useCallback(async () => {
     const [clientRes, batchRes] = await Promise.all([
@@ -82,7 +94,15 @@ export default function CaretakerLedgerPage() {
     setClient(clientData);
     setTransactions(txs);
     const batchData = await batchRes.json();
-    if (Array.isArray(batchData)) setBatches(batchData);
+    if (Array.isArray(batchData)) {
+      setBatches(batchData);
+      if (Array.isArray(batchData) && batchData.length > 0) {
+        const expRes = await fetch(`/api/expenses?batch_id=${batchData[0].id}`);
+        if (expRes.ok) setExpenses(await expRes.json());
+      } else {
+        setExpenses([]);
+      }
+    }
     setLoading(false);
   }, [id, router]);
 
@@ -130,6 +150,26 @@ export default function CaretakerLedgerPage() {
     fetchData();
   }
 
+  async function handleCreateExpense() {
+    if (!batches[0]) return;
+    setSavingExpense(true);
+    await fetch('/api/expenses', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ batch_id: batches[0].id, item: expenseForm.item, quantity: expenseForm.quantity, price: expenseForm.price }),
+    });
+    setSavingExpense(false);
+    setExpenseModal(false);
+    setExpenseForm({ item: '', quantity: '1', price: '' });
+    fetchData();
+  }
+
+  async function handleDeleteExpense(expId: number) {
+    if (!confirm('Delete this expense?')) return;
+    await fetch(`/api/expenses/${expId}`, { method: 'DELETE' });
+    fetchData();
+  }
+
   const totalDebit       = transactions.reduce((s, t) => s + Number(t.debit), 0);
   const totalCredit      = transactions.reduce((s, t) => s + Number(t.credit), 0);
   const totalBags        = transactions.reduce((s, t) => s + Number(t.bags), 0);
@@ -154,9 +194,10 @@ export default function CaretakerLedgerPage() {
     return { ...tx, runningBalance, days, dffs1, interest };
   });
 
-  const totalDffs1    = withComputed.reduce((s, tx) => s + tx.dffs1, 0);
-  const totalInterest = withComputed.reduce((s, tx) => s + tx.interest, 0);
-  const dffs2         = 50 * (batches[0]?.heads ?? 0);
+  const totalDffs1         = withComputed.reduce((s, tx) => s + tx.dffs1, 0);
+  const totalInterest      = withComputed.reduce((s, tx) => s + tx.interest, 0);
+  const dffs2              = 50 * (batches[0]?.heads ?? 0);
+  const totalOtherExpenses = expenses.reduce((s, e) => s + Number(e.quantity) * Number(e.price), 0);
 
   if (loading) {
     return (
@@ -356,15 +397,146 @@ export default function CaretakerLedgerPage() {
                   <span className="text-gray-600 dark:text-gray-400">Del Fee</span>
                   <span className="font-medium text-gray-900 dark:text-white">{num(totalDeliveryFee)}</span>
                 </div>
+                {totalOtherExpenses > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">Other Expenses</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{num(totalOtherExpenses)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between border-t border-gray-200 dark:border-gray-700 pt-1.5 mt-1">
                   <span className="font-bold text-gray-900 dark:text-white">Total</span>
-                  <span className="font-bold text-gray-900 dark:text-white underline">{num(balance + totalInterest + totalDffs1 + dffs2 + totalDeliveryFee)}</span>
+                  <span className="font-bold text-gray-900 dark:text-white underline">{num(balance + totalInterest + totalDffs1 + dffs2 + totalDeliveryFee + totalOtherExpenses)}</span>
                 </div>
               </div>
             </div>
           </div>
         )}
       </div>
+
+      {/* ── Other Expenses section ───────────────────────────────────── */}
+      {batches.length > 0 && (
+        <div className="mt-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 print:hidden">
+          <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <h2 className="font-semibold text-gray-900 dark:text-white">Other Expenses</h2>
+              <span className="text-xs text-gray-400 dark:text-gray-500">Batch #{batches[0].batch_number}</span>
+              {expenses.length > 0 && (
+                <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full">{expenses.length}</span>
+              )}
+            </div>
+            {isLoggedIn && (
+              <button
+                onClick={() => setExpenseModal(true)}
+                className="flex items-center gap-1.5 text-sm text-green-800 dark:text-green-400 font-medium hover:text-green-700"
+              >
+                <Plus className="w-4 h-4" /> Add Expense
+              </button>
+            )}
+          </div>
+          {expenses.length === 0 ? (
+            <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">No other expenses recorded.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+                    <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3">ITEM</th>
+                    <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3">QUANTITY</th>
+                    <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3">PRICE</th>
+                    <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3">TOTAL</th>
+                    {isLoggedIn && <th className="px-4 py-3" />}
+                  </tr>
+                </thead>
+                <tbody>
+                  {expenses.map(e => (
+                    <tr key={e.id} className="border-b border-gray-50 dark:border-gray-700 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-700/50">
+                      <td className="px-4 py-3 text-gray-800 dark:text-gray-200">{e.item}</td>
+                      <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{Number(e.quantity).toFixed(2)}</td>
+                      <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{num(Number(e.price))}</td>
+                      <td className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-white">{num(Number(e.quantity) * Number(e.price))}</td>
+                      {isLoggedIn && (
+                        <td className="px-4 py-3">
+                          <button onClick={() => handleDeleteExpense(e.id)} className="p-1 text-red-400 hover:text-red-600 flex items-center justify-end w-full">
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                  <tr className="border-t-2 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 font-semibold">
+                    <td colSpan={3} className="px-4 py-3 text-right text-xs text-gray-500 dark:text-gray-400">TOTAL</td>
+                    <td className="px-4 py-3 text-right text-gray-900 dark:text-white">{num(totalOtherExpenses)}</td>
+                    {isLoggedIn && <td />}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Add Expense Modal */}
+      {expenseModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-start justify-center z-50 p-4 pt-24 overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-sm">
+            <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+              <h2 className="text-base font-semibold text-gray-900 dark:text-white">Add Expense</h2>
+              <button onClick={() => setExpenseModal(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl leading-none">×</button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Item *</label>
+                <input
+                  value={expenseForm.item}
+                  onChange={e => setExpenseForm(f => ({ ...f, item: e.target.value }))}
+                  placeholder="e.g. Vitamins"
+                  className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                />
+              </div>
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Quantity</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={expenseForm.quantity}
+                    onChange={e => setExpenseForm(f => ({ ...f, quantity: e.target.value }))}
+                    className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Price *</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={expenseForm.price}
+                    onChange={e => setExpenseForm(f => ({ ...f, price: e.target.value }))}
+                    placeholder="0.00"
+                    className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setExpenseModal(false)}
+                  className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCreateExpense}
+                  disabled={savingExpense || !expenseForm.item || !expenseForm.price}
+                  className="flex-1 bg-green-800 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50"
+                >
+                  {savingExpense ? 'Saving…' : 'Add Expense'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Batches section ──────────────────────────────────────────── */}
       <div className="mt-8 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 print:hidden">
