@@ -49,7 +49,7 @@ export default function CaretakersPage() {
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [modal, setModal] = useState<{ mode: 'add' | 'edit'; client?: Client } | null>(null);
-  const [view, setView] = useState<'card' | 'list'>('card');
+  const [view, setView] = useState<'card' | 'list'>('list');
 
   useEffect(() => {
     const saved = localStorage.getItem('caretakers-view') as 'card' | 'list' | null;
