@@ -40,6 +40,8 @@ export async function POST(req: NextRequest) {
   // Ensure new columns exist (safe on Neon — idempotent)
   await sql`ALTER TABLE clients ADD COLUMN IF NOT EXISTS date_of_hauling DATE`;
   await sql`ALTER TABLE clients ADD COLUMN IF NOT EXISTS date_of_application DATE`;
+  await sql`ALTER TABLE clients DROP CONSTRAINT IF EXISTS clients_status_check`;
+  await sql`ALTER TABLE clients ADD CONSTRAINT clients_status_check CHECK (status IN ('active','inactive','paid','completed','on-going'))`;
 
   // Insert with a temporary code, then update to the zero-padded id
   const [inserted] = await sql`

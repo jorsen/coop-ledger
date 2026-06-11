@@ -136,12 +136,12 @@ export default function TransactionModal({
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-start justify-center z-50 p-4 pt-12 overflow-y-auto">
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-md my-auto">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h2 className="text-base font-semibold text-gray-900">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md my-auto">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+          <h2 className="text-base font-semibold text-gray-900 dark:text-white">
             {transaction ? 'Edit Transaction' : 'Add Transaction'}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -149,16 +149,16 @@ export default function TransactionModal({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Client */}
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Caretaker *</label>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Caretaker *</label>
             {clients.length === 1 ? (
-              <div className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 text-gray-700">
+              <div className="w-full border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-white">
                 {clients[0].name}
               </div>
             ) : (
               <select
                 value={form.client_id}
                 onChange={(e) => set('client_id', Number(e.target.value))}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                 required
               >
                 <option value="">Select caretaker…</option>
@@ -171,16 +171,16 @@ export default function TransactionModal({
 
           {/* Batch */}
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Batch *</label>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Batch *</label>
             {defaultBatchId ? (
-              <div className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 text-gray-700">
+              <div className="w-full border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-white">
                 {batches.find((b) => b.id === defaultBatchId)?.batch_number ?? `Batch #${defaultBatchId}`}
               </div>
             ) : (
               <select
                 value={form.batch_id ?? ''}
                 onChange={(e) => set('batch_id', e.target.value ? Number(e.target.value) : null)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                 required
               >
                 <option value="">Select batch…</option>
@@ -197,35 +197,35 @@ export default function TransactionModal({
           {/* Date + Bags */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Date *</label>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Date *</label>
               <input
                 type="date"
                 value={form.date}
                 onChange={(e) => set('date', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                 required
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Bags</label>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Bags</label>
               <input
                 type="text"
                 inputMode="numeric"
                 value={form.bags}
                 onChange={(e) => set('bags', e.target.value)}
                 placeholder="0"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
               />
             </div>
           </div>
 
           {/* Feed type */}
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Feed Type</label>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Feed Type</label>
             <select
               value={form.feed_type}
               onChange={(e) => set('feed_type', e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
             >
               <option value="">Select feed type</option>
               {feedTypes.map((f) => (
@@ -235,7 +235,7 @@ export default function TransactionModal({
 
             {/* Price hint */}
             {pricePerBag !== null && (
-              <p className="mt-1 flex items-center gap-1 text-xs text-green-700">
+              <p className="mt-1 flex items-center gap-1 text-xs text-green-700 dark:text-green-400">
                 <Info className="w-3 h-3" />
                 Price on {priceDate}: {peso(pricePerBag)} / bag
                 {autoDebit !== null && (
@@ -251,7 +251,7 @@ export default function TransactionModal({
           {/* Debit + Credit */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Total Price (₱)
               </label>
               <input
@@ -259,41 +259,41 @@ export default function TransactionModal({
                 value={form.debit === 0 ? '' : form.debit}
                 readOnly
                 placeholder="auto"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 text-gray-700 cursor-not-allowed"
+                className="w-full border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-white cursor-not-allowed dark:placeholder-gray-400"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Credit (₱)</label>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Credit (₱)</label>
               <input
                 type="text"
                 inputMode="numeric"
                 value={form.credit}
                 onChange={(e) => set('credit', e.target.value)}
                 placeholder="0"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
               />
             </div>
           </div>
 
           {/* Notes */}
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Notes</label>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
             <textarea
               value={form.notes}
               onChange={(e) => set('notes', e.target.value)}
               rows={2}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 resize-none"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 resize-none"
               placeholder="Optional notes…"
             />
           </div>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
 
           <div className="flex gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 border border-gray-300 text-gray-700 py-2 rounded-lg text-sm font-medium hover:bg-gray-50"
+              className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               Cancel
             </button>

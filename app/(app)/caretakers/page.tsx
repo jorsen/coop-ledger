@@ -72,8 +72,8 @@ export default function CaretakersPage() {
     <div>
       <div className="flex flex-col sm:flex-row sm:items-start gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Caretakers</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Manage cooperative members</p>
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Caretakers</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Manage cooperative members</p>
         </div>
         {isLoggedIn && (
           <button
@@ -88,53 +88,53 @@ export default function CaretakersPage() {
 
       {/* Search */}
       <div className="relative mb-6 max-w-xs">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by name or ID…"
-          className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+          className="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
         />
       </div>
 
       {filtered.length === 0 && (
-        <p className="text-gray-400 text-sm text-center py-16">No caretakers found.</p>
+        <p className="text-gray-400 dark:text-gray-500 text-sm text-center py-16">No caretakers found.</p>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.map((client) => (
-          <div key={client.id} className="bg-white rounded-xl border border-gray-200 p-5">
+          <div key={client.id} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
             {/* Header */}
             <div className="flex items-start justify-between mb-1">
-              <h3 className="font-semibold text-gray-900 text-sm">{client.name}</h3>
-              <span
-                className={`text-xs font-medium px-2 py-0.5 rounded ${
-                  client.status === 'active'
-                    ? 'bg-green-50 text-green-700'
-                    : 'bg-gray-100 text-gray-500'
-                }`}
-              >
-                {client.status}
+              <h3 className="font-semibold text-gray-900 dark:text-white text-sm">{client.name}</h3>
+              <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+                client.status === 'active'    ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                client.status === 'on-going'  ? 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                client.status === 'paid'      ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                client.status === 'completed' ? 'bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' :
+                'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
+              }`}>
+                {client.status.charAt(0).toUpperCase() + client.status.slice(1)}
               </span>
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
               ID: {client.client_code}
               {client.current_batch_number && <> · Batch <span className="font-medium text-green-700">#{client.current_batch_number}</span></>}
             </p>
-            <p className="text-xs text-gray-400 mb-3">{client.transaction_count} transaction(s)</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">{client.transaction_count} transaction(s)</p>
 
             {/* Current batch stats */}
-            <div className="grid grid-cols-3 gap-x-4 gap-y-3 py-3 border-t border-gray-100 mb-3">
+            <div className="grid grid-cols-3 gap-x-4 gap-y-3 py-3 border-t border-gray-100 dark:border-gray-700 mb-3">
               <div>
-                <p className="text-xs text-gray-500">Heads</p>
-                <p className="text-sm font-semibold text-green-700">{client.current_heads ?? '—'}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Heads</p>
+                <p className="text-sm font-semibold text-green-700 dark:text-green-400">{client.current_heads ?? '—'}</p>
               </div>
               <div>
-                <p className="text-xs text-gray-500">App. Date</p>
-                <p className="text-sm font-semibold text-gray-900">{fmtDate(client.current_date_of_application)}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">App. Date</p>
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">{fmtDate(client.current_date_of_application)}</p>
               </div>
               <div>
-                <p className="text-xs text-gray-500">Hauling Date</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Hauling Date</p>
                 <p className="text-sm font-semibold text-red-600">{fmtDate(client.current_date_of_hauling)}</p>
               </div>
             </div>
@@ -143,7 +143,7 @@ export default function CaretakersPage() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => router.push(`/caretakers/${client.id}`)}
-                className="flex-1 flex items-center justify-center gap-2 border border-gray-200 text-gray-700 py-1.5 rounded-lg text-sm hover:bg-gray-50 transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 py-1.5 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
                 <Eye className="w-4 h-4" />
                 Ledger
@@ -152,7 +152,7 @@ export default function CaretakersPage() {
                 <>
                   <button
                     onClick={() => setModal({ mode: 'edit', client })}
-                    className="p-1.5 border border-gray-200 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+                    className="p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <Pencil className="w-4 h-4" />
                   </button>

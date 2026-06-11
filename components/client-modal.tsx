@@ -87,12 +87,12 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-start justify-center z-50 overflow-y-auto p-4 pt-16">
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-md">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h2 className="text-base font-semibold text-gray-900">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+          <h2 className="text-base font-semibold text-gray-900 dark:text-white">
             {mode === 'add' ? 'Add Caretaker' : 'Edit Caretaker'}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -100,11 +100,11 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
         <form onSubmit={handleSubmit} className="p-6" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Full Name — always visible */}
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-2">Full Name *</label>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Full Name *</label>
             <input
               value={form.name}
               onChange={(e) => set('name', e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
               placeholder="e.g. Dela Cruz, Juan M."
               required
             />
@@ -115,56 +115,56 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
             <>
               <div style={{ display: 'flex', gap: '16px' }}>
                 <div style={{ flex: 1 }}>
-                  <label className="block text-xs font-medium text-gray-700 mb-2">Batch #</label>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Batch #</label>
                   <input
                     value={form.batch_number}
                     onChange={(e) => set('batch_number', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                     placeholder="e.g. 1"
                   />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label className="block text-xs font-medium text-gray-700 mb-2">Client ID</label>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Client ID</label>
                   <input
                     value={form.client_code}
                     onChange={(e) => set('client_code', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                   />
                 </div>
               </div>
 
               <div style={{ display: 'flex', gap: '16px' }}>
                 <div style={{ flex: 1 }}>
-                  <label className="block text-xs font-medium text-gray-700 mb-2">Heads</label>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Heads</label>
                   <input
                     type="text"
                     inputMode="numeric"
                     value={form.heads}
                     onChange={(e) => handleHeadsChange(e.target.value)}
                     placeholder="0"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                   />
                 </div>
               </div>
 
               <div style={{ display: 'flex', gap: '16px' }}>
                 <div style={{ flex: 1 }}>
-                  <label className="block text-xs font-medium text-gray-700 mb-2">Date of Application</label>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Date of Application</label>
                   <input
                     type="date"
                     value={form.date_of_application}
                     onChange={(e) => set('date_of_application', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
                     style={{ backgroundColor: '#ffffff', height: '46px', WebkitAppearance: 'none', appearance: 'none' }}
                   />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label className="block text-xs font-medium text-gray-700 mb-2">Date of Hauling</label>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Date of Hauling</label>
                   <input
                     type="date"
                     value={form.date_of_hauling}
                     onChange={(e) => set('date_of_hauling', e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
                     style={{ backgroundColor: '#ffffff', height: '46px', WebkitAppearance: 'none', appearance: 'none' }}
                   />
                 </div>
@@ -174,13 +174,16 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
 
           {/* Status — always visible */}
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-2">Status</label>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
             <select
               value={form.status}
               onChange={(e) => set('status', e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
             >
               <option value="active">Active</option>
+              <option value="on-going">On-going</option>
+              <option value="paid">Paid</option>
+              <option value="completed">Completed</option>
               <option value="inactive">Inactive</option>
             </select>
           </div>
@@ -191,7 +194,7 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 border border-gray-300 text-gray-700 py-2 rounded-lg text-sm font-medium hover:bg-gray-50"
+              className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               Cancel
             </button>

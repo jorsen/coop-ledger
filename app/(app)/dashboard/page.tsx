@@ -59,8 +59,8 @@ export default function DashboardPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Feed cooperative transaction overview</p>
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Dashboard</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Feed cooperative transaction overview</p>
       </div>
 
       {/* Stats */}
@@ -72,10 +72,10 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent transactions */}
-      <div className="bg-white rounded-xl border border-gray-200">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h2 className="font-semibold text-gray-900">Recent Transactions</h2>
-          <Link href="/transactions" className="flex items-center gap-1 text-sm text-green-700 hover:text-green-800 font-medium">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+          <h2 className="font-semibold text-gray-900 dark:text-white">Recent Transactions</h2>
+          <Link href="/transactions" className="flex items-center gap-1 text-sm text-green-700 dark:text-green-400 hover:text-green-800 font-medium">
             View All <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -83,28 +83,28 @@ export default function DashboardPage() {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-100">
-                <th className="text-left text-xs font-medium text-gray-500 px-6 py-3">Date</th>
-                <th className="text-left text-xs font-medium text-gray-500 px-6 py-3">Caretaker</th>
-                <th className="text-left text-xs font-medium text-gray-500 px-6 py-3">Feed</th>
-                <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Bags</th>
-                <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Price/Bag</th>
-                <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Total Price</th>
-                <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Credit</th>
+              <tr className="border-b border-gray-100 dark:border-gray-700">
+                <th className="text-left text-xs font-medium text-gray-500 dark:text-gray-400 px-6 py-3">Date</th>
+                <th className="text-left text-xs font-medium text-gray-500 dark:text-gray-400 px-6 py-3">Caretaker</th>
+                <th className="text-left text-xs font-medium text-gray-500 dark:text-gray-400 px-6 py-3">Feed</th>
+                <th className="text-right text-xs font-medium text-gray-500 dark:text-gray-400 px-6 py-3">Bags</th>
+                <th className="text-right text-xs font-medium text-gray-500 dark:text-gray-400 px-6 py-3">Price/Bag</th>
+                <th className="text-right text-xs font-medium text-gray-500 dark:text-gray-400 px-6 py-3">Total Price</th>
+                <th className="text-right text-xs font-medium text-gray-500 dark:text-gray-400 px-6 py-3">Credit</th>
               </tr>
             </thead>
             <tbody>
               {recent.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="text-center text-sm text-gray-400 py-10">
+                  <td colSpan={7} className="text-center text-sm text-gray-400 dark:text-gray-500 py-10">
                     No transactions yet.
                   </td>
                 </tr>
               )}
               {recent.map((tx) => (
-                <tr key={tx.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50">
-                  <td className="px-6 py-3 text-sm text-blue-600 whitespace-nowrap">{fmtDate(tx.date)}</td>
-                  <td className="px-6 py-3 text-sm font-medium text-gray-900">{tx.client_name}</td>
+                <tr key={tx.id} className="border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                  <td className="px-6 py-3 text-sm text-blue-600 dark:text-blue-400 whitespace-nowrap">{fmtDate(tx.date)}</td>
+                  <td className="px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">{tx.client_name}</td>
                   <td className="px-6 py-3">
                     {tx.feed_type && (
                       <span className="inline-block bg-green-50 text-green-800 text-xs font-medium px-2 py-0.5 rounded">
@@ -112,12 +112,12 @@ export default function DashboardPage() {
                       </span>
                     )}
                   </td>
-                  <td className="px-6 py-3 text-sm text-gray-700 text-right">{tx.bags}</td>
-                  <td className="px-6 py-3 text-sm text-gray-600 text-right">
+                  <td className="px-6 py-3 text-sm text-gray-700 dark:text-gray-300 text-right">{tx.bags}</td>
+                  <td className="px-6 py-3 text-sm text-gray-600 dark:text-gray-400 text-right">
                     {tx.price_per_bag ? peso(tx.price_per_bag) : '—'}
                   </td>
-                  <td className="px-6 py-3 text-sm font-medium text-gray-900 text-right">{peso(tx.debit)}</td>
-                  <td className="px-6 py-3 text-sm text-green-600 text-right">{peso(tx.credit)}</td>
+                  <td className="px-6 py-3 text-sm font-medium text-gray-900 dark:text-white text-right">{peso(tx.debit)}</td>
+                  <td className="px-6 py-3 text-sm text-green-600 dark:text-green-400 text-right">{peso(tx.credit)}</td>
                 </tr>
               ))}
             </tbody>

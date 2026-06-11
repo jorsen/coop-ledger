@@ -134,14 +134,14 @@ export default function BatchDetailPage() {
       <div className="flex items-center justify-between mb-4 print:hidden">
         <button
           onClick={() => batch.client_id ? router.push(`/caretakers/${batch.client_id}`) : router.push('/caretakers')}
-          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700"
+          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Caretaker
         </button>
         <div className="flex items-center gap-2">
           <button
             onClick={() => window.print()}
-            className="flex items-center gap-2 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50"
+            className="flex items-center gap-2 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
           >
             <Printer className="w-4 h-4" /> Print
           </button>
@@ -157,38 +157,38 @@ export default function BatchDetailPage() {
       </div>
 
       {batch.client_name && (
-        <div className="bg-white rounded-xl border border-gray-200 px-6 py-5 mb-4 text-sm print:rounded-sm print-card">
+        <div className="bg-white rounded-xl border border-gray-200 px-6 py-5 mb-4 text-sm print:rounded-sm print-card dark:bg-gray-800 dark:border-gray-700">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-4 print:grid-cols-4 print:gap-x-6 print:gap-y-1 print:text-xs">
             <div>
-              <p className="text-xs font-medium text-gray-600 mb-0.5">NAME</p>
-              <p className="font-bold text-gray-900">{batch.client_name}</p>
+              <p className="text-xs font-medium text-gray-600 mb-0.5 dark:text-gray-400">NAME</p>
+              <p className="font-bold text-gray-900 dark:text-white">{batch.client_name}</p>
             </div>
             <div>
-              <p className="text-xs font-medium text-gray-600 mb-0.5">BATCH #</p>
+              <p className="text-xs font-medium text-gray-600 mb-0.5 dark:text-gray-400">BATCH #</p>
               <p className="font-semibold text-blue-600">{batch.batch_number}</p>
             </div>
             <div>
-              <p className="text-xs font-medium text-gray-600 mb-0.5">CLIENT ID</p>
-              <p className="font-semibold text-gray-700">{batch.client_code ?? '—'}</p>
+              <p className="text-xs font-medium text-gray-600 mb-0.5 dark:text-gray-400">CLIENT ID</p>
+              <p className="font-semibold text-gray-700 dark:text-gray-300">{batch.client_code ?? '—'}</p>
             </div>
             <div>
-              <p className="text-xs font-medium text-gray-600 mb-0.5">STATUS</p>
+              <p className="text-xs font-medium text-gray-600 mb-0.5 dark:text-gray-400">STATUS</p>
               <span className="inline-block text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-800">Active</span>
             </div>
             <div>
-              <p className="text-xs font-medium text-gray-600 mb-0.5"># OF HEADS</p>
-              <p className="font-semibold text-gray-900">{batch.heads ?? '—'}</p>
+              <p className="text-xs font-medium text-gray-600 mb-0.5 dark:text-gray-400"># OF HEADS</p>
+              <p className="font-semibold text-gray-900 dark:text-white">{batch.heads ?? '—'}</p>
             </div>
             <div>
-              <p className="text-xs font-medium text-gray-600 mb-0.5">DATE OF APPLICATION</p>
-              <p className="font-semibold text-gray-900">{batch.date_of_application ? fmtDate(batch.date_of_application) : '—'}</p>
+              <p className="text-xs font-medium text-gray-600 mb-0.5 dark:text-gray-400">DATE OF APPLICATION</p>
+              <p className="font-semibold text-gray-900 dark:text-white">{batch.date_of_application ? fmtDate(batch.date_of_application) : '—'}</p>
             </div>
             <div>
-              <p className="text-xs font-medium text-gray-600 mb-0.5">DATE OF HAULING</p>
+              <p className="text-xs font-medium text-gray-600 mb-0.5 dark:text-gray-400">DATE OF HAULING</p>
               <p className="font-semibold text-red-600">{batch.date_of_hauling ? fmtDate(batch.date_of_hauling) : '—'}</p>
             </div>
             <div>
-              <p className="text-xs font-medium text-gray-600 mb-0.5">MATURITY DATE</p>
+              <p className="text-xs font-medium text-gray-600 mb-0.5 dark:text-gray-400">MATURITY DATE</p>
               <p className="font-semibold text-green-700">{batch.maturity_date ? fmtDate(batch.maturity_date) : '—'}</p>
             </div>
           </div>
@@ -198,22 +198,22 @@ export default function BatchDetailPage() {
       {batch.notes && <p className="text-sm text-gray-500 mb-4">{batch.notes}</p>}
 
       {/* Transactions table */}
-      <div className="bg-white rounded-xl border border-gray-200 print-card print:mb-0">
+      <div className="bg-white rounded-xl border border-gray-200 print-card print:mb-0 dark:bg-gray-800 dark:border-gray-700">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3">FEEDS</th>
-                <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3">TR_DATE</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">NO.OF BAGS</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden">Price/Bag</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Debit</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden">Delivery Fee</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Balance</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden">DFFS</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3">Interest</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden"># of Days</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden">Date Maturity</th>
+              <tr className="border-b border-gray-200 bg-gray-50 dark:bg-gray-900 dark:border-gray-700">
+                <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3 dark:text-gray-400">FEEDS</th>
+                <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3 dark:text-gray-400">TR_DATE</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 dark:text-gray-400">NO.OF BAGS</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden dark:text-gray-400">Price/Bag</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 dark:text-gray-400">Debit</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden dark:text-gray-400">Delivery Fee</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 dark:text-gray-400">Balance</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden dark:text-gray-400">DFFS</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 dark:text-gray-400">Interest</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden dark:text-gray-400"># of Days</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden dark:text-gray-400">Date Maturity</th>
                 <th className="px-4 py-3 print:hidden" />
               </tr>
             </thead>
@@ -226,19 +226,19 @@ export default function BatchDetailPage() {
                 </tr>
               )}
               {withComputed.map((tx) => (
-                <tr key={tx.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50">
-                  <td className="px-4 py-3 text-gray-800">{tx.feed_type || '—'}</td>
+                <tr key={tx.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 dark:border-gray-700 dark:hover:bg-gray-700/50">
+                  <td className="px-4 py-3 text-gray-800 dark:text-gray-200">{tx.feed_type || '—'}</td>
                   <td className="px-4 py-3 text-blue-600 whitespace-nowrap">{fmtDate(tx.date)}</td>
-                  <td className="px-4 py-3 text-gray-700 text-right">{Number(tx.bags).toFixed(2)}</td>
-                  <td className="px-4 py-3 text-gray-600 text-right print:hidden">
+                  <td className="px-4 py-3 text-gray-700 text-right dark:text-gray-300">{Number(tx.bags).toFixed(2)}</td>
+                  <td className="px-4 py-3 text-gray-600 text-right print:hidden dark:text-gray-400">
                     {tx.price_per_bag ? num(Number(tx.price_per_bag)) : '—'}
                   </td>
-                  <td className="px-4 py-3 text-gray-900 text-right">{num(tx.debit)}</td>
-                  <td className="px-4 py-3 text-gray-600 text-right print:hidden">{num(Number(tx.delivery_fee ?? 0))}</td>
-                  <td className="px-4 py-3 font-semibold text-gray-900 text-right">{num(tx.runningBalance)}</td>
-                  <td className="px-4 py-3 text-gray-600 text-right print:hidden">{num(tx.dffs1)}</td>
-                  <td className="px-4 py-3 text-gray-600 text-right">{num(tx.interest)}</td>
-                  <td className="px-4 py-3 text-gray-500 text-right print:hidden">{tx.days}</td>
+                  <td className="px-4 py-3 text-gray-900 text-right dark:text-white">{num(tx.debit)}</td>
+                  <td className="px-4 py-3 text-gray-600 text-right print:hidden dark:text-gray-400">{num(Number(tx.delivery_fee ?? 0))}</td>
+                  <td className="px-4 py-3 font-semibold text-gray-900 text-right dark:text-white">{num(tx.runningBalance)}</td>
+                  <td className="px-4 py-3 text-gray-600 text-right print:hidden dark:text-gray-400">{num(tx.dffs1)}</td>
+                  <td className="px-4 py-3 text-gray-600 text-right dark:text-gray-400">{num(tx.interest)}</td>
+                  <td className="px-4 py-3 text-gray-500 text-right print:hidden dark:text-gray-400">{tx.days}</td>
                   <td className="px-4 py-3 text-green-700 text-right whitespace-nowrap print:hidden">{maturityDate ? fmtDate(maturityDate) : '—'}</td>
                   <td className="px-4 py-3 print:hidden">
                     {isLoggedIn && (
@@ -256,15 +256,15 @@ export default function BatchDetailPage() {
               ))}
 
               {withComputed.length > 0 && (
-                <tr className="border-t-2 border-gray-300 bg-gray-50 font-semibold text-sm">
+                <tr className="border-t-2 border-gray-300 bg-gray-50 font-semibold text-sm dark:bg-gray-900 dark:border-gray-700">
                   <td colSpan={2} className="px-4 py-3" />
-                  <td className="px-4 py-3 text-right text-gray-700">{Number(totalBags).toFixed(2)}</td>
+                  <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{Number(totalBags).toFixed(2)}</td>
                   <td className="px-4 py-3 print:hidden" />
-                  <td className="px-4 py-3 text-right text-gray-900">{num(totalDebit)}</td>
-                  <td className="px-4 py-3 text-right text-gray-600 print:hidden">{num(totalDeliveryFee)}</td>
-                  <td className="px-4 py-3 text-right text-gray-900">{num(balance)}</td>
-                  <td className="px-4 py-3 text-right text-gray-700 print:hidden">{num(totalDffs1)}</td>
-                  <td className="px-4 py-3 text-right text-gray-700">{num(totalInterest)}</td>
+                  <td className="px-4 py-3 text-right text-gray-900 dark:text-white">{num(totalDebit)}</td>
+                  <td className="px-4 py-3 text-right text-gray-600 print:hidden dark:text-gray-400">{num(totalDeliveryFee)}</td>
+                  <td className="px-4 py-3 text-right text-gray-900 dark:text-white">{num(balance)}</td>
+                  <td className="px-4 py-3 text-right text-gray-700 print:hidden dark:text-gray-300">{num(totalDffs1)}</td>
+                  <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{num(totalInterest)}</td>
                   <td colSpan={2} className="px-4 py-3 print:hidden" />
                   <td className="print:hidden" />
                 </tr>
@@ -275,32 +275,32 @@ export default function BatchDetailPage() {
 
         {/* Billing summary */}
         {withComputed.length > 0 && (
-          <div className="border-t border-gray-200 px-6 py-4 print:px-2 print:py-2">
+          <div className="border-t border-gray-200 px-6 py-4 print:px-2 print:py-2 dark:border-gray-700">
             <div className="flex justify-end">
               <div className="w-72 space-y-1.5 text-sm print:text-xs print:w-56">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Principal</span>
-                  <span className="font-medium text-gray-900">{num(balance)}</span>
+                  <span className="text-gray-600 dark:text-gray-400">Principal</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{num(balance)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Interest</span>
-                  <span className="font-medium text-gray-900">{num(totalInterest)}</span>
+                  <span className="text-gray-600 dark:text-gray-400">Interest</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{num(totalInterest)}</span>
                 </div>
                 <div className="flex print:hidden justify-between">
-                  <span className="text-gray-600">DFFS 1</span>
-                  <span className="font-medium text-gray-900">{num(totalDffs1)}</span>
+                  <span className="text-gray-600 dark:text-gray-400">DFFS 1</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{num(totalDffs1)}</span>
                 </div>
                 <div className="flex print:hidden justify-between">
-                  <span className="text-gray-600">DFFS 2</span>
-                  <span className="font-medium text-gray-900">{num(dffs2)}</span>
+                  <span className="text-gray-600 dark:text-gray-400">DFFS 2</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{num(dffs2)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Del Fee</span>
-                  <span className="font-medium text-gray-900">{num(totalDeliveryFee)}</span>
+                  <span className="text-gray-600 dark:text-gray-400">Del Fee</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{num(totalDeliveryFee)}</span>
                 </div>
-                <div className="flex justify-between border-t border-gray-200 pt-1.5 mt-1">
-                  <span className="font-bold text-gray-900">Total</span>
-                  <span className="font-bold text-gray-900 underline">{num(balance + totalInterest + totalDffs1 + dffs2 + totalDeliveryFee)}</span>
+                <div className="flex justify-between border-t border-gray-200 pt-1.5 mt-1 dark:border-gray-700">
+                  <span className="font-bold text-gray-900 dark:text-white">Total</span>
+                  <span className="font-bold text-gray-900 underline dark:text-white">{num(balance + totalInterest + totalDffs1 + dffs2 + totalDeliveryFee)}</span>
                 </div>
               </div>
             </div>
