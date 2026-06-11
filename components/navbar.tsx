@@ -40,11 +40,11 @@ export default function Navbar() {
           <div className="w-8 h-8 bg-green-800 rounded-lg flex items-center justify-center text-white font-bold text-xs">
             FC
           </div>
-          <span className="font-semibold text-green-800 dark:text-green-400 text-sm hidden sm:block">Feed Cooperative</span>
+          <span className="font-semibold text-green-800 dark:text-green-400 text-sm hidden lg:block">Feed Cooperative</span>
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden sm:flex items-center gap-1 flex-1">
+        <nav className="hidden lg:flex items-center gap-1 flex-1">
           {NAV_LINKS.filter(l => isLoggedIn || l.public).map(({ href, label, icon: Icon }) => {
             const active = pathname.startsWith(href);
             return (
@@ -67,7 +67,7 @@ export default function Navbar() {
 
         {/* Desktop right */}
         {isLoggedIn && (
-          <div className="hidden sm:flex items-center gap-4 shrink-0 ml-auto">
+          <div className="hidden lg:flex items-center gap-4 shrink-0 ml-auto">
             <span className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-300">
               <span className="w-2 h-2 bg-green-500 rounded-full" />
               1 online
@@ -90,11 +90,11 @@ export default function Navbar() {
         )}
 
         {/* Mobile: active label + hamburger */}
-        <span className="sm:hidden flex-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+        <span className="lg:hidden flex-1 text-sm font-medium text-gray-700 dark:text-gray-200">
           {NAV_LINKS.find(l => pathname.startsWith(l.href))?.label ?? 'Feed Cooperative'}
         </span>
         <button
-          className="sm:hidden p-1.5 text-gray-600 dark:text-gray-400 hover:text-gray-900"
+          className="lg:hidden p-1.5 text-gray-600 dark:text-gray-400 hover:text-gray-900"
           onClick={() => setOpen((v) => !v)}
         >
           {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -103,7 +103,7 @@ export default function Navbar() {
 
       {/* Mobile dropdown */}
       {open && (
-        <div className="sm:hidden border-t border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3 space-y-1">
+        <div className="lg:hidden border-t border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3 space-y-1">
           {NAV_LINKS.filter(l => isLoggedIn || l.public).map(({ href, label, icon: Icon }) => {
             const active = pathname.startsWith(href);
             return (
