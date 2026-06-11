@@ -485,7 +485,7 @@ export default function BatchDetailPage() {
             <span className="text-xs text-gray-400 dark:text-gray-500">— {batch.client_name}</span>
             <span className="ml-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full">{allBatches.length}</span>
           </div>
-          <div className="divide-y divide-gray-50 dark:divide-gray-700">
+          <div className="divide-y divide-gray-50 dark:divide-gray-700 max-h-[60vh] overflow-y-auto">
             {pagedBatches.map((b) => {
               const isViewing = b.id === Number(id);
               return (
