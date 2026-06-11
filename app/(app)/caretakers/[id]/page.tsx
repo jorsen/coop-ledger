@@ -615,46 +615,48 @@ export default function CaretakerLedgerPage() {
               <div
                 key={b.id}
                 onClick={() => { setSelectedBatchId(b.id); setTxPage(0); }}
-                className={`px-4 sm:px-6 py-3 flex flex-wrap items-center gap-x-4 gap-y-2 cursor-pointer ${isViewing ? 'bg-green-50 dark:bg-green-900/10' : 'hover:bg-gray-50/50 dark:hover:bg-gray-700/50'}`}
+                className={`px-4 sm:px-6 py-3 flex flex-col gap-1.5 cursor-pointer ${isViewing ? 'bg-green-50 dark:bg-green-900/10' : 'hover:bg-gray-50/50 dark:hover:bg-gray-700/50'}`}
               >
-                <span className="bg-green-800 text-white text-xs font-bold px-2 py-0.5 rounded shrink-0">
-                  {b.batch_number}
-                </span>
-                {isViewing && (
-                  <span className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 text-xs font-semibold px-2 py-0.5 rounded shrink-0">Viewing</span>
-                )}
-                <span className="text-sm text-gray-500 dark:text-gray-400 shrink-0">
-                  {fmtDate(b.batch_date)}
-                </span>
-                {b.notes && <span className="text-xs text-gray-900 dark:text-gray-500 truncate max-w-xs">{b.notes}</span>}
-                <div className="ml-auto flex items-center gap-3 shrink-0 text-sm text-gray-500 dark:text-gray-400" onClick={e => e.stopPropagation()}>
+                {/* Row 1: badge + date */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="bg-green-800 text-white text-xs font-bold px-2 py-0.5 rounded">
+                    {b.batch_number}
+                  </span>
+                  {isViewing && (
+                    <span className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 text-xs font-semibold px-2 py-0.5 rounded">Viewing</span>
+                  )}
+                  <span className="text-sm text-gray-500 dark:text-gray-400">{fmtDate(b.batch_date)}</span>
+                  {b.notes && <span className="text-xs text-gray-900 dark:text-gray-500 truncate max-w-[160px]">{b.notes}</span>}
+                </div>
+                {/* Row 2: stats + actions */}
+                <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400" onClick={e => e.stopPropagation()}>
                   <span>{b.transaction_count} tx</span>
                   <span>{b.total_bags} bags</span>
-                  <span className="font-medium text-gray-700 dark:text-gray-300 hidden sm:inline">
-                    {num(b.total_debit)}
-                  </span>
-                  <button
-                    onClick={() => router.push(`/batches/${b.id}`)}
-                    className="flex items-center gap-1 text-green-700 dark:text-green-400 hover:text-green-600"
-                  >
-                    <Eye className="w-3.5 h-3.5" /> View
-                  </button>
-                  {isLoggedIn && (
-                    <>
-                      <button
-                        onClick={() => { setEditBatch(b); setEditBatchForm({ batch_number: b.batch_number, batch_date: b.batch_date, notes: b.notes, date_of_application: b.date_of_application ?? '', date_of_hauling: b.date_of_hauling ?? '', maturity_date: b.maturity_date ?? '', heads: b.heads ? String(b.heads) : '' }); }}
-                        className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
-                      >
-                        <Pencil className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteBatch(b.id)}
-                        className="text-red-400 hover:text-red-600"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </>
-                  )}
+                  <span className="font-medium text-gray-700 dark:text-gray-300">{num(b.total_debit)}</span>
+                  <div className="ml-auto flex items-center gap-2">
+                    <button
+                      onClick={() => router.push(`/batches/${b.id}`)}
+                      className="flex items-center gap-1 text-green-700 dark:text-green-400 hover:text-green-600"
+                    >
+                      <Eye className="w-3.5 h-3.5" /> View
+                    </button>
+                    {isLoggedIn && (
+                      <>
+                        <button
+                          onClick={() => { setEditBatch(b); setEditBatchForm({ batch_number: b.batch_number, batch_date: b.batch_date, notes: b.notes, date_of_application: b.date_of_application ?? '', date_of_hauling: b.date_of_hauling ?? '', maturity_date: b.maturity_date ?? '', heads: b.heads ? String(b.heads) : '' }); }}
+                          className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteBatch(b.id)}
+                          className="text-red-400 hover:text-red-600"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
               );
