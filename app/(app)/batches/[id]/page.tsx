@@ -27,6 +27,14 @@ interface Expense {
   price: number;
 }
 
+interface PigSale {
+  id: number;
+  batch_id: number;
+  weight_kg: number;
+  price_per_kg: number;
+  label: string | null;
+}
+
 interface BatchSummary {
   id: number;
   batch_number: string;
@@ -87,6 +95,10 @@ export default function BatchDetailPage() {
   const [editBatch, setEditBatch] = useState<BatchSummary | null>(null);
   const [editBatchForm, setEditBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', maturity_date: '', heads: '' });
   const [savingEditBatch, setSavingEditBatch] = useState(false);
+  const [pigSales, setPigSales] = useState<PigSale[]>([]);
+  const [pigSaleModal, setPigSaleModal] = useState<PigSale | 'new' | null>(null);
+  const [pigSaleForm, setPigSaleForm] = useState({ weight_kg: '', price_per_kg: '270', label: '' });
+  const [savingPigSale, setSavingPigSale] = useState(false);
 
   const fetchData = useCallback(async () => {
     const res = await fetch(`/api/batches/${id}`);
@@ -112,11 +124,17 @@ export default function BatchDetailPage() {
     if (res.ok) setExpenses(await res.json());
   }, [id]);
 
+  const fetchPigSales = useCallback(async () => {
+    const res = await fetch(`/api/pig-sales?batch_id=${id}`);
+    if (res.ok) setPigSales(await res.json());
+  }, [id]);
+
   useEffect(() => {
     fetchData();
     fetchExpenses();
+    fetchPigSales();
     fetch('/api/auth/session').then(r => r.json()).then(d => setIsLoggedIn(d.isLoggedIn));
-  }, [fetchData, fetchExpenses]);
+  }, [fetchData, fetchExpenses, fetchPigSales]);
 
   async function handleAddExpense() {
     setSavingExpense(true);
@@ -136,6 +154,43 @@ export default function BatchDetailPage() {
     await fetch(`/api/expenses/${expId}`, { method: 'DELETE' });
     fetchExpenses();
   }
+
+  function openAddPigSale() {
+    setPigSaleForm({ weight_kg: '', price_per_kg: '270', label: '' });
+    setPigSaleModal('new');
+  }
+
+  function openEditPigSale(sale: PigSale) {
+    setPigSaleForm({ weight_kg: String(sale.weight_kg), price_per_kg: String(sale.price_per_kg), label: sale.label ?? '' });
+    setPigSaleModal(sale);
+  }
+
+  async function handleSavePigSale() {
+    setSavingPigSale(true);
+    if (pigSaleModal === 'new') {
+      await fetch('/api/pig-sales', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ batch_id: id, weight_kg: Number(pigSaleForm.weight_kg), price_per_kg: Number(pigSaleForm.price_per_kg), label: pigSaleForm.label || null }),
+      });
+    } else if (pigSaleModal && typeof pigSaleModal === 'object') {
+      await fetch(`/api/pig-sales/${pigSaleModal.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ weight_kg: Number(pigSaleForm.weight_kg), price_per_kg: Number(pigSaleForm.price_per_kg), label: pigSaleForm.label || null }),
+      });
+    }
+    setSavingPigSale(false);
+    setPigSaleModal(null);
+    fetchPigSales();
+  }
+
+  async function handleDeletePigSale(saleId: number) {
+    if (!confirm('Remove this pig sale?')) return;
+    await fetch(`/api/pig-sales/${saleId}`, { method: 'DELETE' });
+    fetchPigSales();
+  }
+
   usePoll(fetchData);
 
   async function handleDelete(txId: number) {
@@ -205,6 +260,8 @@ export default function BatchDetailPage() {
   const totalInterest = withComputed.reduce((s, tx) => s + tx.interest, 0);
   const dffs2         = 50 * (batch?.heads ?? 0);
   const totalOtherExpenses = expenses.reduce((s, e) => s + Number(e.quantity) * Number(e.price), 0);
+  const totalPigSalesAmount = pigSales.reduce((s, p) => s + Number(p.weight_kg) * Number(p.price_per_kg), 0);
+  const totalPigSalesKg = pigSales.reduce((s, p) => s + Number(p.weight_kg), 0);
 
   const txTotalPages = Math.ceil(withComputed.length / PAGE_SIZE);
   const pagedTx = withComputed.slice(txPage * PAGE_SIZE, (txPage + 1) * PAGE_SIZE);
@@ -523,6 +580,77 @@ export default function BatchDetailPage() {
         )}
       </div>
 
+      {/* ── Pig Sales ── */}
+      <div className="mt-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+          <div>
+            <h2 className="font-semibold text-gray-900 dark:text-white text-sm">Pig Sales</h2>
+            {pigSales.length > 0 && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                {totalPigSalesKg.toFixed(2)} kg &mdash; Total: <span className="font-semibold text-gray-700 dark:text-gray-300">₱{num(totalPigSalesAmount)}</span>
+              </p>
+            )}
+          </div>
+          {isLoggedIn && (
+            <button
+              onClick={openAddPigSale}
+              className="flex items-center gap-1.5 text-sm text-green-800 dark:text-green-400 font-medium hover:text-green-700"
+            >
+              <Plus className="w-4 h-4" /> Add Pig Sale
+            </button>
+          )}
+        </div>
+
+        {pigSales.length === 0 ? (
+          <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">No pig sales recorded.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+                  <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-6 py-3">#</th>
+                  <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-6 py-3">Label</th>
+                  <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-6 py-3">Weight (kg)</th>
+                  <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-6 py-3">Price/kg (₱)</th>
+                  <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-6 py-3">Total (₱)</th>
+                  {isLoggedIn && <th className="px-6 py-3" />}
+                </tr>
+              </thead>
+              <tbody>
+                {pigSales.map((sale, i) => (
+                  <tr key={sale.id} className="border-b border-gray-50 dark:border-gray-700 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-700/30">
+                    <td className="px-6 py-3 text-gray-500 dark:text-gray-400">{i + 1}</td>
+                    <td className="px-6 py-3 text-gray-700 dark:text-gray-300">{sale.label || '—'}</td>
+                    <td className="px-6 py-3 text-gray-700 dark:text-gray-300 text-right">{Number(sale.weight_kg).toFixed(2)}</td>
+                    <td className="px-6 py-3 text-gray-700 dark:text-gray-300 text-right">{num(Number(sale.price_per_kg))}</td>
+                    <td className="px-6 py-3 font-semibold text-gray-900 dark:text-white text-right">{num(Number(sale.weight_kg) * Number(sale.price_per_kg))}</td>
+                    {isLoggedIn && (
+                      <td className="px-6 py-3">
+                        <div className="flex items-center justify-end gap-2">
+                          <button onClick={() => openEditPigSale(sale)} className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
+                            <Pencil className="w-3.5 h-3.5" />
+                          </button>
+                          <button onClick={() => handleDeletePigSale(sale.id)} className="p-1 text-red-400 hover:text-red-600">
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+                <tr className="border-t-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 font-semibold">
+                  <td colSpan={2} className="px-6 py-3 text-right text-xs text-gray-500 dark:text-gray-400">Total</td>
+                  <td className="px-6 py-3 text-right text-gray-700 dark:text-gray-300">{totalPigSalesKg.toFixed(2)} kg</td>
+                  <td className="px-6 py-3" />
+                  <td className="px-6 py-3 text-right text-gray-900 dark:text-white">₱{num(totalPigSalesAmount)}</td>
+                  {isLoggedIn && <td />}
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
       </div>{/* end main content */}
 
       {/* ── Batches sidebar (order 2 on mobile, spans both rows on desktop) ── */}
@@ -776,6 +904,75 @@ export default function BatchDetailPage() {
                   className="flex-1 bg-green-800 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50"
                 >
                   {savingEditBatch ? 'Saving…' : 'Save Changes'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Pig Sale Modal (Add / Edit) */}
+      {pigSaleModal !== null && (
+        <div className="fixed inset-0 bg-black/40 flex items-start justify-center z-50 p-4 pt-16">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-sm">
+            <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+              <h2 className="text-base font-semibold text-gray-900 dark:text-white">
+                {pigSaleModal === 'new' ? 'Add Pig Sale' : 'Edit Pig Sale'}
+              </h2>
+              <button onClick={() => setPigSaleModal(null)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Label <span className="text-gray-400">(optional)</span></label>
+                <input
+                  value={pigSaleForm.label}
+                  onChange={e => setPigSaleForm(f => ({ ...f, label: e.target.value }))}
+                  placeholder="e.g. Pig 1, Large pig"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Weight (kg) *</label>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={pigSaleForm.weight_kg}
+                    onChange={e => setPigSaleForm(f => ({ ...f, weight_kg: e.target.value }))}
+                    placeholder="e.g. 85.5"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Price/kg (₱) *</label>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={pigSaleForm.price_per_kg}
+                    onChange={e => setPigSaleForm(f => ({ ...f, price_per_kg: e.target.value }))}
+                    placeholder="270"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+              </div>
+              {pigSaleForm.weight_kg && pigSaleForm.price_per_kg && (
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Total: <span className="font-semibold text-gray-700 dark:text-gray-300">₱{num(Number(pigSaleForm.weight_kg) * Number(pigSaleForm.price_per_kg))}</span>
+                </p>
+              )}
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setPigSaleModal(null)}
+                  className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSavePigSale}
+                  disabled={savingPigSale || !pigSaleForm.weight_kg || !pigSaleForm.price_per_kg}
+                  className="flex-1 bg-green-800 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50"
+                >
+                  {savingPigSale ? 'Saving…' : pigSaleModal === 'new' ? 'Add' : 'Save'}
                 </button>
               </div>
             </div>

@@ -26,6 +26,7 @@ const ENTITY_COLORS: Record<string, string> = {
   transaction: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
   batch:       'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
   expense:     'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+  pig_sale:    'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400',
 };
 
 function timeAgo(dateStr: string) {
@@ -61,7 +62,7 @@ export default function ActivityPage() {
   }, []);
 
   useEffect(() => { fetchLogs(); }, [fetchLogs]);
-  usePoll(fetchLogs);
+  usePoll(fetchLogs, 3000);
 
   const filtered = filter === 'all' ? logs : logs.filter(l =>
     filter === 'created' || filter === 'updated' || filter === 'deleted'
