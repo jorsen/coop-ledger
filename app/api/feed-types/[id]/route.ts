@@ -38,6 +38,26 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   return NextResponse.json(updated);
 }
 
+export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+  const { error } = await requireAuth();
+  if (error) return error;
+
+  const { old_name } = await req.json();
+  if (!old_name) return NextResponse.json({ error: 'old_name is required' }, { status: 400 });
+
+  const [ft] = await sql`SELECT name FROM feed_types WHERE id = ${params.id}`;
+  if (!ft) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+
+  const result = await sql`
+    UPDATE transactions
+    SET feed_type = ${ft.name}
+    WHERE LOWER(TRIM(feed_type)) = LOWER(TRIM(${old_name}))
+    RETURNING id
+  `;
+
+  return NextResponse.json({ updated: result.length });
+}
+
 export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
   const { error } = await requireAuth();
   if (error) return error;

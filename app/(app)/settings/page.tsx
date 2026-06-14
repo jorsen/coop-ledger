@@ -168,6 +168,9 @@ function FeedTypeCard({ feedType, onRefresh }: { feedType: FeedType; onRefresh: 
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput]   = useState(feedType.name);
   const [savingName, setSavingName] = useState(false);
+  const [migrateInput, setMigrateInput] = useState('');
+  const [migrateResult, setMigrateResult] = useState<string | null>(null);
+  const [migrating, setMigrating]   = useState(false);
 
   const loadPrices = useCallback(async () => {
     const res = await fetch(`/api/feed-types/${feedType.id}`);
@@ -203,6 +206,25 @@ function FeedTypeCard({ feedType, onRefresh }: { feedType: FeedType; onRefresh: 
     if (!confirm(`Archive "${feedType.name}"?`)) return;
     await fetch(`/api/feed-types/${feedType.id}`, { method: 'DELETE' });
     onRefresh();
+  }
+
+  async function migrateTransactions() {
+    if (!migrateInput.trim()) return;
+    setMigrating(true);
+    setMigrateResult(null);
+    const res = await fetch(`/api/feed-types/${feedType.id}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ old_name: migrateInput.trim() }),
+    });
+    setMigrating(false);
+    if (res.ok) {
+      const { updated } = await res.json();
+      setMigrateResult(`${updated} transaction${updated !== 1 ? 's' : ''} updated.`);
+      setMigrateInput('');
+    } else {
+      setMigrateResult('Failed.');
+    }
   }
 
   return (
@@ -296,6 +318,27 @@ function FeedTypeCard({ feedType, onRefresh }: { feedType: FeedType; onRefresh: 
               </tbody>
             </table>
           )}
+          {/* Migrate old transaction name */}
+          <div className="px-5 py-4 border-t border-gray-100 dark:border-gray-700">
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Fix old transaction name</p>
+            <div className="flex items-center gap-2">
+              <input
+                value={migrateInput}
+                onChange={e => { setMigrateInput(e.target.value); setMigrateResult(null); }}
+                onKeyDown={e => e.key === 'Enter' && migrateTransactions()}
+                placeholder={`e.g. old name for "${feedType.name}"`}
+                className="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+              />
+              <button
+                onClick={migrateTransactions}
+                disabled={migrating || !migrateInput.trim()}
+                className="text-xs font-medium bg-green-800 text-white px-3 py-1.5 rounded-lg hover:bg-green-700 disabled:opacity-50 shrink-0"
+              >
+                {migrating ? 'Updating…' : 'Update'}
+              </button>
+            </div>
+            {migrateResult && <p className="text-xs text-green-700 dark:text-green-400 mt-1.5">{migrateResult}</p>}
+          </div>
         </div>
       )}
 
