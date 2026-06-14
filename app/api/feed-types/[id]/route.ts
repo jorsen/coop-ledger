@@ -31,8 +31,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     RETURNING *
   `;
 
-  if (existing.name !== name) {
-    await sql`UPDATE transactions SET feed_type = ${name} WHERE feed_type = ${existing.name}`;
+  if (existing.name.trim() !== name.trim()) {
+    await sql`UPDATE transactions SET feed_type = ${name} WHERE LOWER(TRIM(feed_type)) = LOWER(TRIM(${existing.name}))`;
   }
 
   return NextResponse.json(updated);

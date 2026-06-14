@@ -186,14 +186,15 @@ function FeedTypeCard({ feedType, onRefresh }: { feedType: FeedType; onRefresh: 
   }
 
   async function renameFeedType() {
-    if (!nameInput.trim() || nameInput.trim() === feedType.name) { setEditingName(false); return; }
+    if (!nameInput.trim() || nameInput.trim() === feedType.name.trim()) { setEditingName(false); return; }
     setSavingName(true);
-    await fetch(`/api/feed-types/${feedType.id}`, {
+    const res = await fetch(`/api/feed-types/${feedType.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: nameInput.trim(), active: true }),
     });
     setSavingName(false);
+    if (!res.ok) return;
     setEditingName(false);
     onRefresh();
   }
