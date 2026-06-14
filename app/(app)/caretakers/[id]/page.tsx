@@ -209,7 +209,7 @@ export default function CaretakerLedgerPage() {
   }
 
   function openAddPigSale() {
-    setPigSaleForm({ weight_kg: '', price_per_kg: String(selectedBatch?.pig_price_per_kg ?? 170) });
+    setPigSaleForm({ weight_kg: '', price_per_kg: String(selectedBatch?.pig_price_per_kg && selectedBatch.pig_price_per_kg !== 270 ? selectedBatch.pig_price_per_kg : 170) });
     setPigSaleModal('new');
   }
 
@@ -628,9 +628,9 @@ export default function CaretakerLedgerPage() {
                     </>
                   ) : (
                     <>
-                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300">₱{num(selectedBatch?.pig_price_per_kg ?? 170)}/kg</span>
+                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300">₱{num(selectedBatch?.pig_price_per_kg && selectedBatch.pig_price_per_kg !== 270 ? selectedBatch.pig_price_per_kg : 170)}/kg</span>
                       {isLoggedIn && (
-                        <button onClick={() => { setPigPriceInput(String(selectedBatch?.pig_price_per_kg ?? 170)); setEditingPigPrice(true); }} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <button onClick={() => { setPigPriceInput(String(selectedBatch?.pig_price_per_kg && selectedBatch.pig_price_per_kg !== 270 ? selectedBatch.pig_price_per_kg : 170)); setEditingPigPrice(true); }} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                           <Pencil className="w-3 h-3" />
                         </button>
                       )}
@@ -1072,10 +1072,11 @@ export default function CaretakerLedgerPage() {
                 <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Weight (kg) *</label>
                 <input
                   type="text"
-                  inputMode="decimal"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={pigSaleForm.weight_kg}
-                  onChange={e => setPigSaleForm(f => ({ ...f, weight_kg: e.target.value }))}
-                  placeholder="e.g. 85.5"
+                  onChange={e => setPigSaleForm(f => ({ ...f, weight_kg: e.target.value.replace(/[^0-9]/g, '') }))}
+                  placeholder="e.g. 85"
                   autoFocus
                   className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
                 />
