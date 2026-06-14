@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { sql } from '@/lib/db';
+import { logActivity } from '@/lib/activity';
 
 export async function GET(req: NextRequest) {
   const { error } = await requireAuth();
@@ -55,5 +56,8 @@ export async function POST(req: NextRequest) {
     RETURNING *
   `;
 
+  const [client] = await sql`SELECT name FROM clients WHERE id = ${client_id}`;
+  const label = client ? client.name : `client #${client_id}`;
+  await logActivity('created', 'transaction', tx.id, `Added transaction for ${label}: ${feed_type || 'feed'} × ${bags || 0} bags (₱${debit || 0})`);
   return NextResponse.json(tx, { status: 201 });
 }

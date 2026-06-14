@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { sql } from '@/lib/db';
+import { logActivity } from '@/lib/activity';
 
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
   const [client] = await sql`SELECT * FROM clients WHERE id = ${params.id}`;
@@ -55,6 +56,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   `;
 
   if (!updated) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  await logActivity('updated', 'caretaker', updated.id, `Updated caretaker ${updated.name} (${updated.client_code})`);
   return NextResponse.json(updated);
 }
 
@@ -62,6 +64,8 @@ export async function DELETE(_req: NextRequest, { params }: { params: { id: stri
   const { error } = await requireAuth();
   if (error) return error;
 
+  const [existing] = await sql`SELECT name, client_code FROM clients WHERE id = ${params.id}`;
   await sql`DELETE FROM clients WHERE id = ${params.id}`;
+  if (existing) await logActivity('deleted', 'caretaker', Number(params.id), `Deleted caretaker ${existing.name} (${existing.client_code})`);
   return NextResponse.json({ success: true });
 }

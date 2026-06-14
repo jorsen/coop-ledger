@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { sql } from '@/lib/db';
+import { logActivity } from '@/lib/activity';
 
 export async function GET() {
   const clients = await sql`
@@ -57,5 +58,6 @@ export async function POST(req: NextRequest) {
     UPDATE clients SET client_code = ${autoCode} WHERE id = ${inserted.id} RETURNING *
   `;
 
+  await logActivity('created', 'caretaker', client.id, `Created caretaker ${client.name} (${autoCode})`);
   return NextResponse.json(client, { status: 201 });
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { sql } from '@/lib/db';
+import { logActivity } from '@/lib/activity';
 
 export async function GET(req: NextRequest) {
   const clientId = req.nextUrl.searchParams.get('client_id');
@@ -76,6 +77,8 @@ export async function POST(req: NextRequest) {
       batch = b;
     }
 
+    const [cl] = client_id ? await sql`SELECT name FROM clients WHERE id = ${client_id}` : [null];
+    await logActivity('created', 'batch', batch.id, `Created batch ${batch.batch_number}${cl ? ` for ${cl.name}` : ''}`);
     return NextResponse.json(batch, { status: 201 });
   } catch (err) {
     console.error('POST /api/batches error:', err);

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { sql } from '@/lib/db';
+import { logActivity } from '@/lib/activity';
 
 export async function GET(req: NextRequest) {
   await sql`
@@ -48,5 +49,6 @@ export async function POST(req: NextRequest) {
     VALUES (${batch_id}, ${item}, ${quantity ?? 1}, ${price})
     RETURNING *
   `;
+  await logActivity('created', 'expense', row.id, `Added expense "${item}" × ${quantity ?? 1} to batch #${batch_id}`);
   return NextResponse.json(row, { status: 201 });
 }

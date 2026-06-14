@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { sql } from '@/lib/db';
+import { logActivity } from '@/lib/activity';
 
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
   const [batch] = await sql`
@@ -62,6 +63,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   `;
 
   if (!updated) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  await logActivity('updated', 'batch', updated.id, `Updated batch ${updated.batch_number}`);
   return NextResponse.json(updated);
 }
 
@@ -69,6 +71,8 @@ export async function DELETE(_req: NextRequest, { params }: { params: { id: stri
   const { error } = await requireAuth();
   if (error) return error;
 
+  const [existing] = await sql`SELECT b.batch_number, c.name AS client_name FROM batches b LEFT JOIN clients c ON c.id = b.client_id WHERE b.id = ${params.id}`;
   await sql`DELETE FROM batches WHERE id = ${params.id}`;
+  if (existing) await logActivity('deleted', 'batch', Number(params.id), `Deleted batch ${existing.batch_number}${existing.client_name ? ` (${existing.client_name})` : ''}`);
   return NextResponse.json({ success: true });
 }
