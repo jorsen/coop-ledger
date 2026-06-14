@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Plus, Pencil, Trash2, Activity, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Pencil, Trash2, Activity, ChevronLeft, ChevronRight } from 'lucide-react';
 import { usePoll } from '@/hooks/use-poll';
 
 interface Log {
@@ -83,19 +83,11 @@ export default function ActivityPage() {
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row sm:items-start gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-            <Activity className="w-6 h-6 text-green-700" /> Activity Log
-          </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{total} total actions recorded</p>
-        </div>
-        <button
-          onClick={fetchLogs}
-          className="flex items-center gap-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 sm:ml-auto"
-        >
-          <RefreshCw className="w-4 h-4" /> Refresh
-        </button>
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+          <Activity className="w-6 h-6 text-green-700" /> Activity Log
+        </h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{total} total actions recorded</p>
       </div>
 
       {/* Filters */}
