@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Save, Plus, Trash2, ChevronDown, ChevronUp, Moon, Sun } from 'lucide-react';
+import { Save, Plus, Trash2, ChevronDown, ChevronUp, Moon, Sun, Pencil, Check, X } from 'lucide-react';
 import { useTheme } from '@/components/theme-provider';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -162,9 +162,12 @@ function AddPriceModal({ feedType, onClose, onSave }: { feedType: FeedType; onCl
 
 // ── Feed type card ────────────────────────────────────────────────────────────
 function FeedTypeCard({ feedType, onRefresh }: { feedType: FeedType; onRefresh: () => void }) {
-  const [expanded, setExpanded] = useState(false);
-  const [prices, setPrices]     = useState<FeedPrice[]>([]);
-  const [addPrice, setAddPrice] = useState(false);
+  const [expanded, setExpanded]     = useState(false);
+  const [prices, setPrices]         = useState<FeedPrice[]>([]);
+  const [addPrice, setAddPrice]     = useState(false);
+  const [editingName, setEditingName] = useState(false);
+  const [nameInput, setNameInput]   = useState(feedType.name);
+  const [savingName, setSavingName] = useState(false);
 
   const loadPrices = useCallback(async () => {
     const res = await fetch(`/api/feed-types/${feedType.id}`);
@@ -182,6 +185,19 @@ function FeedTypeCard({ feedType, onRefresh }: { feedType: FeedType; onRefresh: 
     onRefresh();
   }
 
+  async function renameFeedType() {
+    if (!nameInput.trim() || nameInput.trim() === feedType.name) { setEditingName(false); return; }
+    setSavingName(true);
+    await fetch(`/api/feed-types/${feedType.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: nameInput.trim(), active: true }),
+    });
+    setSavingName(false);
+    setEditingName(false);
+    onRefresh();
+  }
+
   async function deleteFeedType() {
     if (!confirm(`Archive "${feedType.name}"?`)) return;
     await fetch(`/api/feed-types/${feedType.id}`, { method: 'DELETE' });
@@ -192,7 +208,30 @@ function FeedTypeCard({ feedType, onRefresh }: { feedType: FeedType; onRefresh: 
     <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 px-5 py-4">
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-gray-900 dark:text-white text-sm">{feedType.name}</p>
+          {editingName ? (
+            <div className="flex items-center gap-2">
+              <input
+                autoFocus
+                value={nameInput}
+                onChange={e => setNameInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') renameFeedType(); if (e.key === 'Escape') { setNameInput(feedType.name); setEditingName(false); } }}
+                className="border border-green-700 rounded-lg px-2 py-1 text-sm font-medium text-gray-900 dark:text-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-green-800 w-full"
+              />
+              <button onClick={renameFeedType} disabled={savingName} className="p-1 text-green-700 hover:text-green-900 shrink-0">
+                <Check className="w-4 h-4" />
+              </button>
+              <button onClick={() => { setNameInput(feedType.name); setEditingName(false); }} className="p-1 text-gray-400 hover:text-gray-600 shrink-0">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5">
+              <p className="font-medium text-gray-900 dark:text-white text-sm">{feedType.name}</p>
+              <button onClick={() => { setNameInput(feedType.name); setEditingName(true); }} className="p-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <Pencil className="w-3 h-3" />
+              </button>
+            </div>
+          )}
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
             {feedType.current_price
               ? <>Current: <span className="font-semibold text-green-700">{peso(feedType.current_price)}</span> / bag (as of {fmtDate(feedType.price_date!)})</>
