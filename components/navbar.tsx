@@ -35,7 +35,7 @@ export default function Navbar() {
 
   return (
     <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-30 print:hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center gap-4">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 h-14 flex items-center gap-4">
         {/* Logo */}
         <Link href="/dashboard" className="flex items-center gap-2 shrink-0" onClick={() => setOpen(false)}>
           <div className="w-8 h-8 bg-green-800 rounded-lg flex items-center justify-center text-white font-bold text-xs">
