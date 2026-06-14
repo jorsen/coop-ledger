@@ -538,9 +538,10 @@ export default function CaretakerLedgerPage() {
         )}
       </div>
 
-      {/* ── Other Expenses section ───────────────────────────────────── */}
+      {/* ── Other Expenses + Pig Sales ── */}
       {batches.length > 0 && (
-        <div className="mt-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 print:hidden">
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 print:hidden">
           <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <h2 className="font-semibold text-gray-900 dark:text-white">Other Expenses</h2>
@@ -597,6 +598,102 @@ export default function CaretakerLedgerPage() {
               </table>
             </div>
           )}
+        </div>
+
+        {/* Pig Sales */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 print:hidden">
+            <div className="px-4 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+              <div>
+                <h2 className="font-semibold text-gray-900 dark:text-white text-sm">Pig Sales</h2>
+                {pigSales.length > 0 && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    {fmtKg(totalPigSalesKg)} kg &mdash; Total: <span className="font-semibold text-gray-700 dark:text-gray-300">₱{num(totalPigSalesAmount)}</span>
+                  </p>
+                )}
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Batch #{selectedBatch?.batch_number}</p>
+                <div className="flex items-center gap-1.5 mt-1">
+                  <span className="text-xs text-gray-400 dark:text-gray-500">Default price:</span>
+                  {editingPigPrice ? (
+                    <>
+                      <span className="text-xs text-gray-500">₱</span>
+                      <input
+                        type="text" inputMode="decimal"
+                        value={pigPriceInput}
+                        onChange={e => setPigPriceInput(e.target.value)}
+                        className="w-16 text-xs border border-gray-300 dark:border-gray-600 rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+                      />
+                      <span className="text-xs text-gray-500">/kg</span>
+                      <button onClick={saveDefaultPigPrice} className="text-xs font-medium text-green-700 dark:text-green-400 hover:text-green-600">Save</button>
+                      <button onClick={() => setEditingPigPrice(false)} className="text-xs text-gray-400 hover:text-gray-600">×</button>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300">₱{num(selectedBatch?.pig_price_per_kg ?? 170)}/kg</span>
+                      {isLoggedIn && (
+                        <button onClick={() => { setPigPriceInput(String(selectedBatch?.pig_price_per_kg ?? 170)); setEditingPigPrice(true); }} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                          <Pencil className="w-3 h-3" />
+                        </button>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+              {isLoggedIn && (
+                <button
+                  onClick={openAddPigSale}
+                  className="flex items-center gap-1.5 text-sm text-green-800 dark:text-green-400 font-medium hover:text-green-700"
+                >
+                  <Plus className="w-4 h-4" /> Add Pig Sale
+                </button>
+              )}
+            </div>
+            {pigSales.length === 0 ? (
+              <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">No pig sales recorded.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+                      <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3">#</th>
+                      <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3">Weight (kg)</th>
+                      <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3">Price/kg (₱)</th>
+                      <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3">Total (₱)</th>
+                      {isLoggedIn && <th className="px-4 py-3" />}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pigSales.map((sale, i) => (
+                      <tr key={sale.id} className="border-b border-gray-50 dark:border-gray-700 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-700/30">
+                        <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{i + 1}</td>
+                        <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{fmtKg(sale.weight_kg)}</td>
+                        <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{num(Number(sale.price_per_kg))}</td>
+                        <td className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-white">{num(Number(sale.weight_kg) * Number(sale.price_per_kg))}</td>
+                        {isLoggedIn && (
+                          <td className="px-4 py-3">
+                            <div className="flex items-center justify-end gap-2">
+                              <button onClick={() => openEditPigSale(sale)} className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
+                                <Pencil className="w-3.5 h-3.5" />
+                              </button>
+                              <button onClick={() => handleDeletePigSale(sale.id)} className="p-1 text-red-400 hover:text-red-600">
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        )}
+                      </tr>
+                    ))}
+                    <tr className="border-t-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 font-semibold">
+                      <td className="px-4 py-3 text-right text-xs text-gray-500 dark:text-gray-400">Total</td>
+                      <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{fmtKg(totalPigSalesKg)} kg</td>
+                      <td className="px-4 py-3" />
+                      <td className="px-4 py-3 text-right text-gray-900 dark:text-white">₱{num(totalPigSalesAmount)}</td>
+                      {isLoggedIn && <td />}
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            )}
+        </div>
         </div>
       )}
 
@@ -764,103 +861,6 @@ export default function CaretakerLedgerPage() {
           )}
         </div>
       </div>
-
-      {/* ── Pig Sales ── */}
-      {batches.length > 0 && (
-        <div className="md:col-span-1 order-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 print:hidden">
-            <div className="px-4 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
-              <div>
-                <h2 className="font-semibold text-gray-900 dark:text-white text-sm">Pig Sales</h2>
-                {pigSales.length > 0 && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {fmtKg(totalPigSalesKg)} kg &mdash; Total: <span className="font-semibold text-gray-700 dark:text-gray-300">₱{num(totalPigSalesAmount)}</span>
-                  </p>
-                )}
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Batch #{selectedBatch?.batch_number}</p>
-                <div className="flex items-center gap-1.5 mt-1">
-                  <span className="text-xs text-gray-400 dark:text-gray-500">Default price:</span>
-                  {editingPigPrice ? (
-                    <>
-                      <span className="text-xs text-gray-500">₱</span>
-                      <input
-                        type="text" inputMode="decimal"
-                        value={pigPriceInput}
-                        onChange={e => setPigPriceInput(e.target.value)}
-                        className="w-16 text-xs border border-gray-300 dark:border-gray-600 rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
-                      />
-                      <span className="text-xs text-gray-500">/kg</span>
-                      <button onClick={saveDefaultPigPrice} className="text-xs font-medium text-green-700 dark:text-green-400 hover:text-green-600">Save</button>
-                      <button onClick={() => setEditingPigPrice(false)} className="text-xs text-gray-400 hover:text-gray-600">×</button>
-                    </>
-                  ) : (
-                    <>
-                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300">₱{num(selectedBatch?.pig_price_per_kg ?? 170)}/kg</span>
-                      {isLoggedIn && (
-                        <button onClick={() => { setPigPriceInput(String(selectedBatch?.pig_price_per_kg ?? 170)); setEditingPigPrice(true); }} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                          <Pencil className="w-3 h-3" />
-                        </button>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
-              {isLoggedIn && (
-                <button
-                  onClick={openAddPigSale}
-                  className="flex items-center gap-1.5 text-sm text-green-800 dark:text-green-400 font-medium hover:text-green-700"
-                >
-                  <Plus className="w-4 h-4" /> Add Pig Sale
-                </button>
-              )}
-            </div>
-            {pigSales.length === 0 ? (
-              <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">No pig sales recorded.</p>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-                      <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3">#</th>
-                      <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3">Weight (kg)</th>
-                      <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3">Price/kg (₱)</th>
-                      <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3">Total (₱)</th>
-                      {isLoggedIn && <th className="px-4 py-3" />}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pigSales.map((sale, i) => (
-                      <tr key={sale.id} className="border-b border-gray-50 dark:border-gray-700 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-700/50">
-                        <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{i + 1}</td>
-                        <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{fmtKg(sale.weight_kg)}</td>
-                        <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{num(Number(sale.price_per_kg))}</td>
-                        <td className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-white">{num(Number(sale.weight_kg) * Number(sale.price_per_kg))}</td>
-                        {isLoggedIn && (
-                          <td className="px-4 py-3">
-                            <div className="flex items-center justify-end gap-2">
-                              <button onClick={() => openEditPigSale(sale)} className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
-                                <Pencil className="w-3.5 h-3.5" />
-                              </button>
-                              <button onClick={() => handleDeletePigSale(sale.id)} className="p-1 text-red-400 hover:text-red-600">
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </td>
-                        )}
-                      </tr>
-                    ))}
-                    <tr className="border-t-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 font-semibold">
-                      <td className="px-4 py-3 text-right text-xs text-gray-500 dark:text-gray-400">Total</td>
-                      <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{fmtKg(totalPigSalesKg)} kg</td>
-                      <td className="px-4 py-3" />
-                      <td className="px-4 py-3 text-right text-gray-900 dark:text-white">₱{num(totalPigSalesAmount)}</td>
-                      {isLoggedIn && <td />}
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            )}
-        </div>
-      )}
 
       </div>{/* end grid */}
 
