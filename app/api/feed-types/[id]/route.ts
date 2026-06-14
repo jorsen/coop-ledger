@@ -21,6 +21,9 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
   const { name, active } = await req.json();
 
+  const [existing] = await sql`SELECT name FROM feed_types WHERE id = ${params.id}`;
+  if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+
   const [updated] = await sql`
     UPDATE feed_types
     SET name = ${name}, active = ${active}
@@ -28,7 +31,10 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     RETURNING *
   `;
 
-  if (!updated) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  if (existing.name !== name) {
+    await sql`UPDATE transactions SET feed_type = ${name} WHERE feed_type = ${existing.name}`;
+  }
+
   return NextResponse.json(updated);
 }
 

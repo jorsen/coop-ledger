@@ -100,7 +100,7 @@ export default function CaretakerLedgerPage() {
   const [selectedBatchId, setSelectedBatchId] = useState<number | null>(null);
   const [pigSales, setPigSales] = useState<PigSale[]>([]);
   const [pigSaleModal, setPigSaleModal] = useState<PigSale | 'new' | null>(null);
-  const [pigSaleForm, setPigSaleForm] = useState({ weight_kg: '', price_per_kg: '270' });
+  const [pigSaleForm, setPigSaleForm] = useState({ weight_kg: '', price_per_kg: '170' });
   const [savingPigSale, setSavingPigSale] = useState(false);
   const [editingPigPrice, setEditingPigPrice] = useState(false);
   const [pigPriceInput, setPigPriceInput] = useState('');
@@ -209,7 +209,7 @@ export default function CaretakerLedgerPage() {
   }
 
   function openAddPigSale() {
-    setPigSaleForm({ weight_kg: '', price_per_kg: String(selectedBatch?.pig_price_per_kg ?? 270) });
+    setPigSaleForm({ weight_kg: '', price_per_kg: String(selectedBatch?.pig_price_per_kg ?? 170) });
     setPigSaleModal('new');
   }
 
@@ -794,9 +794,9 @@ export default function CaretakerLedgerPage() {
                     </>
                   ) : (
                     <>
-                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300">₱{num(selectedBatch?.pig_price_per_kg ?? 270)}/kg</span>
+                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300">₱{num(selectedBatch?.pig_price_per_kg ?? 170)}/kg</span>
                       {isLoggedIn && (
-                        <button onClick={() => { setPigPriceInput(String(selectedBatch?.pig_price_per_kg ?? 270)); setEditingPigPrice(true); }} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <button onClick={() => { setPigPriceInput(String(selectedBatch?.pig_price_per_kg ?? 170)); setEditingPigPrice(true); }} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                           <Pencil className="w-3 h-3" />
                         </button>
                       )}

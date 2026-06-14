@@ -122,9 +122,24 @@ export default function CalendarPage() {
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <h2 className="text-base font-semibold text-gray-900 dark:text-white tracking-tight">
-              {MONTHS[month]} {year}
-            </h2>
+            <div className="flex items-center gap-2">
+              <select
+                value={month}
+                onChange={e => { setMonth(Number(e.target.value)); setSelected(null); }}
+                className="text-sm font-semibold text-gray-900 dark:text-white bg-transparent border-none focus:outline-none focus:ring-2 focus:ring-green-800 rounded cursor-pointer dark:bg-gray-800"
+              >
+                {MONTHS.map((m, i) => <option key={m} value={i}>{m}</option>)}
+              </select>
+              <select
+                value={year}
+                onChange={e => { setYear(Number(e.target.value)); setSelected(null); }}
+                className="text-sm font-semibold text-gray-900 dark:text-white bg-transparent border-none focus:outline-none focus:ring-2 focus:ring-green-800 rounded cursor-pointer dark:bg-gray-800"
+              >
+                {Array.from({ length: today.getFullYear() - 2019 + 3 }, (_, i) => 2020 + i).map(y => (
+                  <option key={y} value={y}>{y}</option>
+                ))}
+              </select>
+            </div>
             <button
               onClick={nextMonth}
               className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-colors"

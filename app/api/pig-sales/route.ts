@@ -9,7 +9,7 @@ async function ensureTable() {
       id           SERIAL PRIMARY KEY,
       batch_id     INTEGER REFERENCES batches(id) ON DELETE CASCADE,
       weight_kg    DECIMAL(8,2) NOT NULL,
-      price_per_kg DECIMAL(10,2) NOT NULL DEFAULT 270,
+      price_per_kg DECIMAL(10,2) NOT NULL DEFAULT 170,
       label        VARCHAR(200),
       created_at   TIMESTAMPTZ DEFAULT NOW()
     )
