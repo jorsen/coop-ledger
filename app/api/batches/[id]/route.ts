@@ -4,6 +4,8 @@ import { sql } from '@/lib/db';
 import { logActivity } from '@/lib/activity';
 
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+  await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS pig_price_per_kg DECIMAL(10,2) DEFAULT 270`;
+
   const [batch] = await sql`
     SELECT b.*,
       c.name        AS client_name,
@@ -64,6 +66,22 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
   if (!updated) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   await logActivity('updated', 'batch', updated.id, `Updated batch ${updated.batch_number}`);
+  return NextResponse.json(updated);
+}
+
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+  const { error } = await requireAuth();
+  if (error) return error;
+
+  await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS pig_price_per_kg DECIMAL(10,2) DEFAULT 270`;
+
+  const { pig_price_per_kg } = await req.json();
+  const [updated] = await sql`
+    UPDATE batches SET pig_price_per_kg = ${pig_price_per_kg}
+    WHERE id = ${params.id}
+    RETURNING id, pig_price_per_kg
+  `;
+  if (!updated) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json(updated);
 }
 

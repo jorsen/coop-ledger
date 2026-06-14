@@ -18,6 +18,7 @@ interface Batch {
   transaction_count: number;
   total_bags: number;
   total_debit: number;
+  pig_price_per_kg: number | null;
 }
 
 interface Client {
@@ -68,6 +69,8 @@ const PAGE_SIZE = 10;
 const num = (n: number) =>
   new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
 
+const fmtKg = (n: number | string) => parseFloat(Number(n).toFixed(2)).toString();
+
 const fmtDate = (d: string) => {
   const [y, m, day] = d.split('-');
   return `${parseInt(m)}/${parseInt(day)}/${y}`;
@@ -97,8 +100,10 @@ export default function CaretakerLedgerPage() {
   const [selectedBatchId, setSelectedBatchId] = useState<number | null>(null);
   const [pigSales, setPigSales] = useState<PigSale[]>([]);
   const [pigSaleModal, setPigSaleModal] = useState<PigSale | 'new' | null>(null);
-  const [pigSaleForm, setPigSaleForm] = useState({ weight_kg: '', price_per_kg: '270', label: '' });
+  const [pigSaleForm, setPigSaleForm] = useState({ weight_kg: '', price_per_kg: '270' });
   const [savingPigSale, setSavingPigSale] = useState(false);
+  const [editingPigPrice, setEditingPigPrice] = useState(false);
+  const [pigPriceInput, setPigPriceInput] = useState('');
 
   const fetchData = useCallback(async () => {
     const [clientRes, batchRes] = await Promise.all([
@@ -204,12 +209,12 @@ export default function CaretakerLedgerPage() {
   }
 
   function openAddPigSale() {
-    setPigSaleForm({ weight_kg: '', price_per_kg: '270', label: '' });
+    setPigSaleForm({ weight_kg: '', price_per_kg: String(selectedBatch?.pig_price_per_kg ?? 270) });
     setPigSaleModal('new');
   }
 
   function openEditPigSale(sale: PigSale) {
-    setPigSaleForm({ weight_kg: String(sale.weight_kg), price_per_kg: String(sale.price_per_kg), label: sale.label ?? '' });
+    setPigSaleForm({ weight_kg: String(sale.weight_kg), price_per_kg: String(sale.price_per_kg) });
     setPigSaleModal(sale);
   }
 
@@ -220,18 +225,29 @@ export default function CaretakerLedgerPage() {
       await fetch('/api/pig-sales', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ batch_id: selectedBatchId, weight_kg: Number(pigSaleForm.weight_kg), price_per_kg: Number(pigSaleForm.price_per_kg), label: pigSaleForm.label || null }),
+        body: JSON.stringify({ batch_id: selectedBatchId, weight_kg: Number(pigSaleForm.weight_kg), price_per_kg: Number(pigSaleForm.price_per_kg) }),
       });
     } else if (pigSaleModal && typeof pigSaleModal === 'object') {
       await fetch(`/api/pig-sales/${pigSaleModal.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ weight_kg: Number(pigSaleForm.weight_kg), price_per_kg: Number(pigSaleForm.price_per_kg), label: pigSaleForm.label || null }),
+        body: JSON.stringify({ weight_kg: Number(pigSaleForm.weight_kg), price_per_kg: Number(pigSaleForm.price_per_kg) }),
       });
     }
     setSavingPigSale(false);
     setPigSaleModal(null);
     fetchPigSales(selectedBatchId);
+  }
+
+  async function saveDefaultPigPrice() {
+    if (!selectedBatchId) return;
+    await fetch(`/api/batches/${selectedBatchId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pig_price_per_kg: Number(pigPriceInput) }),
+    });
+    setEditingPigPrice(false);
+    fetchData();
   }
 
   async function handleDeletePigSale(saleId: number) {
@@ -592,10 +608,36 @@ export default function CaretakerLedgerPage() {
               <h2 className="font-semibold text-gray-900 dark:text-white text-sm">Pig Sales</h2>
               {pigSales.length > 0 && (
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                  {totalPigSalesKg.toFixed(2)} kg &mdash; Total: <span className="font-semibold text-gray-700 dark:text-gray-300">₱{num(totalPigSalesAmount)}</span>
+                  {fmtKg(totalPigSalesKg)} kg &mdash; Total: <span className="font-semibold text-gray-700 dark:text-gray-300">₱{num(totalPigSalesAmount)}</span>
                 </p>
               )}
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Batch #{selectedBatch?.batch_number}</p>
+              <div className="flex items-center gap-1.5 mt-1">
+                <span className="text-xs text-gray-400 dark:text-gray-500">Default price:</span>
+                {editingPigPrice ? (
+                  <>
+                    <span className="text-xs text-gray-500">₱</span>
+                    <input
+                      type="text" inputMode="decimal"
+                      value={pigPriceInput}
+                      onChange={e => setPigPriceInput(e.target.value)}
+                      className="w-16 text-xs border border-gray-300 dark:border-gray-600 rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+                    />
+                    <span className="text-xs text-gray-500">/kg</span>
+                    <button onClick={saveDefaultPigPrice} className="text-xs font-medium text-green-700 dark:text-green-400 hover:text-green-600">Save</button>
+                    <button onClick={() => setEditingPigPrice(false)} className="text-xs text-gray-400 hover:text-gray-600">×</button>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300">₱{num(selectedBatch?.pig_price_per_kg ?? 270)}/kg</span>
+                    {isLoggedIn && (
+                      <button onClick={() => { setPigPriceInput(String(selectedBatch?.pig_price_per_kg ?? 270)); setEditingPigPrice(true); }} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <Pencil className="w-3 h-3" />
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
             {isLoggedIn && (
               <button
@@ -614,7 +656,6 @@ export default function CaretakerLedgerPage() {
                 <thead>
                   <tr className="border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
                     <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3">#</th>
-                    <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3">Label</th>
                     <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3">Weight (kg)</th>
                     <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3">Price/kg (₱)</th>
                     <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3">Total (₱)</th>
@@ -625,8 +666,7 @@ export default function CaretakerLedgerPage() {
                   {pigSales.map((sale, i) => (
                     <tr key={sale.id} className="border-b border-gray-50 dark:border-gray-700 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-700/50">
                       <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{i + 1}</td>
-                      <td className="px-4 py-3 text-gray-700 dark:text-gray-300">{sale.label || '—'}</td>
-                      <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{Number(sale.weight_kg).toFixed(2)}</td>
+                      <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{fmtKg(sale.weight_kg)}</td>
                       <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{num(Number(sale.price_per_kg))}</td>
                       <td className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-white">{num(Number(sale.weight_kg) * Number(sale.price_per_kg))}</td>
                       {isLoggedIn && (
@@ -644,8 +684,8 @@ export default function CaretakerLedgerPage() {
                     </tr>
                   ))}
                   <tr className="border-t-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 font-semibold">
-                    <td colSpan={2} className="px-4 py-3 text-right text-xs text-gray-500 dark:text-gray-400">Total</td>
-                    <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{totalPigSalesKg.toFixed(2)} kg</td>
+                    <td className="px-4 py-3 text-right text-xs text-gray-500 dark:text-gray-400">Total</td>
+                    <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{fmtKg(totalPigSalesKg)} kg</td>
                     <td className="px-4 py-3" />
                     <td className="px-4 py-3 text-right text-gray-900 dark:text-white">₱{num(totalPigSalesAmount)}</td>
                     {isLoggedIn && <td />}
@@ -1027,37 +1067,26 @@ export default function CaretakerLedgerPage() {
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Label <span className="text-gray-400">(optional)</span></label>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Weight (kg) *</label>
                 <input
-                  value={pigSaleForm.label}
-                  onChange={e => setPigSaleForm(f => ({ ...f, label: e.target.value }))}
-                  placeholder="e.g. Pig 1, Large pig"
+                  type="text"
+                  inputMode="decimal"
+                  value={pigSaleForm.weight_kg}
+                  onChange={e => setPigSaleForm(f => ({ ...f, weight_kg: e.target.value }))}
+                  placeholder="e.g. 85.5"
+                  autoFocus
                   className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Weight (kg) *</label>
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    value={pigSaleForm.weight_kg}
-                    onChange={e => setPigSaleForm(f => ({ ...f, weight_kg: e.target.value }))}
-                    placeholder="e.g. 85.5"
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Price/kg (₱) *</label>
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    value={pigSaleForm.price_per_kg}
-                    onChange={e => setPigSaleForm(f => ({ ...f, price_per_kg: e.target.value }))}
-                    placeholder="270"
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
-                  />
-                </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Price/kg (₱)</label>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={pigSaleForm.price_per_kg}
+                  onChange={e => setPigSaleForm(f => ({ ...f, price_per_kg: e.target.value }))}
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+                />
               </div>
               {pigSaleForm.weight_kg && pigSaleForm.price_per_kg && (
                 <p className="text-xs text-gray-500 dark:text-gray-400">
