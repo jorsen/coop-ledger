@@ -598,7 +598,7 @@ export default function BatchDetailPage() {
       </div>{/* end main content */}
 
       {/* ── Batches sidebar (order 2 on mobile, spans both rows on desktop) ── */}
-      <div className="md:col-span-1 md:row-span-2 lg:sticky lg:top-[72px] order-2 flex flex-col gap-4 print:hidden">
+      <div className="md:col-span-1 lg:sticky lg:top-[72px] order-2 print:hidden">
         {allBatches.length > 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
             <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center gap-2">
@@ -676,9 +676,10 @@ export default function BatchDetailPage() {
             )}
           </div>
         )}
+      </div>
 
-        {/* Pig Sales */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+      {/* ── Pig Sales ── */}
+      <div className="md:col-span-1 order-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 print:hidden">
           <div className="px-4 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
             <div>
               <h2 className="font-semibold text-gray-900 dark:text-white text-sm">Pig Sales</h2>
@@ -771,7 +772,6 @@ export default function BatchDetailPage() {
             </div>
           )}
         </div>
-      </div>
 
       </div>{/* end grid */}
 
