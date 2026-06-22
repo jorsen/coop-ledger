@@ -38,9 +38,9 @@ export default function DashboardPage() {
   const fetchData = useCallback(() => {
     fetch('/api/dashboard')
       .then((r) => r.json())
-      .then(({ stats, recent }) => {
-        setStats(stats);
-        setRecent(recent);
+      .then((data) => {
+        if (data?.stats) setStats(data.stats);
+        if (Array.isArray(data?.recent)) setRecent(data.recent);
       })
       .finally(() => setLoading(false));
   }, []);
