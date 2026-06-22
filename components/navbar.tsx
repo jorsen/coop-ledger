@@ -8,7 +8,7 @@ import clsx from 'clsx';
 import { useTheme } from '@/components/theme-provider';
 
 const NAV_LINKS = [
-  { href: '/dashboard',    label: 'Dashboard',    icon: LayoutDashboard, public: false },
+  { href: '/dashboard',    label: 'Dashboard',    icon: LayoutDashboard, public: true  },
   { href: '/caretakers',   label: 'Caretakers',   icon: Users,           public: true  },
   { href: '/calendar',     label: 'Calendar',     icon: CalendarDays,    public: true  },
   { href: '/transactions', label: 'Transactions', icon: FileText,        public: false },
