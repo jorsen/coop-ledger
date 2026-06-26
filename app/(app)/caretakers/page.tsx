@@ -331,7 +331,7 @@ export default function CaretakersPage() {
                     </td>
                     <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
                       {client.all_batches?.length > 1
-                        ? <div className="divide-y divide-gray-100 dark:divide-gray-700">{client.all_batches.map(b => (
+                        ? <div className="divide-y divide-gray-200 dark:divide-gray-600 w-full">{client.all_batches.map(b => (
                             <div key={b.batch_number} className="py-1.5 text-xs font-medium text-green-700 dark:text-green-400 whitespace-nowrap">#{b.batch_number}</div>
                           ))}</div>
                         : client.current_batch_number
@@ -341,7 +341,7 @@ export default function CaretakersPage() {
                     </td>
                     <td className="px-4 py-3 text-right text-green-700 dark:text-green-400 font-semibold">
                       {client.all_batches?.length > 1
-                        ? <div className="divide-y divide-gray-100 dark:divide-gray-700">{client.all_batches.map(b => (
+                        ? <div className="divide-y divide-gray-200 dark:divide-gray-600 w-full">{client.all_batches.map(b => (
                             <div key={b.batch_number} className="py-1.5 text-xs whitespace-nowrap">{b.heads ?? '—'}</div>
                           ))}</div>
                         : (client.current_heads ?? '—')
@@ -349,7 +349,7 @@ export default function CaretakersPage() {
                     </td>
                     <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
                       {client.all_batches?.length > 1
-                        ? <div className="divide-y divide-gray-100 dark:divide-gray-700">{client.all_batches.map(b => (
+                        ? <div className="divide-y divide-gray-200 dark:divide-gray-600 w-full">{client.all_batches.map(b => (
                             <div key={b.batch_number} className="py-1.5 text-xs whitespace-nowrap">{fmtDate(b.date_of_application)}</div>
                           ))}</div>
                         : <span className="whitespace-nowrap">{fmtDate(client.current_date_of_application)}</span>
@@ -357,7 +357,7 @@ export default function CaretakersPage() {
                     </td>
                     <td className="px-4 py-3 text-red-600 font-medium">
                       {client.all_batches?.length > 1
-                        ? <div className="divide-y divide-gray-100 dark:divide-gray-700">{client.all_batches.map(b => (
+                        ? <div className="divide-y divide-gray-200 dark:divide-gray-600 w-full">{client.all_batches.map(b => (
                             <div key={b.batch_number} className="py-1.5 text-xs whitespace-nowrap">{fmtDate(b.date_of_hauling)}</div>
                           ))}</div>
                         : <span className="whitespace-nowrap">{fmtDate(client.current_date_of_hauling)}</span>
