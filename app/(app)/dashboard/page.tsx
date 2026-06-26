@@ -86,19 +86,21 @@ export default function DashboardPage() {
               <TrendingUp className="w-5 h-5 text-green-700" />
             </div>
           </div>
-          <p className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">{peso(stats?.total_loan_amount ?? 0)}</p>
-          {(stats?.paid_deducted ?? 0) > 0 && (
-            <div className="text-xs text-gray-400 dark:text-gray-500 space-y-0.5 border-t border-gray-100 dark:border-gray-700 pt-2">
-              <div className="flex justify-between">
-                <span>Grand Total</span>
-                <span className="font-medium text-gray-600 dark:text-gray-300">{peso(stats?.grand_total_debits ?? 0)}</span>
-              </div>
-              <div className="flex justify-between text-blue-500">
-                <span>Less Paid Batches</span>
-                <span className="font-medium">− {peso(stats?.paid_deducted ?? 0)}</span>
-              </div>
+          <p className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">{peso(stats?.total_loan_amount ?? 0)}</p>
+          <div className="text-xs space-y-1 border-t border-gray-100 dark:border-gray-700 pt-2">
+            <div className="flex justify-between text-gray-500 dark:text-gray-400">
+              <span>All Debits</span>
+              <span className="font-medium">{peso(stats?.grand_total_debits ?? 0)}</span>
             </div>
-          )}
+            <div className="flex justify-between text-blue-500 dark:text-blue-400">
+              <span>Less Paid Batches</span>
+              <span className="font-medium">− {peso(stats?.paid_deducted ?? 0)}</span>
+            </div>
+            <div className="flex justify-between text-green-700 dark:text-green-400 font-semibold border-t border-gray-100 dark:border-gray-700 pt-1">
+              <span>= Loans</span>
+              <span>{peso(stats?.total_loan_amount ?? 0)}</span>
+            </div>
+          </div>
         </div>
         <StatCard label="Total Delivery Fees"     value={peso(stats?.total_delivery_fees ?? 0)} icon={Truck}      iconBg="bg-purple-50" iconColor="text-purple-600" />
       </div>
