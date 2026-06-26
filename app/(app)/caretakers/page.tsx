@@ -188,29 +188,21 @@ export default function CaretakersPage() {
                   <select
                     value={client.is_updated ? 'updated' : 'not-updated'}
                     onChange={e => handleToggleUpdated(client.id, e.target.value === 'updated')}
-                    className={`text-xs font-medium text-white border-0 rounded px-2 py-0.5 outline-none cursor-pointer w-full ${
-                      client.is_updated ? 'bg-green-600' : 'bg-gray-400 dark:bg-gray-500'
-                    }`}
+                    className="w-full text-xs font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 outline-none cursor-pointer focus:ring-1 focus:ring-green-700"
                   >
                     <option value="updated">Updated</option>
                     <option value="not-updated">Not Updated</option>
                   </select>
                 ) : (
-                  <span className={`text-xs font-medium text-white px-2 py-0.5 rounded block ${
-                    client.is_updated ? 'bg-green-600' : 'bg-gray-400 dark:bg-gray-500'
-                  }`}>
+                  <span className="text-xs font-medium text-gray-700 dark:text-gray-200">
                     {client.is_updated ? 'Updated' : 'Not Updated'}
                   </span>
                 )}
               </div>
               {client.notes && (
-                <div className={`flex items-start gap-1.5 mt-1.5 border rounded-md px-2 py-1.5 ${
-                  client.is_updated
-                    ? 'bg-green-600 border-green-700'
-                    : 'bg-gray-400 dark:bg-gray-500 border-gray-500'
-                }`}>
-                  <StickyNote className="w-3 h-3 shrink-0 mt-0.5 text-white" />
-                  <p className="text-xs line-clamp-2 leading-tight text-white">{client.notes}</p>
+                <div className="flex items-start gap-1.5 mt-1.5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded-md px-2 py-1.5">
+                  <StickyNote className="w-3 h-3 shrink-0 mt-0.5 text-amber-500" />
+                  <p className="text-xs line-clamp-2 leading-tight text-amber-800 dark:text-amber-300">{client.notes}</p>
                 </div>
               )}
               <p className="text-xs text-gray-400 dark:text-gray-500 mb-3 mt-1">{client.transaction_count} transaction(s)</p>
@@ -293,28 +285,20 @@ export default function CaretakersPage() {
                         <select
                           value={client.is_updated ? 'updated' : 'not-updated'}
                           onChange={e => handleToggleUpdated(client.id, e.target.value === 'updated')}
-                          className={`text-xs font-medium text-white border-0 rounded px-2 py-0.5 outline-none cursor-pointer ${
-                            client.is_updated ? 'bg-green-600' : 'bg-gray-400 dark:bg-gray-500'
-                          }`}
+                          className="text-xs font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 outline-none cursor-pointer focus:ring-1 focus:ring-green-700"
                         >
                           <option value="updated">Updated</option>
                           <option value="not-updated">Not Updated</option>
                         </select>
                       ) : (
-                        <span className={`text-xs font-medium text-white px-2 py-0.5 rounded ${
-                          client.is_updated ? 'bg-green-600' : 'bg-gray-400 dark:bg-gray-500'
-                        }`}>
+                        <span className="text-xs font-medium text-gray-700 dark:text-gray-200">
                           {client.is_updated ? 'Updated' : 'Not Updated'}
                         </span>
                       )}
                       {client.notes && (
-                        <div className={`flex items-start gap-1 mt-1 border rounded px-1.5 py-1 ${
-                          client.is_updated
-                            ? 'bg-green-600 border-green-700'
-                            : 'bg-gray-400 dark:bg-gray-500 border-gray-500'
-                        }`} title={client.notes}>
-                          <StickyNote className="w-3 h-3 shrink-0 mt-0.5 text-white" />
-                          <p className="text-xs truncate leading-tight text-white">{client.notes}</p>
+                        <div className="flex items-start gap-1 mt-1 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded px-1.5 py-1" title={client.notes}>
+                          <StickyNote className="w-3 h-3 shrink-0 mt-0.5 text-amber-500" />
+                          <p className="text-xs truncate leading-tight text-amber-800 dark:text-amber-300">{client.notes}</p>
                         </div>
                       )}
                     </td>
