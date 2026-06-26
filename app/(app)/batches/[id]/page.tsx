@@ -383,8 +383,11 @@ export default function BatchDetailPage() {
 
       {batch.notes && <p className="text-sm text-gray-500 mb-4">{batch.notes}</p>}
 
+      {/* ── Print layout: transactions left, summary+expenses right ── */}
+      <div className="print:flex print:gap-3 print:items-start">
+
       {/* Transactions table */}
-      <div className="bg-white rounded-xl border border-gray-200 print-card print:mb-0 dark:bg-gray-800 dark:border-gray-700">
+      <div className="bg-white rounded-xl border border-gray-200 print-card print:mb-0 print:flex-1 print:min-w-0 dark:bg-gray-800 dark:border-gray-700">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -461,9 +464,9 @@ export default function BatchDetailPage() {
         </div>
 
 
-        {/* Billing summary */}
+        {/* Billing summary - screen only; print version is in right column */}
         {withComputed.length > 0 && (
-          <div className="border-t border-gray-200 px-6 py-4 print:px-2 print:py-2 dark:border-gray-700">
+          <div className="border-t border-gray-200 px-6 py-4 print:hidden dark:border-gray-700">
             <div className="flex justify-end">
               <div className="w-72 space-y-1.5 text-sm print:text-xs print:w-56">
                 <div className="flex justify-between">
@@ -502,8 +505,22 @@ export default function BatchDetailPage() {
         )}
       </div>
 
+      {/* Right column: print-only billing summary + Other Expenses + Pig Sales */}
+      <div className="print:flex-none print:w-56">
+
+        {/* Print-only billing summary */}
+        {withComputed.length > 0 && (
+          <div className="hidden print:block border border-gray-300 rounded p-3 text-xs space-y-1 mb-3">
+            <div className="flex justify-between"><span>Principal</span><span className="font-medium">{num(balance)}</span></div>
+            <div className="flex justify-between"><span>Interest</span><span className="font-medium">{num(totalInterest)}</span></div>
+            <div className="flex justify-between"><span>Del Fee</span><span className="font-medium">{num(totalDeliveryFee)}</span></div>
+            {totalOtherExpenses > 0 && <div className="flex justify-between"><span>Other Exp</span><span className="font-medium">{num(totalOtherExpenses)}</span></div>}
+            <div className="flex justify-between border-t border-gray-300 pt-1 font-bold"><span>Total</span><span className="underline">{num(balance + totalInterest + totalDffs1 + dffs2 + totalDeliveryFee + totalOtherExpenses)}</span></div>
+          </div>
+        )}
+
       {/* ── Other Expenses + Pig Sales ── */}
-      <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div className="mt-6 print:mt-0 grid grid-cols-1 md:grid-cols-2 print:grid-cols-1 gap-5 print:gap-3">
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
         <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
           <div>
@@ -658,6 +675,8 @@ export default function BatchDetailPage() {
           )}
         </div>
       </div>{/* end 2-col grid */}
+      </div>{/* end right column */}
+      </div>{/* end print flex wrapper */}
 
       </div>{/* end main content */}
 
