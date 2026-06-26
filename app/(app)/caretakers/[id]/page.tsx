@@ -370,15 +370,16 @@ export default function CaretakerLedgerPage() {
           </div>
           <div>
             <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">STATUS</p>
-            <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${
-              client.status === 'active'    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
-              client.status === 'on-going'  ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
-              client.status === 'paid'      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' :
-              client.status === 'completed' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' :
-              'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
-            }`}>
-              {client.status.charAt(0).toUpperCase() + client.status.slice(1)}
-            </span>
+            {(() => {
+              const s = selectedBatch?.status ?? 'active';
+              const cls =
+                s === 'active'    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
+                s === 'on-going'  ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                s === 'paid'      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' :
+                s === 'completed' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' :
+                'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400';
+              return <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${cls}`}>{s.charAt(0).toUpperCase() + s.slice(1)}</span>;
+            })()}
           </div>
           <div>
             <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5"># OF HEADS</p>
