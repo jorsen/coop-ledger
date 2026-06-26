@@ -201,9 +201,13 @@ export default function CaretakersPage() {
                 )}
               </div>
               {client.notes && (
-                <div className="flex items-start gap-1.5 mt-1.5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded-md px-2 py-1.5">
-                  <StickyNote className="w-3 h-3 text-amber-500 shrink-0 mt-0.5" />
-                  <p className="text-xs text-amber-800 dark:text-amber-300 line-clamp-2 leading-tight">{client.notes}</p>
+                <div className={`flex items-start gap-1.5 mt-1.5 border rounded-md px-2 py-1.5 ${
+                  client.is_updated
+                    ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700/40'
+                    : 'bg-gray-50 dark:bg-gray-700/40 border-gray-200 dark:border-gray-600'
+                }`}>
+                  <StickyNote className={`w-3 h-3 shrink-0 mt-0.5 ${client.is_updated ? 'text-green-600' : 'text-gray-400'}`} />
+                  <p className={`text-xs line-clamp-2 leading-tight ${client.is_updated ? 'text-green-800 dark:text-green-300' : 'text-gray-500 dark:text-gray-400'}`}>{client.notes}</p>
                 </div>
               )}
               <p className="text-xs text-gray-400 dark:text-gray-500 mb-3 mt-1">{client.transaction_count} transaction(s)</p>
@@ -303,9 +307,13 @@ export default function CaretakersPage() {
                         </div>
                       )}
                       {client.notes && (
-                        <div className="flex items-start gap-1 mt-1 w-full bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded px-1.5 py-1" title={client.notes}>
-                          <StickyNote className="w-3 h-3 text-amber-500 shrink-0 mt-0.5" />
-                          <p className="text-xs text-amber-800 dark:text-amber-300 truncate leading-tight">{client.notes}</p>
+                        <div className={`flex items-start gap-1 mt-1 w-full border rounded px-1.5 py-1 ${
+                          client.is_updated
+                            ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700/40'
+                            : 'bg-gray-50 dark:bg-gray-700/40 border-gray-200 dark:border-gray-600'
+                        }`} title={client.notes}>
+                          <StickyNote className={`w-3 h-3 shrink-0 mt-0.5 ${client.is_updated ? 'text-green-600' : 'text-gray-400'}`} />
+                          <p className={`text-xs truncate leading-tight ${client.is_updated ? 'text-green-800 dark:text-green-300' : 'text-gray-500 dark:text-gray-400'}`}>{client.notes}</p>
                         </div>
                       )}
                     </td>
