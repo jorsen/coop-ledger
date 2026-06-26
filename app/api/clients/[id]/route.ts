@@ -64,6 +64,25 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   return NextResponse.json(updated);
 }
 
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+  const { error } = await requireAuth();
+  if (error) return error;
+
+  const body = await req.json();
+
+  await sql`ALTER TABLE clients ADD COLUMN IF NOT EXISTS is_updated BOOLEAN DEFAULT FALSE`;
+
+  const [updated] = await sql`
+    UPDATE clients
+    SET is_updated = ${body.is_updated ?? false}, updated_at = NOW()
+    WHERE id = ${params.id}
+    RETURNING id, is_updated
+  `;
+
+  if (!updated) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  return NextResponse.json(updated);
+}
+
 export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
   const { error } = await requireAuth();
   if (error) return error;

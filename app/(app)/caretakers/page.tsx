@@ -87,6 +87,15 @@ export default function CaretakersPage() {
     return matchesSearch && matchesUpdated;
   });
 
+  async function handleToggleUpdated(id: number, value: boolean) {
+    setClients(prev => prev.map(c => c.id === id ? { ...c, is_updated: value } : c));
+    await fetch(`/api/clients/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ is_updated: value }),
+    });
+  }
+
   async function handleDelete(id: number) {
     if (!confirm('Delete this caretaker and all their transactions? This cannot be undone.')) return;
     await fetch(`/api/clients/${id}`, { method: 'DELETE' });
@@ -174,9 +183,30 @@ export default function CaretakersPage() {
                 ID: {client.client_code}
                 {client.current_batch_number && <> · Batch <span className="font-medium text-green-700">#{client.current_batch_number}</span></>}
               </p>
-              {client.is_updated && (
-                <span className="inline-block bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 text-xs font-medium px-2 py-0.5 rounded mt-1">Updated</span>
-              )}
+              <div className="mt-1" onClick={e => e.stopPropagation()}>
+                {isLoggedIn ? (
+                  <select
+                    value={client.is_updated ? 'updated' : 'not-updated'}
+                    onChange={e => handleToggleUpdated(client.id, e.target.value === 'updated')}
+                    className={`text-xs font-medium px-2 py-0.5 rounded border-0 outline-none cursor-pointer ${
+                      client.is_updated
+                        ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                        : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
+                    }`}
+                  >
+                    <option value="updated">Updated</option>
+                    <option value="not-updated">Not Updated</option>
+                  </select>
+                ) : (
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+                    client.is_updated
+                      ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                      : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
+                  }`}>
+                    {client.is_updated ? 'Updated' : 'Not Updated'}
+                  </span>
+                )}
+              </div>
               {client.notes && (
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{client.notes}</p>
               )}
@@ -255,14 +285,31 @@ export default function CaretakersPage() {
                     <td className="px-4 py-3">
                       <StatusBadge status={client.status} />
                     </td>
-                    <td className="px-4 py-3 max-w-[180px]">
-                      {client.is_updated && (
-                        <span className="inline-block bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 text-xs font-medium px-2 py-0.5 rounded mb-1">Updated</span>
-                      )}
-                      {client.notes ? (
-                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate" title={client.notes}>{client.notes}</p>
+                    <td className="px-4 py-3 max-w-[200px]" onClick={e => e.stopPropagation()}>
+                      {isLoggedIn ? (
+                        <select
+                          value={client.is_updated ? 'updated' : 'not-updated'}
+                          onChange={e => handleToggleUpdated(client.id, e.target.value === 'updated')}
+                          className={`text-xs font-medium px-2 py-0.5 rounded border-0 outline-none cursor-pointer ${
+                            client.is_updated
+                              ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                              : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
+                          }`}
+                        >
+                          <option value="updated">Updated</option>
+                          <option value="not-updated">Not Updated</option>
+                        </select>
                       ) : (
-                        <span className="text-xs text-gray-300 dark:text-gray-600">—</span>
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+                          client.is_updated
+                            ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                            : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
+                        }`}>
+                          {client.is_updated ? 'Updated' : 'Not Updated'}
+                        </span>
+                      )}
+                      {client.notes && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5" title={client.notes}>{client.notes}</p>
                       )}
                     </td>
                     <td className="px-4 py-3 text-gray-700 dark:text-gray-300 whitespace-nowrap">
