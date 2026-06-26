@@ -533,7 +533,7 @@ export default function BatchDetailPage() {
                 <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-6 py-3">Quantity</th>
                 <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-6 py-3">Price</th>
                 <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-6 py-3">Total</th>
-                {isLoggedIn && <th className="px-6 py-3" />}
+                {isLoggedIn && <th className="px-6 py-3 print:hidden" />}
               </tr>
             </thead>
             <tbody>
@@ -544,7 +544,7 @@ export default function BatchDetailPage() {
                   <td className="px-6 py-3 text-gray-700 dark:text-gray-300 text-right">{num(Number(e.price))}</td>
                   <td className="px-6 py-3 font-semibold text-gray-900 dark:text-white text-right">{num(Number(e.quantity) * Number(e.price))}</td>
                   {isLoggedIn && (
-                    <td className="px-6 py-3">
+                    <td className="px-6 py-3 print:hidden">
                       <button onClick={() => handleDeleteExpense(e.id)} className="float-right p-1 text-red-400 hover:text-red-600">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -555,7 +555,7 @@ export default function BatchDetailPage() {
               <tr className="border-t-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 font-semibold">
                 <td colSpan={3} className="px-6 py-3 text-right text-xs text-gray-500 dark:text-gray-400">Total Other Expenses</td>
                 <td className="px-6 py-3 text-right text-gray-900 dark:text-white">{num(totalOtherExpenses)}</td>
-                {isLoggedIn && <td />}
+                {isLoggedIn && <td className="print:hidden" />}
               </tr>
             </tbody>
           </table>
@@ -564,7 +564,7 @@ export default function BatchDetailPage() {
       </div>
 
       {/* Pig Sales */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 print:hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
           <div className="px-4 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
             <div>
               <h2 className="font-semibold text-gray-900 dark:text-white text-sm">Pig Sales</h2>
@@ -603,7 +603,7 @@ export default function BatchDetailPage() {
             {isLoggedIn && (
               <button
                 onClick={openAddPigSale}
-                className="flex items-center gap-1.5 text-sm text-green-800 dark:text-green-400 font-medium hover:text-green-700"
+                className="print:hidden flex items-center gap-1.5 text-sm text-green-800 dark:text-green-400 font-medium hover:text-green-700"
               >
                 <Plus className="w-4 h-4" /> Add Pig Sale
               </button>
@@ -621,7 +621,7 @@ export default function BatchDetailPage() {
                     <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3">Weight (kg)</th>
                     <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3">Price/kg (₱)</th>
                     <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3">Total (₱)</th>
-                    {isLoggedIn && <th className="px-4 py-3" />}
+                    {isLoggedIn && <th className="px-4 py-3 print:hidden" />}
                   </tr>
                 </thead>
                 <tbody>
@@ -632,7 +632,7 @@ export default function BatchDetailPage() {
                       <td className="px-4 py-3 text-gray-700 dark:text-gray-300 text-right">{num(Number(sale.price_per_kg))}</td>
                       <td className="px-4 py-3 font-semibold text-gray-900 dark:text-white text-right">{num(Number(sale.weight_kg) * Number(sale.price_per_kg))}</td>
                       {isLoggedIn && (
-                        <td className="px-4 py-3">
+                        <td className="px-4 py-3 print:hidden">
                           <div className="flex items-center justify-end gap-2">
                             <button onClick={() => openEditPigSale(sale)} className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
                               <Pencil className="w-3.5 h-3.5" />
