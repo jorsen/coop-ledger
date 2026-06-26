@@ -61,13 +61,16 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
   if (!updated) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-  // Also sync dates to the latest batch so the list view reflects the change
+  // Ensure batch columns exist, then sync dates to the latest batch
+  await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS date_of_application DATE`;
+  await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS date_of_hauling DATE`;
+  await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS heads INTEGER`;
   await sql`
     UPDATE batches
     SET
       date_of_application = ${date_of_application || null},
       date_of_hauling     = ${date_of_hauling || null},
-      heads               = ${heads || null}
+      heads               = ${heads ? Number(heads) : null}
     WHERE id = (
       SELECT id FROM batches WHERE client_id = ${params.id} ORDER BY created_at DESC LIMIT 1
     )

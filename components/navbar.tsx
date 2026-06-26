@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Users, FileText, Settings, LogOut, Menu, X, Moon, Sun, CalendarDays, Activity } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, Settings, LogOut, Menu, X, Moon, Sun, CalendarDays, Activity, DatabaseBackup } from 'lucide-react';
 import clsx from 'clsx';
 import { useTheme } from '@/components/theme-provider';
 
@@ -14,6 +14,7 @@ const NAV_LINKS = [
   { href: '/transactions', label: 'Transactions', icon: FileText,        public: false },
   { href: '/activity',     label: 'Activity',     icon: Activity,        public: false },
   { href: '/settings',     label: 'Settings',     icon: Settings,        public: false },
+  { href: '/backup',       label: 'Backup',       icon: DatabaseBackup,  public: false },
 ];
 
 export default function Navbar() {
