@@ -36,21 +36,21 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 w-full max-w-sm">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 w-full max-w-sm">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10 bg-green-800 rounded-lg flex items-center justify-center text-white font-bold text-sm">
             FC
           </div>
           <div>
-            <h1 className="text-base font-semibold text-green-800">Feed Cooperative</h1>
-            <p className="text-xs text-gray-500">Sign in to continue</p>
+            <h1 className="text-base font-semibold text-green-800 dark:text-green-400">Feed Cooperative</h1>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Sign in to continue</p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
@@ -58,13 +58,13 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter admin password"
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-800 focus:border-transparent"
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-800 focus:border-transparent"
                 required
               />
             </div>
           </div>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
 
           <button
             type="submit"

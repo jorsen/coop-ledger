@@ -8,11 +8,11 @@ const ThemeContext = createContext<{ theme: Theme; toggle: () => void }>({ theme
 export function useTheme() { return useContext(ThemeContext); }
 
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('light');
+  const [theme, setTheme] = useState<Theme>('dark');
 
   useEffect(() => {
     const saved = localStorage.getItem('theme') as Theme | null;
-    const preferred = saved ?? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const preferred = saved ?? 'dark';
     setTheme(preferred);
     document.documentElement.classList.toggle('dark', preferred === 'dark');
   }, []);
