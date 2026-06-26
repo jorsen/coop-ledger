@@ -174,6 +174,7 @@ export default function CaretakerLedgerPage() {
     });
     setSavingEditBatch(false);
     setEditBatch(null);
+    localStorage.setItem('batch_status_changed', String(Date.now()));
     fetchData();
   }
 

@@ -58,6 +58,14 @@ export default function DashboardPage() {
     return () => document.removeEventListener('visibilitychange', onVisible);
   }, [fetchData]);
 
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'batch_status_changed') fetchData();
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, [fetchData]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
