@@ -863,6 +863,7 @@ export default function CaretakerLedgerPage() {
           transaction={modal.tx}
           clients={[{ id: client.id, name: client.name }]}
           defaultClientId={client.id}
+          defaultBatchId={modal.tx ? undefined : (selectedBatchId ?? undefined)}
           onClose={() => setModal(null)}
           onSave={() => { setModal(null); fetchData(); }}
         />

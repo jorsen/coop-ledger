@@ -6,6 +6,19 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active'`;
 
+  // Backfill batch_id for transactions that have no batch assignment.
+  // Assigns each unlinked transaction to the client's most recently created batch.
+  await sql`
+    UPDATE transactions t
+    SET batch_id = (
+      SELECT b.id FROM batches b
+      WHERE b.client_id = t.client_id
+      ORDER BY b.created_at DESC
+      LIMIT 1
+    )
+    WHERE t.batch_id IS NULL AND t.client_id IS NOT NULL
+  `;
+
   const [stats, recent] = await Promise.all([
     sql`
       SELECT
