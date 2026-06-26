@@ -414,7 +414,7 @@ export default function BatchDetailPage() {
               {withComputed.map((tx) => (
                 <tr key={tx.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 dark:border-gray-700 dark:hover:bg-gray-700/50">
                   <td className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap">{tx.feed_type || '—'}</td>
-                  <td className="px-4 py-3 text-blue-600 whitespace-nowrap">{fmtDate(tx.date)}</td>
+                  <td className="px-4 py-3 text-blue-600 dark:text-blue-400 whitespace-nowrap">{fmtDate(tx.date)}</td>
                   <td className="px-4 py-3 text-gray-700 text-right dark:text-gray-300">{Number(tx.bags).toFixed(2)}</td>
                   <td className="px-4 py-3 text-gray-600 text-right print:hidden dark:text-gray-400 hidden xl:table-cell">
                     {tx.price_per_bag ? num(Number(tx.price_per_bag)) : '—'}
@@ -425,7 +425,7 @@ export default function BatchDetailPage() {
                   <td className="px-4 py-3 text-gray-600 text-right print:hidden dark:text-gray-400 hidden xl:table-cell">{num(tx.dffs1)}</td>
                   <td className="px-4 py-3 text-gray-600 text-right dark:text-gray-400 hidden sm:table-cell">{num(tx.interest)}</td>
                   <td className="px-4 py-3 text-gray-500 text-right print:hidden dark:text-gray-400 hidden xl:table-cell">{tx.days}</td>
-                  <td className="px-4 py-3 text-green-700 text-right whitespace-nowrap print:hidden hidden xl:table-cell">{maturityDate ? fmtDate(maturityDate) : '—'}</td>
+                  <td className="px-4 py-3 text-green-700 dark:text-green-400 text-right whitespace-nowrap print:hidden hidden xl:table-cell">{maturityDate ? fmtDate(maturityDate) : '—'}</td>
                   <td className="px-4 py-3 print:hidden">
                     {isLoggedIn && (
                       <div className="flex items-center justify-end gap-2">
@@ -537,7 +537,7 @@ export default function BatchDetailPage() {
               </tr>
             </thead>
             <tbody>
-              {pagedExp.map(e => (
+              {expenses.map(e => (
                 <tr key={e.id} className="border-b border-gray-50 dark:border-gray-700 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-700/30">
                   <td className="px-6 py-3 text-gray-800 dark:text-gray-200">{e.item}</td>
                   <td className="px-6 py-3 text-gray-700 dark:text-gray-300 text-right">{Number(e.quantity).toFixed(2)}</td>
@@ -559,22 +559,6 @@ export default function BatchDetailPage() {
               </tr>
             </tbody>
           </table>
-          </div>
-        )}
-        {expTotalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-gray-700">
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-              {expPage * PAGE_SIZE + 1}–{Math.min((expPage + 1) * PAGE_SIZE, expenses.length)} of {expenses.length}
-            </span>
-            <div className="flex items-center gap-1">
-              <button onClick={() => setExpPage(p => p - 1)} disabled={expPage === 0} className="p-1.5 rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30">
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <span className="text-xs text-gray-600 dark:text-gray-400 px-1">{expPage + 1} / {expTotalPages}</span>
-              <button onClick={() => setExpPage(p => p + 1)} disabled={expPage >= expTotalPages - 1} className="p-1.5 rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30">
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
           </div>
         )}
       </div>
@@ -688,7 +672,7 @@ export default function BatchDetailPage() {
               <span className="ml-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full">{allBatches.length}</span>
             </div>
             <div className="divide-y divide-gray-50 dark:divide-gray-700 max-h-[60vh] overflow-y-auto">
-              {pagedBatches.map((b) => {
+              {allBatches.map((b) => {
                 const isViewing = b.id === Number(id);
                 return (
                   <div key={b.id} className={`px-4 sm:px-6 py-3 flex flex-col gap-1.5 ${isViewing ? 'bg-green-50 dark:bg-green-900/10' : 'hover:bg-gray-50/50 dark:hover:bg-gray-700/50'}`}>
@@ -738,22 +722,6 @@ export default function BatchDetailPage() {
                 );
               })}
             </div>
-            {batchTotalPages > 1 && (
-              <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-gray-700">
-                <span className="text-xs text-gray-500 dark:text-gray-400">
-                  {batchPage * PAGE_SIZE + 1}–{Math.min((batchPage + 1) * PAGE_SIZE, allBatches.length)} of {allBatches.length}
-                </span>
-                <div className="flex items-center gap-1">
-                  <button onClick={() => setBatchPage(p => p - 1)} disabled={batchPage === 0} className="p-1.5 rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30">
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <span className="text-xs text-gray-600 dark:text-gray-400 px-1">{batchPage + 1} / {batchTotalPages}</span>
-                  <button onClick={() => setBatchPage(p => p + 1)} disabled={batchPage >= batchTotalPages - 1} className="p-1.5 rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30">
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         )}
       </div>
