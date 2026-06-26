@@ -11,7 +11,16 @@ export async function GET() {
       lb.batch_number        AS current_batch_number,
       lb.heads               AS current_heads,
       lb.date_of_application AS current_date_of_application,
-      lb.date_of_hauling     AS current_date_of_hauling
+      lb.date_of_hauling     AS current_date_of_hauling,
+      COALESCE((
+        SELECT json_agg(json_build_object(
+          'batch_number', b.batch_number,
+          'date_of_application', b.date_of_application,
+          'date_of_hauling', b.date_of_hauling
+        ) ORDER BY b.created_at DESC)
+        FROM batches b
+        WHERE b.client_id = c.id
+      ), '[]'::json) AS all_batches
     FROM clients c
     LEFT JOIN transactions t ON t.client_id = c.id
     LEFT JOIN LATERAL (

@@ -6,6 +6,12 @@ import { Plus, Eye, Pencil, Trash2, Search, LayoutGrid, List, StickyNote } from 
 import ClientModal from '@/components/client-modal';
 import { usePoll } from '@/hooks/use-poll';
 
+interface BatchInfo {
+  batch_number: string;
+  date_of_application: string | null;
+  date_of_hauling: string | null;
+}
+
 interface Client {
   id: number;
   client_code: string;
@@ -20,6 +26,7 @@ interface Client {
   current_heads: number | null;
   current_date_of_application: string | null;
   current_date_of_hauling: string | null;
+  all_batches: BatchInfo[];
   notes: string | null;
   is_updated: boolean;
 }
@@ -213,11 +220,27 @@ export default function CaretakersPage() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">App. Date</p>
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white">{fmtDate(client.current_date_of_application)}</p>
+                  {client.all_batches?.length > 1
+                    ? <div className="space-y-0.5 mt-0.5">{client.all_batches.map(b => (
+                        <div key={b.batch_number} className="flex items-center gap-1 text-xs">
+                          <span className="text-gray-400 dark:text-gray-500">#{b.batch_number}:</span>
+                          <span className="font-semibold text-gray-900 dark:text-white">{fmtDate(b.date_of_application)}</span>
+                        </div>
+                      ))}</div>
+                    : <p className="text-sm font-semibold text-gray-900 dark:text-white">{fmtDate(client.current_date_of_application)}</p>
+                  }
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">Hauling Date</p>
-                  <p className="text-sm font-semibold text-red-600">{fmtDate(client.current_date_of_hauling)}</p>
+                  {client.all_batches?.length > 1
+                    ? <div className="space-y-0.5 mt-0.5">{client.all_batches.map(b => (
+                        <div key={b.batch_number} className="flex items-center gap-1 text-xs">
+                          <span className="text-red-400">#{b.batch_number}:</span>
+                          <span className="font-semibold text-red-600">{fmtDate(b.date_of_hauling)}</span>
+                        </div>
+                      ))}</div>
+                    : <p className="text-sm font-semibold text-red-600">{fmtDate(client.current_date_of_hauling)}</p>
+                  }
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -308,8 +331,28 @@ export default function CaretakersPage() {
                         : <span className="text-gray-400">—</span>}
                     </td>
                     <td className="px-4 py-3 text-right text-green-700 dark:text-green-400 font-semibold">{client.current_heads ?? '—'}</td>
-                    <td className="px-4 py-3 text-gray-700 dark:text-gray-300 whitespace-nowrap">{fmtDate(client.current_date_of_application)}</td>
-                    <td className="px-4 py-3 text-red-600 font-medium whitespace-nowrap">{fmtDate(client.current_date_of_hauling)}</td>
+                    <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
+                      {client.all_batches?.length > 1
+                        ? <div className="space-y-0.5">{client.all_batches.map(b => (
+                            <div key={b.batch_number} className="flex items-center gap-1.5 text-xs whitespace-nowrap">
+                              <span className="text-gray-400 dark:text-gray-500">#{b.batch_number}:</span>
+                              <span>{fmtDate(b.date_of_application)}</span>
+                            </div>
+                          ))}</div>
+                        : <span className="whitespace-nowrap">{fmtDate(client.current_date_of_application)}</span>
+                      }
+                    </td>
+                    <td className="px-4 py-3 text-red-600 font-medium">
+                      {client.all_batches?.length > 1
+                        ? <div className="space-y-0.5">{client.all_batches.map(b => (
+                            <div key={b.batch_number} className="flex items-center gap-1.5 text-xs whitespace-nowrap">
+                              <span className="text-red-400">#{b.batch_number}:</span>
+                              <span>{fmtDate(b.date_of_hauling)}</span>
+                            </div>
+                          ))}</div>
+                        : <span className="whitespace-nowrap">{fmtDate(client.current_date_of_hauling)}</span>
+                      }
+                    </td>
                     <td className="px-4 py-3 text-right text-gray-500 dark:text-gray-400">{client.transaction_count}</td>
                     <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                       <div className="flex items-center justify-end gap-2">
