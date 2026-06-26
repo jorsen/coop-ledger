@@ -20,6 +20,8 @@ interface Client {
   current_heads: number | null;
   current_date_of_application: string | null;
   current_date_of_hauling: string | null;
+  notes: string | null;
+  is_updated: boolean;
 }
 
 const fmtDate = (d: string | null) => {
@@ -46,6 +48,7 @@ export default function CaretakersPage() {
   const router = useRouter();
   const [clients, setClients] = useState<Client[]>([]);
   const [search, setSearch] = useState('');
+  const [updatedFilter, setUpdatedFilter] = useState<'all' | 'updated' | 'not-updated'>('all');
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [modal, setModal] = useState<{ mode: 'add' | 'edit'; client?: Client } | null>(null);
@@ -73,11 +76,16 @@ export default function CaretakersPage() {
   }, [fetchClients]);
   usePoll(fetchClients);
 
-  const filtered = clients.filter(
-    (c) =>
+  const filtered = clients.filter((c) => {
+    const matchesSearch =
       c.name.toLowerCase().includes(search.toLowerCase()) ||
-      c.client_code.toLowerCase().includes(search.toLowerCase())
-  );
+      c.client_code.toLowerCase().includes(search.toLowerCase());
+    const matchesUpdated =
+      updatedFilter === 'all' ||
+      (updatedFilter === 'updated' && c.is_updated) ||
+      (updatedFilter === 'not-updated' && !c.is_updated);
+    return matchesSearch && matchesUpdated;
+  });
 
   async function handleDelete(id: number) {
     if (!confirm('Delete this caretaker and all their transactions? This cannot be undone.')) return;
@@ -112,8 +120,8 @@ export default function CaretakersPage() {
       </div>
 
       {/* Search + view toggle */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className="relative max-w-xs flex-1">
+      <div className="flex items-center gap-3 mb-6 flex-wrap">
+        <div className="relative max-w-xs flex-1 min-w-[160px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
           <input
             value={search}
@@ -122,6 +130,15 @@ export default function CaretakersPage() {
             className="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
           />
         </div>
+        <select
+          value={updatedFilter}
+          onChange={(e) => setUpdatedFilter(e.target.value as 'all' | 'updated' | 'not-updated')}
+          className="border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 shrink-0"
+        >
+          <option value="all">All</option>
+          <option value="updated">Updated</option>
+          <option value="not-updated">Not Updated</option>
+        </select>
         <div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shrink-0">
           <button
             onClick={() => toggleView('card')}
@@ -157,7 +174,13 @@ export default function CaretakersPage() {
                 ID: {client.client_code}
                 {client.current_batch_number && <> · Batch <span className="font-medium text-green-700">#{client.current_batch_number}</span></>}
               </p>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">{client.transaction_count} transaction(s)</p>
+              {client.is_updated && (
+                <span className="inline-block bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 text-xs font-medium px-2 py-0.5 rounded mt-1">Updated</span>
+              )}
+              {client.notes && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{client.notes}</p>
+              )}
+              <p className="text-xs text-gray-400 dark:text-gray-500 mb-3 mt-1">{client.transaction_count} transaction(s)</p>
               <div className="grid grid-cols-3 gap-x-4 gap-y-3 py-3 border-t border-gray-100 dark:border-gray-700 mb-3">
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">Heads</p>
@@ -211,6 +234,7 @@ export default function CaretakersPage() {
                   <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">NAME</th>
                   <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">ID</th>
                   <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">STATUS</th>
+                  <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">NOTES</th>
                   <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">BATCH #</th>
                   <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">HEADS</th>
                   <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">APP. DATE</th>
@@ -230,6 +254,16 @@ export default function CaretakersPage() {
                     <td className="px-4 py-3 text-gray-500 dark:text-gray-400 whitespace-nowrap">{client.client_code}</td>
                     <td className="px-4 py-3">
                       <StatusBadge status={client.status} />
+                    </td>
+                    <td className="px-4 py-3 max-w-[180px]">
+                      {client.is_updated && (
+                        <span className="inline-block bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 text-xs font-medium px-2 py-0.5 rounded mb-1">Updated</span>
+                      )}
+                      {client.notes ? (
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate" title={client.notes}>{client.notes}</p>
+                      ) : (
+                        <span className="text-xs text-gray-300 dark:text-gray-600">—</span>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-gray-700 dark:text-gray-300 whitespace-nowrap">
                       {client.current_batch_number

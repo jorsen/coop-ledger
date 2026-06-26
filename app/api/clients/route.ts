@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
   const { error } = await requireAuth();
   if (error) return error;
 
-  const { name, batch_number, status, heads, allocation, date_of_hauling, date_of_application } = await req.json();
+  const { name, batch_number, status, heads, allocation, date_of_hauling, date_of_application, notes, is_updated } = await req.json();
 
   if (!name) {
     return NextResponse.json({ error: 'name is required' }, { status: 400 });
@@ -43,12 +43,14 @@ export async function POST(req: NextRequest) {
   await sql`ALTER TABLE clients ADD COLUMN IF NOT EXISTS date_of_application DATE`;
   await sql`ALTER TABLE clients DROP CONSTRAINT IF EXISTS clients_status_check`;
   await sql`ALTER TABLE clients ADD CONSTRAINT clients_status_check CHECK (status IN ('active','inactive','paid','completed','on-going'))`;
+  await sql`ALTER TABLE clients ADD COLUMN IF NOT EXISTS notes TEXT`;
+  await sql`ALTER TABLE clients ADD COLUMN IF NOT EXISTS is_updated BOOLEAN DEFAULT FALSE`;
 
   // Insert with a temporary code, then update to the zero-padded id
   const [inserted] = await sql`
-    INSERT INTO clients (client_code, name, batch_number, status, heads, allocation, date_of_hauling, date_of_application)
+    INSERT INTO clients (client_code, name, batch_number, status, heads, allocation, date_of_hauling, date_of_application, notes, is_updated)
     VALUES ('TMP', ${name}, ${batch_number || '1'}, ${status || 'active'}, ${heads || 0}, ${allocation || 0},
-      ${date_of_hauling || null}, ${date_of_application || null})
+      ${date_of_hauling || null}, ${date_of_application || null}, ${notes || null}, ${is_updated ?? false})
     RETURNING id
   `;
 

@@ -12,6 +12,8 @@ interface Client {
   heads: number | string;
   date_of_hauling: string;
   date_of_application: string;
+  notes?: string | null;
+  is_updated?: boolean;
 }
 
 interface ClientModalProps {
@@ -29,6 +31,8 @@ const EMPTY: Client = {
   heads: '',
   date_of_hauling: '',
   date_of_application: '',
+  notes: '',
+  is_updated: false,
 };
 
 export default function ClientModal({ mode, client, onClose, onSave }: ClientModalProps) {
@@ -187,6 +191,29 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
               <option value="inactive">Inactive</option>
             </select>
           </div>
+
+          {/* Notes */}
+          <div>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Notes</label>
+            <textarea
+              value={form.notes ?? ''}
+              onChange={(e) => set('notes', e.target.value)}
+              rows={3}
+              placeholder="Optional notes…"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 resize-none"
+            />
+          </div>
+
+          {/* Updated flag */}
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={form.is_updated ?? false}
+              onChange={(e) => setForm(f => ({ ...f, is_updated: e.target.checked }))}
+              className="w-4 h-4 accent-green-800"
+            />
+            <span className="text-sm text-gray-700 dark:text-gray-300">Mark as Updated</span>
+          </label>
 
           {error && <p className="text-sm text-red-600">{error}</p>}
 

@@ -32,12 +32,14 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   const { error } = await requireAuth();
   if (error) return error;
 
-  const { client_code, name, batch_number, status, heads, allocation, date_of_hauling, date_of_application } = await req.json();
+  const { client_code, name, batch_number, status, heads, allocation, date_of_hauling, date_of_application, notes, is_updated } = await req.json();
 
   await sql`ALTER TABLE clients ADD COLUMN IF NOT EXISTS date_of_hauling DATE`;
   await sql`ALTER TABLE clients ADD COLUMN IF NOT EXISTS date_of_application DATE`;
   await sql`ALTER TABLE clients DROP CONSTRAINT IF EXISTS clients_status_check`;
   await sql`ALTER TABLE clients ADD CONSTRAINT clients_status_check CHECK (status IN ('active','inactive','paid','completed','on-going'))`;
+  await sql`ALTER TABLE clients ADD COLUMN IF NOT EXISTS notes TEXT`;
+  await sql`ALTER TABLE clients ADD COLUMN IF NOT EXISTS is_updated BOOLEAN DEFAULT FALSE`;
 
   const [updated] = await sql`
     UPDATE clients
@@ -50,6 +52,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       allocation           = ${allocation},
       date_of_hauling      = ${date_of_hauling || null},
       date_of_application  = ${date_of_application || null},
+      notes                = ${notes || null},
+      is_updated           = ${is_updated ?? false},
       updated_at           = NOW()
     WHERE id = ${params.id}
     RETURNING *
