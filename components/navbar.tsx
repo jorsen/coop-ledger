@@ -68,19 +68,21 @@ export default function Navbar() {
         </nav>
 
         {/* Desktop right */}
-        {isLoggedIn && (
-          <div className="hidden lg:flex items-center gap-4 shrink-0 ml-auto">
+        <div className="hidden lg:flex items-center gap-4 shrink-0 ml-auto">
+          {isLoggedIn && (
             <span className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-300">
               <span className="w-2 h-2 bg-green-500 rounded-full" />
               1 online
             </span>
-            <button
-              onClick={toggle}
-              className="flex items-center justify-center p-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-              aria-label="Toggle theme"
-            >
-              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </button>
+          )}
+          <button
+            onClick={toggle}
+            className="flex items-center justify-center p-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
+          {isLoggedIn && (
             <button
               onClick={handleLogout}
               className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
@@ -88,8 +90,8 @@ export default function Navbar() {
               <LogOut className="w-4 h-4" />
               Logout
             </button>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Mobile: active label + hamburger */}
         <span className="lg:hidden flex-1 text-sm font-medium text-gray-700 dark:text-gray-200">
@@ -125,15 +127,15 @@ export default function Navbar() {
               </Link>
             );
           })}
-          {isLoggedIn && (
-            <div className="pt-2 border-t border-gray-100 dark:border-gray-700">
-              <button
-                onClick={toggle}
-                className="flex items-center gap-3 px-3 py-2.5 w-full text-left rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-              >
-                {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-                {theme === 'dark' ? 'Light mode' : 'Dark mode'}
-              </button>
+          <div className="pt-2 border-t border-gray-100 dark:border-gray-700">
+            <button
+              onClick={toggle}
+              className="flex items-center gap-3 px-3 py-2.5 w-full text-left rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+            </button>
+            {isLoggedIn && (
               <button
                 onClick={() => { setOpen(false); handleLogout(); }}
                 className="flex items-center gap-3 px-3 py-2.5 w-full text-left rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -141,8 +143,8 @@ export default function Navbar() {
                 <LogOut className="w-4 h-4" />
                 Logout
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       )}
     </header>
