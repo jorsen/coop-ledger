@@ -13,6 +13,7 @@ interface DashboardStats {
   grand_total_debits: number;
   paid_deducted: number;
   paid_batch_count: number;
+  paid_batch_names: string | null;
   total_bags: number;
   total_delivery_fees: number;
 }
@@ -102,9 +103,14 @@ export default function DashboardPage() {
               <span className="font-medium">{peso(stats?.grand_total_debits ?? 0)}</span>
             </div>
             <div className="flex justify-between text-blue-500 dark:text-blue-400">
-              <span>Less Paid Batches {(stats?.paid_batch_count ?? 0) > 0 && <span className="ml-1 bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300 px-1.5 py-0.5 rounded-full text-[10px] font-bold">{stats?.paid_batch_count}</span>}</span>
+              <span>Less Paid Batches {(stats?.paid_batch_count ?? 0) > 0 && <span className="ml-1 bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300 px-1.5 py-0.5 rounded-full text-[10px] font-bold" title={stats?.paid_batch_names ?? ''}>{stats?.paid_batch_count}</span>}</span>
               <span className="font-medium">− {peso(stats?.paid_deducted ?? 0)}</span>
             </div>
+            {stats?.paid_batch_names && (
+              <div className="text-[10px] text-blue-400 dark:text-blue-500 italic truncate">
+                {stats.paid_batch_names}
+              </div>
+            )}
             <div className="flex justify-between text-green-700 dark:text-green-400 font-semibold border-t border-gray-100 dark:border-gray-700 pt-1">
               <span>= Loans</span>
               <span>{peso(stats?.total_loan_amount ?? 0)}</span>

@@ -34,6 +34,9 @@ export async function GET() {
          WHERE LOWER(TRIM(COALESCE(b.status, 'active'))) = 'paid'
         )                                                           AS paid_deducted,
         (SELECT COUNT(*)::int FROM batches WHERE LOWER(TRIM(status)) = 'paid') AS paid_batch_count,
+        (SELECT STRING_AGG(b.batch_number || ' (' || COALESCE(c.name,'?') || ')', ', ')
+         FROM batches b LEFT JOIN clients c ON c.id = b.client_id
+         WHERE LOWER(TRIM(b.status)) = 'paid') AS paid_batch_names,
         (SELECT COALESCE(SUM(bags), 0) FROM transactions)::int     AS total_bags,
         (SELECT COALESCE(SUM(
           COALESCE((
