@@ -47,7 +47,13 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => { fetchData(); }, [fetchData]);
-  usePoll(fetchData);
+  usePoll(fetchData, 3000);
+
+  useEffect(() => {
+    const onVisible = () => { if (!document.hidden) fetchData(); };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, [fetchData]);
 
   if (loading) {
     return (
