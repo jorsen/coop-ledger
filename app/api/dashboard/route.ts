@@ -31,6 +31,12 @@ export async function GET() {
              SELECT id FROM batches WHERE status = 'paid'
            ))
         )                                                           AS total_loan_amount,
+        (SELECT COALESCE(SUM(debit), 0) FROM transactions)         AS grand_total_debits,
+        (SELECT COALESCE(SUM(t.debit), 0)
+         FROM transactions t
+         WHERE t.batch_id IN (
+           SELECT id FROM batches WHERE status = 'paid'
+         ))                                                         AS paid_deducted,
         (SELECT COALESCE(SUM(bags), 0) FROM transactions)::int     AS total_bags,
         (SELECT COALESCE(SUM(
           COALESCE((

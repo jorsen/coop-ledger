@@ -10,6 +10,8 @@ interface DashboardStats {
   active_clients: number;
   total_transactions: number;
   total_loan_amount: number;
+  grand_total_debits: number;
+  paid_deducted: number;
   total_bags: number;
   total_delivery_fees: number;
 }
@@ -77,7 +79,27 @@ export default function DashboardPage() {
         <StatCard label="Total Bags"              value={stats?.total_bags ?? 0}               icon={Package}    iconBg="bg-orange-50" iconColor="text-orange-600" />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
-        <StatCard label="Total Amount of Loans"   value={peso(stats?.total_loan_amount ?? 0)}  icon={TrendingUp} iconBg="bg-green-50"  iconColor="text-green-700" />
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+          <div className="flex items-start justify-between mb-3">
+            <p className="text-sm text-gray-500 dark:text-gray-400">Total Amount of Loans</p>
+            <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 text-green-700" />
+            </div>
+          </div>
+          <p className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">{peso(stats?.total_loan_amount ?? 0)}</p>
+          {(stats?.paid_deducted ?? 0) > 0 && (
+            <div className="text-xs text-gray-400 dark:text-gray-500 space-y-0.5 border-t border-gray-100 dark:border-gray-700 pt-2">
+              <div className="flex justify-between">
+                <span>Grand Total</span>
+                <span className="font-medium text-gray-600 dark:text-gray-300">{peso(stats?.grand_total_debits ?? 0)}</span>
+              </div>
+              <div className="flex justify-between text-blue-500">
+                <span>Less Paid Batches</span>
+                <span className="font-medium">− {peso(stats?.paid_deducted ?? 0)}</span>
+              </div>
+            </div>
+          )}
+        </div>
         <StatCard label="Total Delivery Fees"     value={peso(stats?.total_delivery_fees ?? 0)} icon={Truck}      iconBg="bg-purple-50" iconColor="text-purple-600" />
       </div>
 
