@@ -16,3 +16,8 @@ function getClient(): SqlFn {
 
 export const sql = ((strings: TemplateStringsArray, ...values: unknown[]) =>
   getClient()(strings, ...values)) as unknown as SqlFn;
+
+// Execute a raw SQL string (safe only for internal use with hardcoded queries)
+export function rawQuery(query: string, params: unknown[] = []): Promise<unknown[]> {
+  return (getClient() as any)(query, params) as Promise<unknown[]>;
+}

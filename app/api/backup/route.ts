@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
-import { sql } from '@/lib/db';
+import { sql, rawQuery } from '@/lib/db';
 
 export async function GET() {
   const { error } = await requireAuth();
@@ -46,25 +46,32 @@ export async function GET() {
   });
 }
 
-async function resetSequence(table: string, column = 'id') {
-  try {
-    await sql.unsafe(
-      `SELECT setval(pg_get_serial_sequence('${table}', '${column}'), COALESCE((SELECT MAX(${column}) FROM ${table}), 0) + 1, false)`
-    );
-  } catch {}
-}
+const TABLES_DELETE_ORDER = [
+  'activity_logs', 'pig_sales', 'expenses', 'transactions',
+  'feed_prices', 'batches', 'clients', 'feed_types', 'settings',
+];
 
-async function restoreTable(table: string, rows: Record<string, unknown>[]) {
+const SEQUENCE_TABLES = [
+  'clients', 'batches', 'transactions',
+  'feed_types', 'feed_prices', 'expenses', 'pig_sales', 'activity_logs',
+];
+
+async function restoreTable(tableName: string, rows: Record<string, unknown>[]) {
   if (!rows?.length) return;
   try {
-    await sql.unsafe(`DELETE FROM ${table}`);
-    // Insert in chunks of 50 to avoid query size limits
+    const cols = Object.keys(rows[0]);
+    const colList = cols.map(c => `"${c}"`).join(', ');
+    // Insert in chunks of 50
     for (let i = 0; i < rows.length; i += 50) {
       const chunk = rows.slice(i, i + 50);
-      await sql`INSERT INTO ${sql(table)} ${sql(chunk)}`;
+      const placeholders = chunk.map(
+        (_, ri) => `(${cols.map((_, ci) => `$${ri * cols.length + ci + 1}`).join(', ')})`
+      ).join(', ');
+      const values = chunk.flatMap(row => cols.map(c => row[c] ?? null));
+      await rawQuery(`INSERT INTO "${tableName}" (${colList}) VALUES ${placeholders}`, values);
     }
   } catch (e) {
-    console.error(`restore ${table}:`, e);
+    console.error(`restore ${tableName}:`, e);
   }
 }
 
@@ -86,8 +93,8 @@ export async function POST(req: NextRequest) {
   const { tables } = backup;
 
   // Delete in reverse FK dependency order
-  for (const t of ['activity_logs', 'pig_sales', 'expenses', 'transactions', 'feed_prices', 'batches', 'clients', 'feed_types', 'settings']) {
-    try { await sql.unsafe(`DELETE FROM ${t}`); } catch {}
+  for (const t of TABLES_DELETE_ORDER) {
+    try { await rawQuery(`DELETE FROM "${t}"`); } catch {}
   }
 
   // Restore in FK dependency order
@@ -101,17 +108,14 @@ export async function POST(req: NextRequest) {
   await restoreTable('pig_sales',     tables.pig_sales     ?? []);
   await restoreTable('activity_logs', tables.activity_logs ?? []);
 
-  // Reset auto-increment sequences
-  await Promise.all([
-    resetSequence('clients'),
-    resetSequence('batches'),
-    resetSequence('transactions'),
-    resetSequence('feed_types'),
-    resetSequence('feed_prices'),
-    resetSequence('expenses'),
-    resetSequence('pig_sales'),
-    resetSequence('activity_logs'),
-  ]);
+  // Reset sequences so new inserts don't conflict
+  for (const t of SEQUENCE_TABLES) {
+    try {
+      await rawQuery(
+        `SELECT setval(pg_get_serial_sequence('${t}', 'id'), COALESCE((SELECT MAX(id) FROM "${t}"), 0) + 1, false)`
+      );
+    } catch {}
+  }
 
   return NextResponse.json({ success: true, restored_at: new Date().toISOString() });
 }
