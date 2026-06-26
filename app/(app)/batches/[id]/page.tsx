@@ -890,7 +890,7 @@ export default function BatchDetailPage() {
                     type="date"
                     value={editBatchForm.date_of_application}
                     onChange={e => setEditBatchForm(f => ({ ...f, date_of_application: e.target.value }))}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white [color-scheme:light] dark:[color-scheme:dark]"
                   />
                 </div>
                 <div>
@@ -899,7 +899,7 @@ export default function BatchDetailPage() {
                     type="date"
                     value={editBatchForm.date_of_hauling}
                     onChange={e => setEditBatchForm(f => ({ ...f, date_of_hauling: e.target.value }))}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white [color-scheme:light] dark:[color-scheme:dark]"
                   />
                 </div>
               </div>
@@ -910,7 +910,7 @@ export default function BatchDetailPage() {
                     type="date"
                     value={editBatchForm.maturity_date}
                     onChange={e => setEditBatchForm(f => ({ ...f, maturity_date: e.target.value }))}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white [color-scheme:light] dark:[color-scheme:dark]"
                   />
                 </div>
                 <div>

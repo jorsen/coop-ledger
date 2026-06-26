@@ -156,28 +156,6 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '16px' }}>
-                <div style={{ flex: 1 }}>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Date of Application</label>
-                  <input
-                    type="date"
-                    value={form.date_of_application}
-                    onChange={(e) => set('date_of_application', e.target.value)}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 text-sm text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 [color-scheme:light] dark:[color-scheme:dark]"
-                    style={{ height: '46px' }}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Date of Hauling</label>
-                  <input
-                    type="date"
-                    value={form.date_of_hauling}
-                    onChange={(e) => set('date_of_hauling', e.target.value)}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 text-sm text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 [color-scheme:light] dark:[color-scheme:dark]"
-                    style={{ height: '46px' }}
-                  />
-                </div>
-              </div>
             </>
           )}
 
