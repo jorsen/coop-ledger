@@ -183,19 +183,22 @@ export default function CaretakersPage() {
                 ID: {client.client_code}
                 {client.current_batch_number && <> · Batch <span className="font-medium text-green-700">#{client.current_batch_number}</span></>}
               </p>
-              <div className="mt-1.5 flex items-center gap-1.5" onClick={e => e.stopPropagation()}>
-                <span className={`w-2 h-2 rounded-full shrink-0 ${client.is_updated ? 'bg-green-500' : 'bg-gray-400'}`} />
+              <div className="mt-1.5" onClick={e => e.stopPropagation()}>
                 {isLoggedIn ? (
                   <select
                     value={client.is_updated ? 'updated' : 'not-updated'}
                     onChange={e => handleToggleUpdated(client.id, e.target.value === 'updated')}
-                    className="text-xs font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 outline-none cursor-pointer focus:ring-1 focus:ring-green-700"
+                    className={`text-xs font-medium text-white border-0 rounded px-2 py-0.5 outline-none cursor-pointer w-full ${
+                      client.is_updated ? 'bg-green-600' : 'bg-gray-400 dark:bg-gray-500'
+                    }`}
                   >
                     <option value="updated">Updated</option>
                     <option value="not-updated">Not Updated</option>
                   </select>
                 ) : (
-                  <span className="text-xs font-medium text-gray-700 dark:text-gray-200">
+                  <span className={`text-xs font-medium text-white px-2 py-0.5 rounded block ${
+                    client.is_updated ? 'bg-green-600' : 'bg-gray-400 dark:bg-gray-500'
+                  }`}>
                     {client.is_updated ? 'Updated' : 'Not Updated'}
                   </span>
                 )}
@@ -203,11 +206,11 @@ export default function CaretakersPage() {
               {client.notes && (
                 <div className={`flex items-start gap-1.5 mt-1.5 border rounded-md px-2 py-1.5 ${
                   client.is_updated
-                    ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700/40'
-                    : 'bg-gray-50 dark:bg-gray-700/40 border-gray-200 dark:border-gray-600'
+                    ? 'bg-green-600 border-green-700'
+                    : 'bg-gray-400 dark:bg-gray-500 border-gray-500'
                 }`}>
-                  <StickyNote className={`w-3 h-3 shrink-0 mt-0.5 ${client.is_updated ? 'text-green-600' : 'text-gray-400'}`} />
-                  <p className={`text-xs line-clamp-2 leading-tight ${client.is_updated ? 'text-green-800 dark:text-green-300' : 'text-gray-500 dark:text-gray-400'}`}>{client.notes}</p>
+                  <StickyNote className="w-3 h-3 shrink-0 mt-0.5 text-white" />
+                  <p className="text-xs line-clamp-2 leading-tight text-white">{client.notes}</p>
                 </div>
               )}
               <p className="text-xs text-gray-400 dark:text-gray-500 mb-3 mt-1">{client.transaction_count} transaction(s)</p>
@@ -287,33 +290,31 @@ export default function CaretakersPage() {
                     </td>
                     <td className="px-4 py-3 w-px whitespace-nowrap" onClick={e => e.stopPropagation()}>
                       {isLoggedIn ? (
-                        <div className="flex items-center gap-1.5">
-                          <span className={`w-2 h-2 rounded-full shrink-0 ${client.is_updated ? 'bg-green-500' : 'bg-gray-400'}`} />
-                          <select
-                            value={client.is_updated ? 'updated' : 'not-updated'}
-                            onChange={e => handleToggleUpdated(client.id, e.target.value === 'updated')}
-                            className="text-xs font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 outline-none cursor-pointer focus:ring-1 focus:ring-green-700"
-                          >
-                            <option value="updated">Updated</option>
-                            <option value="not-updated">Not Updated</option>
-                          </select>
-                        </div>
+                        <select
+                          value={client.is_updated ? 'updated' : 'not-updated'}
+                          onChange={e => handleToggleUpdated(client.id, e.target.value === 'updated')}
+                          className={`text-xs font-medium text-white border-0 rounded px-2 py-0.5 outline-none cursor-pointer ${
+                            client.is_updated ? 'bg-green-600' : 'bg-gray-400 dark:bg-gray-500'
+                          }`}
+                        >
+                          <option value="updated">Updated</option>
+                          <option value="not-updated">Not Updated</option>
+                        </select>
                       ) : (
-                        <div className="flex items-center gap-1.5">
-                          <span className={`w-2 h-2 rounded-full shrink-0 ${client.is_updated ? 'bg-green-500' : 'bg-gray-400'}`} />
-                          <span className="text-xs font-medium text-gray-700 dark:text-gray-200">
-                            {client.is_updated ? 'Updated' : 'Not Updated'}
-                          </span>
-                        </div>
+                        <span className={`text-xs font-medium text-white px-2 py-0.5 rounded ${
+                          client.is_updated ? 'bg-green-600' : 'bg-gray-400 dark:bg-gray-500'
+                        }`}>
+                          {client.is_updated ? 'Updated' : 'Not Updated'}
+                        </span>
                       )}
                       {client.notes && (
                         <div className={`flex items-start gap-1 mt-1 border rounded px-1.5 py-1 ${
                           client.is_updated
-                            ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700/40'
-                            : 'bg-gray-50 dark:bg-gray-700/40 border-gray-200 dark:border-gray-600'
+                            ? 'bg-green-600 border-green-700'
+                            : 'bg-gray-400 dark:bg-gray-500 border-gray-500'
                         }`} title={client.notes}>
-                          <StickyNote className={`w-3 h-3 shrink-0 mt-0.5 ${client.is_updated ? 'text-green-600' : 'text-gray-400'}`} />
-                          <p className={`text-xs truncate leading-tight ${client.is_updated ? 'text-green-800 dark:text-green-300' : 'text-gray-500 dark:text-gray-400'}`}>{client.notes}</p>
+                          <StickyNote className="w-3 h-3 shrink-0 mt-0.5 text-white" />
+                          <p className="text-xs truncate leading-tight text-white">{client.notes}</p>
                         </div>
                       )}
                     </td>
