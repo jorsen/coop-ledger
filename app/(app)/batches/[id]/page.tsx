@@ -411,7 +411,7 @@ export default function BatchDetailPage() {
                   </td>
                 </tr>
               )}
-              {pagedTx.map((tx) => (
+              {withComputed.map((tx) => (
                 <tr key={tx.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 dark:border-gray-700 dark:hover:bg-gray-700/50">
                   <td className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap">{tx.feed_type || '—'}</td>
                   <td className="px-4 py-3 text-blue-600 whitespace-nowrap">{fmtDate(tx.date)}</td>
@@ -460,23 +460,6 @@ export default function BatchDetailPage() {
           </table>
         </div>
 
-        {/* Tx pagination */}
-        {txTotalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-gray-700 print:hidden">
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-              {txPage * PAGE_SIZE + 1}–{Math.min((txPage + 1) * PAGE_SIZE, withComputed.length)} of {withComputed.length}
-            </span>
-            <div className="flex items-center gap-1">
-              <button onClick={() => setTxPage(p => p - 1)} disabled={txPage === 0} className="p-1.5 rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30">
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <span className="text-xs text-gray-600 dark:text-gray-400 px-1">{txPage + 1} / {txTotalPages}</span>
-              <button onClick={() => setTxPage(p => p + 1)} disabled={txPage >= txTotalPages - 1} className="p-1.5 rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30">
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Billing summary */}
         {withComputed.length > 0 && (
