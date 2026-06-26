@@ -66,5 +66,7 @@ export async function GET() {
     `,
   ]);
 
-  return NextResponse.json({ stats: stats[0], recent });
+  return NextResponse.json({ stats: stats[0], recent }, {
+    headers: { 'Cache-Control': 'no-store, max-age=0' },
+  });
 }

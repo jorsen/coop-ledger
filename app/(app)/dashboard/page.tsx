@@ -39,7 +39,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(() => {
-    fetch('/api/dashboard')
+    fetch('/api/dashboard', { cache: 'no-store' })
       .then((r) => r.json())
       .then((data) => {
         if (data?.stats) setStats(data.stats);
