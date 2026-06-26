@@ -6,18 +6,30 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active'`;
 
+  // Link any unassigned transactions to their client's most recent batch
+  await sql`
+    UPDATE transactions t
+    SET batch_id = (
+      SELECT b.id FROM batches b
+      WHERE b.client_id = t.client_id
+      ORDER BY b.created_at DESC LIMIT 1
+    )
+    WHERE t.batch_id IS NULL AND t.client_id IS NOT NULL
+  `;
+
   const [stats, recent] = await Promise.all([
     sql`
       SELECT
         (SELECT COUNT(*) FROM clients WHERE status = 'active')::int AS active_clients,
         (SELECT COUNT(*) FROM transactions)::int                    AS total_transactions,
-        (SELECT COALESCE(SUM(t.debit), 0)
-         FROM transactions t
-         WHERE COALESCE((
-           SELECT b.status FROM batches b
-           WHERE b.client_id = t.client_id
-           ORDER BY b.created_at DESC LIMIT 1
-         ), 'active') != 'paid')                                    AS total_loan_amount,
+        (
+          (SELECT COALESCE(SUM(debit), 0) FROM transactions)
+          -
+          (SELECT COALESCE(SUM(t.debit), 0)
+           FROM transactions t
+           JOIN batches b ON b.id = t.batch_id
+           WHERE COALESCE(b.status, 'active') = 'paid')
+        )                                                           AS total_loan_amount,
         (SELECT COALESCE(SUM(bags), 0) FROM transactions)::int     AS total_bags,
         (SELECT COALESCE(SUM(
           COALESCE((
