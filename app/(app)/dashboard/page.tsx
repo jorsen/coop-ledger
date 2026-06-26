@@ -12,6 +12,7 @@ interface DashboardStats {
   total_loan_amount: number;
   grand_total_debits: number;
   paid_deducted: number;
+  paid_batch_count: number;
   total_bags: number;
   total_delivery_fees: number;
 }
@@ -93,7 +94,7 @@ export default function DashboardPage() {
               <span className="font-medium">{peso(stats?.grand_total_debits ?? 0)}</span>
             </div>
             <div className="flex justify-between text-blue-500 dark:text-blue-400">
-              <span>Less Paid Batches</span>
+              <span>Less Paid Batches {(stats?.paid_batch_count ?? 0) > 0 && <span className="ml-1 bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300 px-1.5 py-0.5 rounded-full text-[10px] font-bold">{stats?.paid_batch_count}</span>}</span>
               <span className="font-medium">− {peso(stats?.paid_deducted ?? 0)}</span>
             </div>
             <div className="flex justify-between text-green-700 dark:text-green-400 font-semibold border-t border-gray-100 dark:border-gray-700 pt-1">

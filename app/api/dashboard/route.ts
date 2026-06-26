@@ -22,21 +22,18 @@ export async function GET() {
       SELECT
         (SELECT COUNT(*) FROM clients WHERE status = 'active')::int AS active_clients,
         (SELECT COUNT(*) FROM transactions)::int                    AS total_transactions,
-        (
-          (SELECT COALESCE(SUM(debit), 0) FROM transactions)
-          -
-          (SELECT COALESCE(SUM(t.debit), 0)
-           FROM transactions t
-           WHERE t.batch_id IN (
-             SELECT id FROM batches WHERE status = 'paid'
-           ))
+        (SELECT COALESCE(SUM(t.debit), 0)
+         FROM transactions t
+         LEFT JOIN batches b ON b.id = t.batch_id
+         WHERE LOWER(TRIM(COALESCE(b.status, 'active'))) != 'paid'
         )                                                           AS total_loan_amount,
         (SELECT COALESCE(SUM(debit), 0) FROM transactions)         AS grand_total_debits,
         (SELECT COALESCE(SUM(t.debit), 0)
          FROM transactions t
-         WHERE t.batch_id IN (
-           SELECT id FROM batches WHERE status = 'paid'
-         ))                                                         AS paid_deducted,
+         LEFT JOIN batches b ON b.id = t.batch_id
+         WHERE LOWER(TRIM(COALESCE(b.status, 'active'))) = 'paid'
+        )                                                           AS paid_deducted,
+        (SELECT COUNT(*)::int FROM batches WHERE LOWER(TRIM(status)) = 'paid') AS paid_batch_count,
         (SELECT COALESCE(SUM(bags), 0) FROM transactions)::int     AS total_bags,
         (SELECT COALESCE(SUM(
           COALESCE((
