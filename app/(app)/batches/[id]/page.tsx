@@ -532,7 +532,7 @@ export default function BatchDetailPage() {
           {isLoggedIn && (
             <button
               onClick={() => setExpenseModal(true)}
-              className="flex items-center gap-1.5 text-sm text-green-800 dark:text-green-400 font-medium hover:text-green-700"
+              className="flex items-center gap-1.5 text-sm text-green-800 dark:text-green-400 font-medium hover:text-green-700 print:hidden"
             >
               <Plus className="w-4 h-4" /> Add Expense
             </button>
@@ -590,7 +590,7 @@ export default function BatchDetailPage() {
                   {fmtKg(totalPigSalesKg)} kg &mdash; Total: <span className="font-semibold text-gray-700 dark:text-gray-300">₱{num(totalPigSalesAmount)}</span>
                 </p>
               )}
-              <div className="flex items-center gap-1.5 mt-1">
+              <div className="flex items-center gap-1.5 mt-1 print:hidden">
                 <span className="text-xs text-gray-400 dark:text-gray-500">Default price:</span>
                 {editingPigPrice ? (
                   <>

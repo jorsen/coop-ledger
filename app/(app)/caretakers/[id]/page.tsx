@@ -553,7 +553,7 @@ export default function CaretakerLedgerPage() {
             {isLoggedIn && (
               <button
                 onClick={() => setExpenseModal(true)}
-                className="flex items-center gap-1.5 text-sm text-green-800 dark:text-green-400 font-medium hover:text-green-700"
+                className="flex items-center gap-1.5 text-sm text-green-800 dark:text-green-400 font-medium hover:text-green-700 print:hidden"
               >
                 <Plus className="w-4 h-4" /> Add Expense
               </button>
@@ -570,7 +570,7 @@ export default function CaretakerLedgerPage() {
                     <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3">QUANTITY</th>
                     <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3">PRICE</th>
                     <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3">TOTAL</th>
-                    {isLoggedIn && <th className="px-4 py-3" />}
+                    {isLoggedIn && <th className="px-4 py-3 print:hidden" />}
                   </tr>
                 </thead>
                 <tbody>
@@ -581,7 +581,7 @@ export default function CaretakerLedgerPage() {
                       <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{num(Number(e.price))}</td>
                       <td className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-white">{num(Number(e.quantity) * Number(e.price))}</td>
                       {isLoggedIn && (
-                        <td className="px-4 py-3">
+                        <td className="px-4 py-3 print:hidden">
                           <button onClick={() => handleDeleteExpense(e.id)} className="p-1 text-red-400 hover:text-red-600 flex items-center justify-end w-full">
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -592,7 +592,7 @@ export default function CaretakerLedgerPage() {
                   <tr className="border-t-2 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 font-semibold">
                     <td colSpan={3} className="px-4 py-3 text-right text-xs text-gray-500 dark:text-gray-400">TOTAL</td>
                     <td className="px-4 py-3 text-right text-gray-900 dark:text-white">{num(totalOtherExpenses)}</td>
-                    {isLoggedIn && <td />}
+                    {isLoggedIn && <td className="print:hidden" />}
                   </tr>
                 </tbody>
               </table>
@@ -611,7 +611,7 @@ export default function CaretakerLedgerPage() {
                   </p>
                 )}
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Batch #{selectedBatch?.batch_number}</p>
-                <div className="flex items-center gap-1.5 mt-1">
+                <div className="flex items-center gap-1.5 mt-1 print:hidden">
                   <span className="text-xs text-gray-400 dark:text-gray-500">Default price:</span>
                   {editingPigPrice ? (
                     <>
@@ -641,7 +641,7 @@ export default function CaretakerLedgerPage() {
               {isLoggedIn && (
                 <button
                   onClick={openAddPigSale}
-                  className="flex items-center gap-1.5 text-sm text-green-800 dark:text-green-400 font-medium hover:text-green-700"
+                  className="flex items-center gap-1.5 text-sm text-green-800 dark:text-green-400 font-medium hover:text-green-700 print:hidden"
                 >
                   <Plus className="w-4 h-4" /> Add Pig Sale
                 </button>
@@ -658,7 +658,7 @@ export default function CaretakerLedgerPage() {
                       <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3">Weight (kg)</th>
                       <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3">Price/kg (₱)</th>
                       <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3">Total (₱)</th>
-                      {isLoggedIn && <th className="px-4 py-3" />}
+                      {isLoggedIn && <th className="px-4 py-3 print:hidden" />}
                     </tr>
                   </thead>
                   <tbody>
@@ -669,7 +669,7 @@ export default function CaretakerLedgerPage() {
                         <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{num(Number(sale.price_per_kg))}</td>
                         <td className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-white">{num(Number(sale.weight_kg) * Number(sale.price_per_kg))}</td>
                         {isLoggedIn && (
-                          <td className="px-4 py-3">
+                          <td className="px-4 py-3 print:hidden">
                             <div className="flex items-center justify-end gap-2">
                               <button onClick={() => openEditPigSale(sale)} className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
                                 <Pencil className="w-3.5 h-3.5" />
