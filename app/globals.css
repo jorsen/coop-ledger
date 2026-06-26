@@ -8,15 +8,33 @@
     margin: 6mm;
   }
 
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+
   html, body {
     height: auto !important;
     overflow: hidden !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* Force white background and black text everywhere */
+  *, *::before, *::after {
+    background-color: transparent !important;
+    color: #000 !important;
+    border-color: #ccc !important;
+    box-shadow: none !important;
   }
 
   body {
     font-family: Arial, Helvetica, sans-serif !important;
     font-size: 11px !important;
-    color: #000 !important;
+    background: #fff !important;
+  }
+
+  /* Restore white on containers */
+  div, section, article, main {
+    background-color: #fff !important;
   }
 
   table {
@@ -24,24 +42,36 @@
     font-size: 11px !important;
     border-collapse: collapse !important;
     width: 100% !important;
+    background: #fff !important;
   }
 
   table th,
   table td {
     padding: 3px 8px !important;
     border: 1px solid #999 !important;
+    color: #000 !important;
+    background-color: #fff !important;
   }
 
   table thead tr {
     background-color: #f3f4f6 !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
   }
+
+  table thead th {
+    background-color: #f3f4f6 !important;
+    color: #333 !important;
+  }
+
+  /* Keep colored text for key financial values */
+  .print-red { color: #b91c1c !important; }
+  .print-green { color: #15803d !important; }
+  .print-blue { color: #1d4ed8 !important; }
 
   .print-card {
     border: 1px solid #ccc !important;
     border-radius: 4px !important;
     padding: 10px !important;
     margin-bottom: 10px !important;
+    background: #fff !important;
   }
 }

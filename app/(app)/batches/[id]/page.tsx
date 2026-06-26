@@ -298,7 +298,7 @@ export default function BatchDetailPage() {
   return (
     <div>
       {/* Print header */}
-      <div className="hidden print:hidden print:items-center print:justify-between mb-2 border-b border-gray-400 pb-1 text-xs">
+      <div className="hidden print:flex print:items-center print:justify-between mb-2 border-b border-gray-400 pb-1 text-xs">
         <div className="flex items-center gap-4">
           {batch.client_name && <span><span className="text-gray-500">NAME: </span><strong>{batch.client_name}</strong></span>}
           <span><span className="text-gray-500">BATCH #: </span><strong>{batch.batch_number}</strong></span>
