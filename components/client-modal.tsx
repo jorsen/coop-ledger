@@ -119,43 +119,17 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
             />
           </div>
 
-          {/* Edit mode — show all fields */}
+          {/* Edit mode — show Client ID only */}
           {mode === 'edit' && (
             <>
-              <div style={{ display: 'flex', gap: '16px' }}>
-                <div style={{ flex: 1 }}>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Batch #</label>
-                  <input
-                    value={form.batch_number}
-                    onChange={(e) => set('batch_number', e.target.value)}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
-                    placeholder="e.g. 1"
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Client ID</label>
-                  <input
-                    value={form.client_code}
-                    onChange={(e) => set('client_code', e.target.value)}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
-                  />
-                </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Client ID</label>
+                <input
+                  value={form.client_code}
+                  onChange={(e) => set('client_code', e.target.value)}
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                />
               </div>
-
-              <div style={{ display: 'flex', gap: '16px' }}>
-                <div style={{ flex: 1 }}>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Heads</label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={form.heads}
-                    onChange={(e) => handleHeadsChange(e.target.value)}
-                    placeholder="0"
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
-                  />
-                </div>
-              </div>
-
             </>
           )}
 
