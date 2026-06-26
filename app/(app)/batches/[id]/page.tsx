@@ -333,7 +333,7 @@ export default function BatchDetailPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-start print-layout-grid">
       {/* ── Info card (order 1 on mobile) ── */}
       <div className="md:col-span-2 min-w-0 order-1">
 
@@ -384,10 +384,10 @@ export default function BatchDetailPage() {
       {batch.notes && <p className="text-sm text-gray-500 mb-4">{batch.notes}</p>}
 
       {/* ── Print layout: transactions left, summary+expenses right ── */}
-      <div className="print:flex print:gap-3 print:items-start">
+      <div className="print-side-by-side">
 
       {/* Transactions table */}
-      <div className="bg-white rounded-xl border border-gray-200 print-card print:mb-0 print:flex-1 print:min-w-0 dark:bg-gray-800 dark:border-gray-700">
+      <div className="bg-white rounded-xl border border-gray-200 print-card print:mb-0 print-side-main dark:bg-gray-800 dark:border-gray-700">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -506,7 +506,7 @@ export default function BatchDetailPage() {
       </div>
 
       {/* Right column: print-only billing summary + Other Expenses + Pig Sales */}
-      <div className="print:flex-none print:w-56">
+      <div className="print-side-right">
 
         {/* Print-only billing summary */}
         {withComputed.length > 0 && (

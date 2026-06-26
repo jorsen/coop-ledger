@@ -74,4 +74,24 @@
     margin-bottom: 10px !important;
     background: #fff !important;
   }
+
+  /* Force outer grid to block so main content spans full page width */
+  .print-layout-grid {
+    display: block !important;
+  }
+
+  /* Side-by-side layout: transactions left, summary+expenses right */
+  .print-side-by-side {
+    display: flex !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
+  }
+  .print-side-main {
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+  }
+  .print-side-right {
+    flex: 0 0 210px !important;
+    width: 210px !important;
+  }
 }
