@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Eye, Pencil, Trash2, Search, LayoutGrid, List } from 'lucide-react';
+import { Plus, Eye, Pencil, Trash2, Search, LayoutGrid, List, StickyNote } from 'lucide-react';
 import ClientModal from '@/components/client-modal';
 import { usePoll } from '@/hooks/use-poll';
 
@@ -208,7 +208,10 @@ export default function CaretakersPage() {
                 )}
               </div>
               {client.notes && (
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{client.notes}</p>
+                <div className="flex items-start gap-1.5 mt-1.5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded-md px-2 py-1.5">
+                  <StickyNote className="w-3 h-3 text-amber-500 shrink-0 mt-0.5" />
+                  <p className="text-xs text-amber-800 dark:text-amber-300 line-clamp-2 leading-tight">{client.notes}</p>
+                </div>
               )}
               <p className="text-xs text-gray-400 dark:text-gray-500 mb-3 mt-1">{client.transaction_count} transaction(s)</p>
               <div className="grid grid-cols-3 gap-x-4 gap-y-3 py-3 border-t border-gray-100 dark:border-gray-700 mb-3">
@@ -309,7 +312,10 @@ export default function CaretakersPage() {
                         </span>
                       )}
                       {client.notes && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5" title={client.notes}>{client.notes}</p>
+                        <div className="flex items-start gap-1 mt-1 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded px-1.5 py-1 max-w-[180px]" title={client.notes}>
+                          <StickyNote className="w-3 h-3 text-amber-500 shrink-0 mt-0.5" />
+                          <p className="text-xs text-amber-800 dark:text-amber-300 truncate leading-tight">{client.notes}</p>
+                        </div>
                       )}
                     </td>
                     <td className="px-4 py-3 text-gray-700 dark:text-gray-300 whitespace-nowrap">
