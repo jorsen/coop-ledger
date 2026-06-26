@@ -231,11 +231,8 @@ export default function CaretakersPage() {
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">App. Date</p>
                   {client.all_batches?.length > 1
-                    ? <div className="space-y-0.5 mt-0.5">{client.all_batches.map(b => (
-                        <div key={b.batch_number} className="flex items-center gap-1 text-xs">
-                          <span className="text-gray-400 dark:text-gray-500">#{b.batch_number}:</span>
-                          <span className="font-semibold text-gray-900 dark:text-white">{fmtDate(b.date_of_application)}</span>
-                        </div>
+                    ? <div className="divide-y divide-gray-100 dark:divide-gray-700 mt-0.5">{client.all_batches.map(b => (
+                        <div key={b.batch_number} className="py-0.5 text-xs font-semibold text-gray-900 dark:text-white">{fmtDate(b.date_of_application)}</div>
                       ))}</div>
                     : <p className="text-sm font-semibold text-gray-900 dark:text-white">{fmtDate(client.current_date_of_application)}</p>
                   }
@@ -243,11 +240,8 @@ export default function CaretakersPage() {
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">Hauling Date</p>
                   {client.all_batches?.length > 1
-                    ? <div className="space-y-0.5 mt-0.5">{client.all_batches.map(b => (
-                        <div key={b.batch_number} className="flex items-center gap-1 text-xs">
-                          <span className="text-red-400">#{b.batch_number}:</span>
-                          <span className="font-semibold text-red-600">{fmtDate(b.date_of_hauling)}</span>
-                        </div>
+                    ? <div className="divide-y divide-gray-100 dark:divide-gray-700 mt-0.5">{client.all_batches.map(b => (
+                        <div key={b.batch_number} className="py-0.5 text-xs font-semibold text-red-600">{fmtDate(b.date_of_hauling)}</div>
                       ))}</div>
                     : <p className="text-sm font-semibold text-red-600">{fmtDate(client.current_date_of_hauling)}</p>
                   }
@@ -337,8 +331,8 @@ export default function CaretakersPage() {
                     </td>
                     <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
                       {client.all_batches?.length > 1
-                        ? <div className="space-y-0.5">{client.all_batches.map(b => (
-                            <div key={b.batch_number} className="text-xs font-medium text-green-700 dark:text-green-400 whitespace-nowrap">#{b.batch_number}</div>
+                        ? <div className="divide-y divide-gray-100 dark:divide-gray-700">{client.all_batches.map(b => (
+                            <div key={b.batch_number} className="py-0.5 text-xs font-medium text-green-700 dark:text-green-400 whitespace-nowrap">#{b.batch_number}</div>
                           ))}</div>
                         : client.current_batch_number
                           ? <span className="font-medium text-green-700 dark:text-green-400">#{client.current_batch_number}</span>
@@ -347,30 +341,24 @@ export default function CaretakersPage() {
                     </td>
                     <td className="px-4 py-3 text-right text-green-700 dark:text-green-400 font-semibold">
                       {client.all_batches?.length > 1
-                        ? <div className="space-y-0.5">{client.all_batches.map(b => (
-                            <div key={b.batch_number} className="text-xs whitespace-nowrap">{b.heads ?? '—'}</div>
+                        ? <div className="divide-y divide-gray-100 dark:divide-gray-700">{client.all_batches.map(b => (
+                            <div key={b.batch_number} className="py-0.5 text-xs whitespace-nowrap">{b.heads ?? '—'}</div>
                           ))}</div>
                         : (client.current_heads ?? '—')
                       }
                     </td>
                     <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
                       {client.all_batches?.length > 1
-                        ? <div className="space-y-0.5">{client.all_batches.map(b => (
-                            <div key={b.batch_number} className="flex items-center gap-1.5 text-xs whitespace-nowrap">
-                              <span className="text-gray-400 dark:text-gray-500">#{b.batch_number}:</span>
-                              <span>{fmtDate(b.date_of_application)}</span>
-                            </div>
+                        ? <div className="divide-y divide-gray-100 dark:divide-gray-700">{client.all_batches.map(b => (
+                            <div key={b.batch_number} className="py-0.5 text-xs whitespace-nowrap">{fmtDate(b.date_of_application)}</div>
                           ))}</div>
                         : <span className="whitespace-nowrap">{fmtDate(client.current_date_of_application)}</span>
                       }
                     </td>
                     <td className="px-4 py-3 text-red-600 font-medium">
                       {client.all_batches?.length > 1
-                        ? <div className="space-y-0.5">{client.all_batches.map(b => (
-                            <div key={b.batch_number} className="flex items-center gap-1.5 text-xs whitespace-nowrap">
-                              <span className="text-red-400">#{b.batch_number}:</span>
-                              <span>{fmtDate(b.date_of_hauling)}</span>
-                            </div>
+                        ? <div className="divide-y divide-gray-100 dark:divide-gray-700">{client.all_batches.map(b => (
+                            <div key={b.batch_number} className="py-0.5 text-xs whitespace-nowrap">{fmtDate(b.date_of_hauling)}</div>
                           ))}</div>
                         : <span className="whitespace-nowrap">{fmtDate(client.current_date_of_hauling)}</span>
                       }
