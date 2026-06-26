@@ -283,19 +283,19 @@ export default function CaretakersPage() {
                     </td>
                     <td className="px-4 py-3 max-w-[200px]" onClick={e => e.stopPropagation()}>
                       {isLoggedIn ? (
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 w-full">
                           <span className={`w-2 h-2 rounded-full shrink-0 ${client.is_updated ? 'bg-green-500' : 'bg-gray-400'}`} />
                           <select
                             value={client.is_updated ? 'updated' : 'not-updated'}
                             onChange={e => handleToggleUpdated(client.id, e.target.value === 'updated')}
-                            className="text-xs font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 outline-none cursor-pointer focus:ring-1 focus:ring-green-700"
+                            className="flex-1 text-xs font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 outline-none cursor-pointer focus:ring-1 focus:ring-green-700"
                           >
                             <option value="updated">Updated</option>
                             <option value="not-updated">Not Updated</option>
                           </select>
                         </div>
                       ) : (
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 w-full">
                           <span className={`w-2 h-2 rounded-full shrink-0 ${client.is_updated ? 'bg-green-500' : 'bg-gray-400'}`} />
                           <span className="text-xs font-medium text-gray-700 dark:text-gray-200">
                             {client.is_updated ? 'Updated' : 'Not Updated'}
@@ -303,7 +303,7 @@ export default function CaretakersPage() {
                         </div>
                       )}
                       {client.notes && (
-                        <div className="flex items-start gap-1 mt-1 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded px-1.5 py-1" title={client.notes}>
+                        <div className="flex items-start gap-1 mt-1 w-full bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded px-1.5 py-1" title={client.notes}>
                           <StickyNote className="w-3 h-3 text-amber-500 shrink-0 mt-0.5" />
                           <p className="text-xs text-amber-800 dark:text-amber-300 truncate leading-tight">{client.notes}</p>
                         </div>
