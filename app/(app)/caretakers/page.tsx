@@ -188,13 +188,13 @@ export default function CaretakersPage() {
                   <select
                     value={client.is_updated ? 'updated' : 'not-updated'}
                     onChange={e => handleToggleUpdated(client.id, e.target.value === 'updated')}
-                    className="w-full text-xs font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 outline-none cursor-pointer focus:ring-1 focus:ring-green-700"
+                    className={`w-full text-xs font-medium bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 outline-none cursor-pointer focus:ring-1 focus:ring-green-700 ${client.is_updated ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'}`}
                   >
                     <option value="updated">Updated</option>
                     <option value="not-updated">Not Updated</option>
                   </select>
                 ) : (
-                  <span className="text-xs font-medium text-gray-700 dark:text-gray-200">
+                  <span className={`text-xs font-medium ${client.is_updated ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'}`}>
                     {client.is_updated ? 'Updated' : 'Not Updated'}
                   </span>
                 )}
@@ -285,13 +285,13 @@ export default function CaretakersPage() {
                         <select
                           value={client.is_updated ? 'updated' : 'not-updated'}
                           onChange={e => handleToggleUpdated(client.id, e.target.value === 'updated')}
-                          className="text-xs font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 outline-none cursor-pointer focus:ring-1 focus:ring-green-700"
+                          className={`text-xs font-medium bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 outline-none cursor-pointer focus:ring-1 focus:ring-green-700 ${client.is_updated ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'}`}
                         >
                           <option value="updated">Updated</option>
                           <option value="not-updated">Not Updated</option>
                         </select>
                       ) : (
-                        <span className="text-xs font-medium text-gray-700 dark:text-gray-200">
+                        <span className={`text-xs font-medium ${client.is_updated ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'}`}>
                           {client.is_updated ? 'Updated' : 'Not Updated'}
                         </span>
                       )}
