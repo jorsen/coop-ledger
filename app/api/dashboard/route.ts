@@ -14,7 +14,7 @@ export async function GET() {
         (SELECT COALESCE(SUM(t.debit), 0)
          FROM transactions t
          LEFT JOIN batches b ON t.batch_id = b.id
-         WHERE COALESCE(b.status, 'active') != 'completed')        AS total_loan_amount,
+         WHERE COALESCE(b.status, 'active') != 'paid')              AS total_loan_amount,
         (SELECT COALESCE(SUM(bags), 0) FROM transactions)::int     AS total_bags,
         (SELECT COALESCE(SUM(
           COALESCE((
