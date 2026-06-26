@@ -8,6 +8,7 @@ import { usePoll } from '@/hooks/use-poll';
 
 interface BatchInfo {
   batch_number: string;
+  heads: number | null;
   date_of_application: string | null;
   date_of_hauling: string | null;
 }
@@ -215,8 +216,17 @@ export default function CaretakersPage() {
               <p className="text-xs text-gray-400 dark:text-gray-500 mb-3 mt-1">{client.transaction_count} transaction(s)</p>
               <div className="grid grid-cols-3 gap-x-4 gap-y-3 py-3 border-t border-gray-100 dark:border-gray-700 mb-3">
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Heads</p>
-                  <p className="text-sm font-semibold text-green-700 dark:text-green-400">{client.current_heads ?? '—'}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Batch / Heads</p>
+                  {client.all_batches?.length > 1
+                    ? <div className="space-y-0.5 mt-0.5">{client.all_batches.map(b => (
+                        <div key={b.batch_number} className="flex items-center gap-1 text-xs">
+                          <span className="font-semibold text-green-700 dark:text-green-400">#{b.batch_number}</span>
+                          <span className="text-gray-400">·</span>
+                          <span className="font-semibold text-green-700 dark:text-green-400">{b.heads ?? '—'}</span>
+                        </div>
+                      ))}</div>
+                    : <p className="text-sm font-semibold text-green-700 dark:text-green-400">{client.current_heads ?? '—'}</p>
+                  }
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">App. Date</p>
@@ -325,12 +335,24 @@ export default function CaretakersPage() {
                         </div>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                      {client.current_batch_number
-                        ? <span className="font-medium text-green-700 dark:text-green-400">#{client.current_batch_number}</span>
-                        : <span className="text-gray-400">—</span>}
+                    <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
+                      {client.all_batches?.length > 1
+                        ? <div className="space-y-0.5">{client.all_batches.map(b => (
+                            <div key={b.batch_number} className="text-xs font-medium text-green-700 dark:text-green-400 whitespace-nowrap">#{b.batch_number}</div>
+                          ))}</div>
+                        : client.current_batch_number
+                          ? <span className="font-medium text-green-700 dark:text-green-400">#{client.current_batch_number}</span>
+                          : <span className="text-gray-400">—</span>
+                      }
                     </td>
-                    <td className="px-4 py-3 text-right text-green-700 dark:text-green-400 font-semibold">{client.current_heads ?? '—'}</td>
+                    <td className="px-4 py-3 text-right text-green-700 dark:text-green-400 font-semibold">
+                      {client.all_batches?.length > 1
+                        ? <div className="space-y-0.5">{client.all_batches.map(b => (
+                            <div key={b.batch_number} className="text-xs whitespace-nowrap">{b.heads ?? '—'}</div>
+                          ))}</div>
+                        : (client.current_heads ?? '—')
+                      }
+                    </td>
                     <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
                       {client.all_batches?.length > 1
                         ? <div className="space-y-0.5">{client.all_batches.map(b => (

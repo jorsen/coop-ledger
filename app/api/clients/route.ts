@@ -15,6 +15,7 @@ export async function GET() {
       COALESCE((
         SELECT json_agg(json_build_object(
           'batch_number', b.batch_number,
+          'heads', b.heads,
           'date_of_application', b.date_of_application,
           'date_of_hauling', b.date_of_hauling
         ) ORDER BY b.created_at DESC)
