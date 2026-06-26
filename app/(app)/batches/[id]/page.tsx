@@ -906,10 +906,7 @@ export default function BatchDetailPage() {
                   className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
                 >
                   <option value="active">Active</option>
-                  <option value="on-going">On-going</option>
                   <option value="paid">Paid</option>
-                  <option value="completed">Completed</option>
-                  <option value="inactive">Inactive</option>
                 </select>
               </div>
               <div>
