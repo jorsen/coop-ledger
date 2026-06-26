@@ -13,6 +13,22 @@ interface Batch {
   transaction_count: number;
   total_bags: number;
   total_debit: number;
+  status: string | null;
+}
+
+function StatusBadge({ status }: { status: string | null }) {
+  const s = status ?? 'active';
+  const cls =
+    s === 'active'    ? 'bg-green-100 text-green-800' :
+    s === 'on-going'  ? 'bg-yellow-100 text-yellow-800' :
+    s === 'paid'      ? 'bg-blue-100 text-blue-800' :
+    s === 'completed' ? 'bg-purple-100 text-purple-800' :
+                        'bg-gray-100 text-gray-500';
+  return (
+    <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${cls}`}>
+      {s.charAt(0).toUpperCase() + s.slice(1)}
+    </span>
+  );
 }
 
 const peso = (n: number) =>
@@ -99,6 +115,7 @@ export default function BatchesPage() {
                 </span>
                 <p className="text-sm text-gray-500">{fmtDate(b.batch_date)}</p>
               </div>
+              <StatusBadge status={b.status} />
             </div>
             {b.notes && <p className="text-xs text-gray-900 dark:text-gray-400 mb-3 line-clamp-2">{b.notes}</p>}
 

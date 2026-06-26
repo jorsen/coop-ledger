@@ -5,6 +5,7 @@ import { logActivity } from '@/lib/activity';
 
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
   await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS pig_price_per_kg DECIMAL(10,2) DEFAULT 170`;
+  await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active'`;
 
   const [batch] = await sql`
     SELECT b.*,
