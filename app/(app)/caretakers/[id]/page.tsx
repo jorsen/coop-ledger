@@ -822,7 +822,7 @@ export default function CaretakerLedgerPage() {
                       {isLoggedIn && (
                         <>
                           <button
-                            onClick={() => { setEditBatch(b); setEditBatchForm({ batch_number: b.batch_number, batch_date: b.batch_date, notes: b.notes, date_of_application: b.date_of_application ?? '', date_of_hauling: b.date_of_hauling ?? '', maturity_date: b.maturity_date ?? '', heads: b.heads ? String(b.heads) : '' }); }}
+                            onClick={() => { setEditBatch(b); setEditBatchForm({ batch_number: b.batch_number, batch_date: b.batch_date?.toString().slice(0, 10) ?? '', notes: b.notes, date_of_application: b.date_of_application?.toString().slice(0, 10) ?? '', date_of_hauling: b.date_of_hauling?.toString().slice(0, 10) ?? '', maturity_date: b.maturity_date?.toString().slice(0, 10) ?? '', heads: b.heads ? String(b.heads) : '' }); }}
                             className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
                           >
                             <Pencil className="w-3.5 h-3.5" />
@@ -910,8 +910,8 @@ export default function CaretakerLedgerPage() {
                     type="date"
                     value={batchForm.date_of_application}
                     onChange={(e) => setBatchForm((f) => ({ ...f, date_of_application: e.target.value }))}
-                    className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-                    style={{ backgroundColor: '#ffffff', height: '42px', WebkitAppearance: 'none', appearance: 'none' }}
+                    className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 [color-scheme:light] dark:[color-scheme:dark]"
+                    style={{ height: '46px' }}
                   />
                 </div>
                 <div style={{ flex: 1 }}>
@@ -920,8 +920,8 @@ export default function CaretakerLedgerPage() {
                     type="date"
                     value={batchForm.date_of_hauling}
                     onChange={(e) => setBatchForm((f) => ({ ...f, date_of_hauling: e.target.value }))}
-                    className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-                    style={{ backgroundColor: '#ffffff', height: '42px', WebkitAppearance: 'none', appearance: 'none' }}
+                    className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 [color-scheme:light] dark:[color-scheme:dark]"
+                    style={{ height: '46px' }}
                   />
                 </div>
               </div>
@@ -931,8 +931,8 @@ export default function CaretakerLedgerPage() {
                   type="date"
                   value={batchForm.maturity_date}
                   onChange={(e) => setBatchForm((f) => ({ ...f, maturity_date: e.target.value }))}
-                  className="w-full border border-green-300 dark:border-green-700 dark:bg-gray-700 dark:text-white rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-                  style={{ backgroundColor: '#ffffff', height: '42px', WebkitAppearance: 'none', appearance: 'none' }}
+                  className="w-full border border-green-300 dark:border-green-700 dark:bg-gray-700 dark:text-white rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 [color-scheme:light] dark:[color-scheme:dark]"
+                  style={{ height: '46px' }}
                 />
               </div>
               <div>
@@ -1002,8 +1002,8 @@ export default function CaretakerLedgerPage() {
                     type="date"
                     value={editBatchForm.date_of_application}
                     onChange={(e) => setEditBatchForm((f) => ({ ...f, date_of_application: e.target.value }))}
-                    className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-                    style={{ backgroundColor: '#ffffff', height: '42px', WebkitAppearance: 'none', appearance: 'none' }}
+                    className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 [color-scheme:light] dark:[color-scheme:dark]"
+                    style={{ height: '46px' }}
                   />
                 </div>
                 <div style={{ flex: 1 }}>
@@ -1012,8 +1012,8 @@ export default function CaretakerLedgerPage() {
                     type="date"
                     value={editBatchForm.date_of_hauling}
                     onChange={(e) => setEditBatchForm((f) => ({ ...f, date_of_hauling: e.target.value }))}
-                    className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-                    style={{ backgroundColor: '#ffffff', height: '42px', WebkitAppearance: 'none', appearance: 'none' }}
+                    className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 [color-scheme:light] dark:[color-scheme:dark]"
+                    style={{ height: '46px' }}
                   />
                 </div>
               </div>
@@ -1023,8 +1023,8 @@ export default function CaretakerLedgerPage() {
                   type="date"
                   value={editBatchForm.maturity_date}
                   onChange={(e) => setEditBatchForm((f) => ({ ...f, maturity_date: e.target.value }))}
-                  className="w-full border border-green-300 dark:border-green-700 dark:bg-gray-700 dark:text-white rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-                  style={{ backgroundColor: '#ffffff', height: '42px', WebkitAppearance: 'none', appearance: 'none' }}
+                  className="w-full border border-green-300 dark:border-green-700 dark:bg-gray-700 dark:text-white rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 [color-scheme:light] dark:[color-scheme:dark]"
+                  style={{ height: '46px' }}
                 />
               </div>
               <div>
