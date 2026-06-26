@@ -19,6 +19,7 @@ interface Batch {
   total_bags: number;
   total_debit: number;
   pig_price_per_kg: number | null;
+  status: string | null;
 }
 
 interface Client {
@@ -86,10 +87,10 @@ export default function CaretakerLedgerPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [modal, setModal] = useState<{ tx?: Transaction } | null>(null);
   const [batchModal, setBatchModal] = useState(false);
-  const [batchForm, setBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', maturity_date: '', heads: '' });
+  const [batchForm, setBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', maturity_date: '', heads: '', status: 'active' });
   const [savingBatch, setSavingBatch] = useState(false);
   const [editBatch, setEditBatch] = useState<Batch | null>(null);
-  const [editBatchForm, setEditBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', maturity_date: '', heads: '' });
+  const [editBatchForm, setEditBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', maturity_date: '', heads: '', status: 'active' });
   const [savingEditBatch, setSavingEditBatch] = useState(false);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [expenseModal, setExpenseModal] = useState(false);
@@ -159,7 +160,7 @@ export default function CaretakerLedgerPage() {
     });
     setSavingBatch(false);
     setBatchModal(false);
-    setBatchForm({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', maturity_date: '', heads: '' });
+    setBatchForm({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', maturity_date: '', heads: '', status: 'active' });
     fetchData();
   }
 
@@ -820,7 +821,7 @@ export default function CaretakerLedgerPage() {
                       {isLoggedIn && (
                         <>
                           <button
-                            onClick={() => { setEditBatch(b); setEditBatchForm({ batch_number: b.batch_number, batch_date: b.batch_date?.toString().slice(0, 10) ?? '', notes: b.notes, date_of_application: b.date_of_application?.toString().slice(0, 10) ?? '', date_of_hauling: b.date_of_hauling?.toString().slice(0, 10) ?? '', maturity_date: b.maturity_date?.toString().slice(0, 10) ?? '', heads: b.heads ? String(b.heads) : '' }); }}
+                            onClick={() => { setEditBatch(b); setEditBatchForm({ batch_number: b.batch_number, batch_date: b.batch_date?.toString().slice(0, 10) ?? '', notes: b.notes, date_of_application: b.date_of_application?.toString().slice(0, 10) ?? '', date_of_hauling: b.date_of_hauling?.toString().slice(0, 10) ?? '', maturity_date: b.maturity_date?.toString().slice(0, 10) ?? '', heads: b.heads ? String(b.heads) : '', status: b.status ?? 'active' }); }}
                             className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
                           >
                             <Pencil className="w-3.5 h-3.5" />
@@ -918,6 +919,21 @@ export default function CaretakerLedgerPage() {
                 />
               </div>
               <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                <select
+                  value={batchForm.status}
+                  onChange={(e) => setBatchForm((f) => ({ ...f, status: e.target.value }))}
+                  className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                  style={{ height: '46px' }}
+                >
+                  <option value="active">Active</option>
+                  <option value="on-going">On-going</option>
+                  <option value="paid">Paid</option>
+                  <option value="completed">Completed</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+              <div>
                 <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
                 <textarea
                   value={batchForm.notes}
@@ -1008,6 +1024,21 @@ export default function CaretakerLedgerPage() {
                   className="w-full border border-green-300 dark:border-green-700 dark:bg-gray-700 dark:text-white rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 [color-scheme:light] dark:[color-scheme:dark]"
                   style={{ height: '46px' }}
                 />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                <select
+                  value={editBatchForm.status}
+                  onChange={(e) => setEditBatchForm((f) => ({ ...f, status: e.target.value }))}
+                  className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                  style={{ height: '46px' }}
+                >
+                  <option value="active">Active</option>
+                  <option value="on-going">On-going</option>
+                  <option value="paid">Paid</option>
+                  <option value="completed">Completed</option>
+                  <option value="inactive">Inactive</option>
+                </select>
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>

@@ -5,6 +5,9 @@ import { logActivity } from '@/lib/activity';
 
 export async function GET(req: NextRequest) {
   await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS pig_price_per_kg DECIMAL(10,2) DEFAULT 170`;
+  await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active'`;
+  await sql`ALTER TABLE batches DROP CONSTRAINT IF EXISTS batches_status_check`;
+  await sql`ALTER TABLE batches ADD CONSTRAINT batches_status_check CHECK (status IN ('active','inactive','paid','completed','on-going'))`;
 
   const clientId = req.nextUrl.searchParams.get('client_id');
 
@@ -45,33 +48,35 @@ export async function POST(req: NextRequest) {
   if (error) return error;
 
   try {
-    const { batch_date, notes, client_id, batch_number, date_of_application, date_of_hauling, maturity_date, heads, allocation } = await req.json();
+    const { batch_date, notes, client_id, batch_number, date_of_application, date_of_hauling, maturity_date, heads, allocation, status } = await req.json();
 
     await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS date_of_application DATE`;
     await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS date_of_hauling DATE`;
     await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS maturity_date DATE`;
     await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS heads INTEGER`;
     await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS allocation DECIMAL(12,2)`;
+    await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active'`;
 
     const dateVal = batch_date || new Date().toISOString().split('T')[0];
+    const statusVal = status || 'active';
 
     let batch;
     if (batch_number?.trim()) {
       const [b] = await sql`
-        INSERT INTO batches (batch_number, client_id, batch_date, notes, date_of_application, date_of_hauling, maturity_date, heads, allocation)
+        INSERT INTO batches (batch_number, client_id, batch_date, notes, date_of_application, date_of_hauling, maturity_date, heads, allocation, status)
         VALUES (${batch_number.trim()}, ${client_id || null}, ${dateVal}, ${notes || ''},
           ${date_of_application || null}, ${date_of_hauling || null}, ${maturity_date || null},
-          ${heads ? Number(heads) : null}, ${allocation ? Number(allocation) : null})
+          ${heads ? Number(heads) : null}, ${allocation ? Number(allocation) : null}, ${statusVal})
         RETURNING *
       `;
       batch = b;
     } else {
       const tmpName = `__TMP__${Date.now()}`;
       const [inserted] = await sql`
-        INSERT INTO batches (batch_number, client_id, batch_date, notes, date_of_application, date_of_hauling, maturity_date, heads, allocation)
+        INSERT INTO batches (batch_number, client_id, batch_date, notes, date_of_application, date_of_hauling, maturity_date, heads, allocation, status)
         VALUES (${tmpName}, ${client_id || null}, ${dateVal}, ${notes || ''},
           ${date_of_application || null}, ${date_of_hauling || null}, ${maturity_date || null},
-          ${heads ? Number(heads) : null}, ${allocation ? Number(allocation) : null})
+          ${heads ? Number(heads) : null}, ${allocation ? Number(allocation) : null}, ${statusVal})
         RETURNING id
       `;
       const autoNumber = `BT-${String(inserted.id).padStart(3, '0')}`;

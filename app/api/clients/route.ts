@@ -17,7 +17,10 @@ export async function GET() {
           'batch_number', b.batch_number,
           'heads', b.heads,
           'date_of_application', b.date_of_application,
-          'date_of_hauling', b.date_of_hauling
+          'date_of_hauling', b.date_of_hauling,
+          'status', COALESCE(b.status, 'active'),
+          'transaction_count', (SELECT COUNT(*)::int FROM transactions t WHERE t.batch_id = b.id),
+          'total_debit', (SELECT COALESCE(SUM(t.debit), 0) FROM transactions t WHERE t.batch_id = b.id)
         ) ORDER BY b.created_at DESC)
         FROM batches b
         WHERE b.client_id = c.id

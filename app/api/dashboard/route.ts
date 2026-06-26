@@ -6,10 +6,23 @@ export async function GET() {
   const [stats, recent] = await Promise.all([
     sql`
       SELECT
-        (SELECT COUNT(*) FROM clients WHERE status = 'active')::int  AS active_clients,
-        (SELECT COUNT(*) FROM transactions)::int                     AS total_transactions,
-        (SELECT COALESCE(SUM(debit), 0) FROM transactions)           AS total_debit,
-        (SELECT COALESCE(SUM(bags), 0)  FROM transactions)::int      AS total_bags
+        (SELECT COUNT(*) FROM clients WHERE status = 'active')::int AS active_clients,
+        (SELECT COUNT(*) FROM transactions)::int                    AS total_transactions,
+        (SELECT COALESCE(SUM(t.debit), 0)
+         FROM transactions t
+         LEFT JOIN batches b ON t.batch_id = b.id
+         WHERE COALESCE(b.status, 'active') != 'completed')        AS total_loan_amount,
+        (SELECT COALESCE(SUM(bags), 0) FROM transactions)::int     AS total_bags,
+        (SELECT COALESCE(SUM(
+          COALESCE((
+            SELECT fp.delivery_fee_per_bag
+            FROM feed_prices fp
+            JOIN feed_types ft ON ft.id = fp.feed_type_id
+            WHERE LOWER(ft.name) = LOWER(t2.feed_type)
+              AND fp.effective_date <= t2.date
+            ORDER BY fp.effective_date DESC LIMIT 1
+          ), (SELECT value::numeric FROM settings WHERE key = 'delivery_fee' LIMIT 1), 0) * t2.bags
+        ), 0) FROM transactions t2)                                AS total_delivery_fees
     `,
     sql`
       SELECT

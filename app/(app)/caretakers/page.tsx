@@ -11,6 +11,9 @@ interface BatchInfo {
   heads: number | null;
   date_of_application: string | null;
   date_of_hauling: string | null;
+  status: string;
+  transaction_count: number;
+  total_debit: number;
 }
 
 interface Client {
@@ -185,7 +188,6 @@ export default function CaretakersPage() {
             <div key={client.id} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
               <div className="flex items-start justify-between mb-1">
                 <h3 className="font-semibold text-gray-900 dark:text-white text-sm">{client.name}</h3>
-                <StatusBadge status={client.status} />
               </div>
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 ID: {client.client_code}
@@ -214,7 +216,7 @@ export default function CaretakersPage() {
                 </div>
               )}
               <p className="text-xs text-gray-400 dark:text-gray-500 mb-3 mt-1">{client.transaction_count} transaction(s)</p>
-              <div className="grid grid-cols-3 gap-x-4 gap-y-3 py-3 border-t border-gray-100 dark:border-gray-700 mb-3">
+              <div className="grid grid-cols-4 gap-x-3 gap-y-3 py-3 border-t border-gray-100 dark:border-gray-700 mb-3">
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">Batch / Heads</p>
                   {client.all_batches?.length > 1
@@ -244,6 +246,15 @@ export default function CaretakersPage() {
                         <div key={b.batch_number} className="py-1.5 text-xs font-semibold text-red-600">{fmtDate(b.date_of_hauling)}</div>
                       ))}</div>
                     : <p className="text-sm font-semibold text-red-600">{fmtDate(client.current_date_of_hauling)}</p>
+                  }
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">TX</p>
+                  {client.all_batches?.length > 1
+                    ? <div className="space-y-0.5 mt-0.5">{client.all_batches.map(b => (
+                        <div key={b.batch_number} className="text-xs font-semibold text-gray-700 dark:text-gray-300">{b.transaction_count}</div>
+                      ))}</div>
+                    : <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">{client.transaction_count}</p>
                   }
                 </div>
               </div>
@@ -285,7 +296,6 @@ export default function CaretakersPage() {
                 <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
                   <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">NAME</th>
                   <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">ID</th>
-                  <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">STATUS</th>
                   <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">NOTES</th>
                   <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">BATCH #</th>
                   <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">HEADS</th>
@@ -304,9 +314,6 @@ export default function CaretakersPage() {
                   >
                     <td className="px-4 py-3 font-medium text-gray-900 dark:text-white whitespace-nowrap">{client.name}</td>
                     <td className="px-4 py-3 text-gray-500 dark:text-gray-400 whitespace-nowrap">{client.client_code}</td>
-                    <td className="px-4 py-3">
-                      <StatusBadge status={client.status} />
-                    </td>
                     <td className="px-4 py-3 w-px whitespace-nowrap" onClick={e => e.stopPropagation()}>
                       {isLoggedIn ? (
                         <select
@@ -363,7 +370,14 @@ export default function CaretakersPage() {
                         : <span className="whitespace-nowrap">{fmtDate(client.current_date_of_hauling)}</span>
                       }
                     </td>
-                    <td className="px-4 py-3 text-right text-gray-500 dark:text-gray-400">{client.transaction_count}</td>
+                    <td className="px-4 py-3 text-right text-gray-500 dark:text-gray-400">
+                      {client.all_batches?.length > 1
+                        ? <div className="divide-y divide-gray-200 dark:divide-gray-600 -my-3 -mx-4">{client.all_batches.map(b => (
+                            <div key={b.batch_number} className="px-4 py-2 text-xs text-right">{b.transaction_count}</div>
+                          ))}</div>
+                        : client.transaction_count
+                      }
+                    </td>
                     <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                       <div className="flex items-center justify-end gap-2">
                         <button

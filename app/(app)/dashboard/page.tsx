@@ -2,15 +2,16 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { Users, FileText, TrendingUp, Package, ArrowRight } from 'lucide-react';
+import { Users, FileText, TrendingUp, Package, Truck, ArrowRight } from 'lucide-react';
 import StatCard from '@/components/stat-card';
 import { usePoll } from '@/hooks/use-poll';
 
 interface DashboardStats {
   active_clients: number;
   total_transactions: number;
-  total_debit: number;
+  total_loan_amount: number;
   total_bags: number;
+  total_delivery_fees: number;
 }
 
 interface RecentTransaction {
@@ -64,11 +65,14 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard label="Active Caretakers"      value={stats?.active_clients ?? 0}     icon={Users}      iconBg="bg-green-50"  iconColor="text-green-700" />
-        <StatCard label="Total Transactions"  value={stats?.total_transactions ?? 0} icon={FileText}   iconBg="bg-blue-50"   iconColor="text-blue-600" />
-        <StatCard label="Total Sales"          value={peso(stats?.total_debit ?? 0)}  icon={TrendingUp} iconBg="bg-green-50"  iconColor="text-green-700" />
-        <StatCard label="Total Bags"          value={stats?.total_bags ?? 0}         icon={Package}    iconBg="bg-orange-50" iconColor="text-orange-600" />
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+        <StatCard label="Active Caretakers"       value={stats?.active_clients ?? 0}          icon={Users}      iconBg="bg-green-50"  iconColor="text-green-700" />
+        <StatCard label="Total Transactions"      value={stats?.total_transactions ?? 0}       icon={FileText}   iconBg="bg-blue-50"   iconColor="text-blue-600" />
+        <StatCard label="Total Bags"              value={stats?.total_bags ?? 0}               icon={Package}    iconBg="bg-orange-50" iconColor="text-orange-600" />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
+        <StatCard label="Total Amount of Loans"   value={peso(stats?.total_loan_amount ?? 0)}  icon={TrendingUp} iconBg="bg-green-50"  iconColor="text-green-700" />
+        <StatCard label="Total Delivery Fees"     value={peso(stats?.total_delivery_fees ?? 0)} icon={Truck}      iconBg="bg-purple-50" iconColor="text-purple-600" />
       </div>
 
       {/* Recent transactions */}

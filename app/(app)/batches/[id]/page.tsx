@@ -19,6 +19,7 @@ interface Batch {
   client_name: string | null;
   client_code: string | null;
   pig_price_per_kg: number | null;
+  status: string | null;
 }
 
 interface Expense {
@@ -48,6 +49,7 @@ interface BatchSummary {
   date_of_hauling?: string | null;
   maturity_date?: string | null;
   heads?: number | null;
+  status?: string | null;
 }
 
 const PAGE_SIZE = 10;
@@ -96,7 +98,7 @@ export default function BatchDetailPage() {
   const [expPage, setExpPage] = useState(0);
   const [batchPage, setBatchPage] = useState(0);
   const [editBatch, setEditBatch] = useState<BatchSummary | null>(null);
-  const [editBatchForm, setEditBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', maturity_date: '', heads: '' });
+  const [editBatchForm, setEditBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', maturity_date: '', heads: '', status: 'active' });
   const [savingEditBatch, setSavingEditBatch] = useState(false);
   const [pigSales, setPigSales] = useState<PigSale[]>([]);
   const [pigSaleModal, setPigSaleModal] = useState<PigSale | 'new' | null>(null);
@@ -244,6 +246,7 @@ export default function BatchDetailPage() {
       date_of_hauling: b.date_of_hauling?.split('T')[0] ?? '',
       maturity_date: b.maturity_date?.split('T')[0] ?? '',
       heads: b.heads != null ? String(b.heads) : '',
+      status: b.status ?? 'active',
     });
   }
 
@@ -354,7 +357,11 @@ export default function BatchDetailPage() {
             </div>
             <div>
               <p className="text-xs font-medium text-gray-600 mb-0.5 dark:text-gray-400">STATUS</p>
-              <span className="inline-block text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-800">Active</span>
+              {(() => {
+                const s = batch.status ?? 'active';
+                const cls = s === 'active' ? 'bg-green-100 text-green-800' : s === 'on-going' ? 'bg-yellow-100 text-yellow-800' : s === 'paid' ? 'bg-blue-100 text-blue-800' : s === 'completed' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-500';
+                return <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${cls}`}>{s.charAt(0).toUpperCase() + s.slice(1)}</span>;
+              })()}
             </div>
             <div>
               <p className="text-xs font-medium text-gray-600 mb-0.5 dark:text-gray-400"># OF HEADS</p>
@@ -890,6 +897,20 @@ export default function BatchDetailPage() {
                     className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
                   />
                 </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                <select
+                  value={editBatchForm.status}
+                  onChange={e => setEditBatchForm(f => ({ ...f, status: e.target.value }))}
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+                >
+                  <option value="active">Active</option>
+                  <option value="on-going">On-going</option>
+                  <option value="paid">Paid</option>
+                  <option value="completed">Completed</option>
+                  <option value="inactive">Inactive</option>
+                </select>
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
