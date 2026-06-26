@@ -6,19 +6,6 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active'`;
 
-  // Backfill batch_id for transactions that have no batch assignment.
-  // Assigns each unlinked transaction to the client's most recently created batch.
-  await sql`
-    UPDATE transactions t
-    SET batch_id = (
-      SELECT b.id FROM batches b
-      WHERE b.client_id = t.client_id
-      ORDER BY b.created_at DESC
-      LIMIT 1
-    )
-    WHERE t.batch_id IS NULL AND t.client_id IS NOT NULL
-  `;
-
   const [stats, recent] = await Promise.all([
     sql`
       SELECT
@@ -26,8 +13,11 @@ export async function GET() {
         (SELECT COUNT(*) FROM transactions)::int                    AS total_transactions,
         (SELECT COALESCE(SUM(t.debit), 0)
          FROM transactions t
-         LEFT JOIN batches b ON t.batch_id = b.id
-         WHERE COALESCE(b.status, 'active') != 'paid')              AS total_loan_amount,
+         WHERE COALESCE((
+           SELECT b.status FROM batches b
+           WHERE b.client_id = t.client_id
+           ORDER BY b.created_at DESC LIMIT 1
+         ), 'active') != 'paid')                                    AS total_loan_amount,
         (SELECT COALESCE(SUM(bags), 0) FROM transactions)::int     AS total_bags,
         (SELECT COALESCE(SUM(
           COALESCE((
