@@ -285,21 +285,21 @@ export default function CaretakersPage() {
                     <td className="px-4 py-3">
                       <StatusBadge status={client.status} />
                     </td>
-                    <td className="px-4 py-3 max-w-[200px]" onClick={e => e.stopPropagation()}>
+                    <td className="px-4 py-3 w-px whitespace-nowrap" onClick={e => e.stopPropagation()}>
                       {isLoggedIn ? (
-                        <div className="flex items-center gap-1.5 w-full">
+                        <div className="flex items-center gap-1.5">
                           <span className={`w-2 h-2 rounded-full shrink-0 ${client.is_updated ? 'bg-green-500' : 'bg-gray-400'}`} />
                           <select
                             value={client.is_updated ? 'updated' : 'not-updated'}
                             onChange={e => handleToggleUpdated(client.id, e.target.value === 'updated')}
-                            className="flex-1 text-xs font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 outline-none cursor-pointer focus:ring-1 focus:ring-green-700"
+                            className="text-xs font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 outline-none cursor-pointer focus:ring-1 focus:ring-green-700"
                           >
                             <option value="updated">Updated</option>
                             <option value="not-updated">Not Updated</option>
                           </select>
                         </div>
                       ) : (
-                        <div className="flex items-center gap-1.5 w-full">
+                        <div className="flex items-center gap-1.5">
                           <span className={`w-2 h-2 rounded-full shrink-0 ${client.is_updated ? 'bg-green-500' : 'bg-gray-400'}`} />
                           <span className="text-xs font-medium text-gray-700 dark:text-gray-200">
                             {client.is_updated ? 'Updated' : 'Not Updated'}
@@ -307,7 +307,7 @@ export default function CaretakersPage() {
                         </div>
                       )}
                       {client.notes && (
-                        <div className={`flex items-start gap-1 mt-1 w-full border rounded px-1.5 py-1 ${
+                        <div className={`flex items-start gap-1 mt-1 border rounded px-1.5 py-1 ${
                           client.is_updated
                             ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700/40'
                             : 'bg-gray-50 dark:bg-gray-700/40 border-gray-200 dark:border-gray-600'
