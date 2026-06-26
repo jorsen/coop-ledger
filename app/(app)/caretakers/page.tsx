@@ -303,7 +303,7 @@ export default function CaretakersPage() {
                         </div>
                       )}
                       {client.notes && (
-                        <div className="flex items-start gap-1 mt-1 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded px-1.5 py-1 max-w-[180px]" title={client.notes}>
+                        <div className="flex items-start gap-1 mt-1 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded px-1.5 py-1" title={client.notes}>
                           <StickyNote className="w-3 h-3 text-amber-500 shrink-0 mt-0.5" />
                           <p className="text-xs text-amber-800 dark:text-amber-300 truncate leading-tight">{client.notes}</p>
                         </div>

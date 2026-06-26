@@ -443,7 +443,7 @@ export default function BatchDetailPage() {
 
               {withComputed.length > 0 && (
                 <tr className="border-t-2 border-gray-300 bg-gray-50 font-semibold text-sm dark:bg-gray-900 dark:border-gray-700">
-                  <td colSpan={2} className="px-4 py-3" />
+                  <td colSpan={2} className="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">Total</td>
                   <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{Number(totalBags).toFixed(2)}</td>
                   <td className="px-4 py-3 print:hidden hidden xl:table-cell" />
                   <td className="px-4 py-3 text-right text-gray-900 dark:text-white">{num(totalDebit)}</td>
