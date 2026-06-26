@@ -389,17 +389,17 @@ export default function BatchDetailPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50 dark:bg-gray-900 dark:border-gray-700">
-                <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3 dark:text-gray-400">FEEDS</th>
-                <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3 dark:text-gray-400">TR_DATE</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 dark:text-gray-400">NO.OF BAGS</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden dark:text-gray-400 hidden xl:table-cell">Price/Bag</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 dark:text-gray-400">Debit</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden dark:text-gray-400 hidden xl:table-cell">Delivery Fee</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 dark:text-gray-400">Balance</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden dark:text-gray-400 hidden xl:table-cell">DFFS</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 dark:text-gray-400 hidden sm:table-cell">Interest</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden dark:text-gray-400 hidden xl:table-cell"># of Days</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden dark:text-gray-400 hidden xl:table-cell">Date Maturity</th>
+                <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3 dark:text-gray-400 whitespace-nowrap">FEEDS</th>
+                <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3 dark:text-gray-400 whitespace-nowrap">TR_DATE</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 dark:text-gray-400 whitespace-nowrap">NO.OF BAGS</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden dark:text-gray-400 hidden xl:table-cell whitespace-nowrap">Price/Bag</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 dark:text-gray-400 whitespace-nowrap">Debit</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden dark:text-gray-400 hidden xl:table-cell whitespace-nowrap">Delivery Fee</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 dark:text-gray-400 whitespace-nowrap">Balance</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden dark:text-gray-400 hidden xl:table-cell whitespace-nowrap">DFFS</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 dark:text-gray-400 hidden sm:table-cell whitespace-nowrap">Interest</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden dark:text-gray-400 hidden xl:table-cell whitespace-nowrap"># of Days</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden dark:text-gray-400 hidden xl:table-cell whitespace-nowrap">Date Maturity</th>
                 <th className="px-4 py-3 print:hidden" />
               </tr>
             </thead>
