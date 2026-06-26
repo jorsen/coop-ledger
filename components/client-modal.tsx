@@ -42,7 +42,12 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
   const [pricePerBag, setPricePerBag] = useState(0);
 
   useEffect(() => {
-    setForm(client ?? EMPTY);
+    if (!client) { setForm(EMPTY); return; }
+    setForm({
+      ...client,
+      date_of_application: client.date_of_application?.toString().slice(0, 10) ?? '',
+      date_of_hauling: client.date_of_hauling?.toString().slice(0, 10) ?? '',
+    });
   }, [client]);
 
   useEffect(() => {
@@ -158,8 +163,8 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
                     type="date"
                     value={form.date_of_application}
                     onChange={(e) => set('date_of_application', e.target.value)}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
-                    style={{ backgroundColor: '#ffffff', height: '46px', WebkitAppearance: 'none', appearance: 'none' }}
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 text-sm text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 [color-scheme:light] dark:[color-scheme:dark]"
+                    style={{ height: '46px' }}
                   />
                 </div>
                 <div style={{ flex: 1 }}>
@@ -168,8 +173,8 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
                     type="date"
                     value={form.date_of_hauling}
                     onChange={(e) => set('date_of_hauling', e.target.value)}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
-                    style={{ backgroundColor: '#ffffff', height: '46px', WebkitAppearance: 'none', appearance: 'none' }}
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 text-sm text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 [color-scheme:light] dark:[color-scheme:dark]"
+                    style={{ height: '46px' }}
                   />
                 </div>
               </div>
