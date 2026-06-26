@@ -159,21 +159,6 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
             </>
           )}
 
-          {/* Status — always visible */}
-          <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
-            <select
-              value={form.status}
-              onChange={(e) => set('status', e.target.value)}
-              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
-            >
-              <option value="active">Active</option>
-              <option value="on-going">On-going</option>
-              <option value="paid">Paid</option>
-              <option value="completed">Completed</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </div>
 
           {/* Notes */}
           <div>
