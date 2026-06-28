@@ -40,7 +40,7 @@ export default function ArchivesPage() {
 
   const fetchArchives = useCallback(async () => {
     const res = await fetch('/api/archives');
-    setBatches(await res.json());
+    if (res.ok) setBatches(await res.json());
     setLoading(false);
   }, []);
 
