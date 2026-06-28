@@ -120,7 +120,8 @@ export default function CaretakerLedgerPage() {
     if (Array.isArray(batchData)) {
       setBatches(batchData);
       if (batchData.length > 0) {
-        setSelectedBatchId(prev => prev ?? batchData[0].id);
+        const firstActive = batchData.find((b: Batch) => b.status !== 'paid');
+        setSelectedBatchId(prev => prev ?? (firstActive ?? batchData[0]).id);
       }
     }
     setLoading(false);
@@ -258,7 +259,7 @@ export default function CaretakerLedgerPage() {
     if (selectedBatchId) fetchPigSales(selectedBatchId);
   }
 
-  const selectedBatch = batches.find(b => b.id === selectedBatchId) ?? batches[0] ?? null;
+  const selectedBatch = batches.find(b => b.id === selectedBatchId) ?? batches.find(b => b.status !== 'paid') ?? null;
   const batchTransactions = selectedBatch
     ? transactions.filter(t => t.batch_no === selectedBatch.batch_number)
     : transactions;
@@ -789,7 +790,7 @@ export default function CaretakerLedgerPage() {
           ) : (
             <>
             <div className="divide-y divide-gray-50 dark:divide-gray-700 max-h-[60vh] overflow-y-auto">
-              {batches.map((b) => {
+              {batches.filter(b => b.status !== 'paid').map((b) => {
                 const isViewing = b.id === selectedBatchId;
                 return (
                 <div
