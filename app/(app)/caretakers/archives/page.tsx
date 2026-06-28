@@ -41,8 +41,13 @@ export default function ArchivesPage() {
   const [dialog, setDialog] = useState<{ title: string; message: string; variant?: 'default' | 'delete'; onConfirm: () => void } | null>(null);
 
   const fetchArchives = useCallback(async () => {
-    const res = await fetch('/api/archives');
-    if (res.ok) setBatches(await res.json());
+    try {
+      const res = await fetch('/api/archives');
+      const data = await res.json();
+      setBatches(Array.isArray(data) ? data : []);
+    } catch {
+      setBatches([]);
+    }
     setLoading(false);
   }, []);
 
