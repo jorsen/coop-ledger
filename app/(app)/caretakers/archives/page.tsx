@@ -2,8 +2,9 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Eye, Search } from 'lucide-react';
+import { ArrowLeft, Eye, Search, Trash2 } from 'lucide-react';
 import { usePoll } from '@/hooks/use-poll';
+import ConfirmModal from '@/components/confirm-modal';
 
 interface ArchivedBatch {
   id: number;
@@ -37,6 +38,7 @@ export default function ArchivesPage() {
   const [batches, setBatches] = useState<ArchivedBatch[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+  const [dialog, setDialog] = useState<{ title: string; message: string; variant?: 'default' | 'delete'; onConfirm: () => void } | null>(null);
 
   const fetchArchives = useCallback(async () => {
     const res = await fetch('/api/archives');
@@ -55,6 +57,18 @@ export default function ArchivesPage() {
       b.batch_number.toLowerCase().includes(q)
     );
   });
+
+  function handleDelete(batch: ArchivedBatch) {
+    setDialog({
+      title: 'Delete Archived Batch',
+      message: `This will permanently delete batch #${batch.batch_number} for ${batch.client_name} and all its transactions.`,
+      variant: 'delete',
+      onConfirm: async () => {
+        await fetch(`/api/batches/${batch.id}`, { method: 'DELETE' });
+        fetchArchives();
+      },
+    });
+  }
 
   if (loading) {
     return (
@@ -132,12 +146,19 @@ export default function ArchivesPage() {
                     <td className="px-4 py-3 text-right text-gray-500 dark:text-gray-400">{batch.transaction_count}</td>
                     <td className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-white whitespace-nowrap">{fmtPeso(batch.total_debit)}</td>
                     <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center justify-end">
+                      <div className="flex items-center justify-end gap-3">
                         <button
                           onClick={() => router.push(`/caretakers/${batch.client_id}?batchId=${batch.id}`)}
                           className="flex items-center gap-1 text-xs text-green-700 dark:text-green-400 hover:text-green-600 font-medium"
                         >
                           <Eye className="w-3.5 h-3.5" /> View
+                        </button>
+                        <button
+                          onClick={() => handleDelete(batch)}
+                          className="p-1 text-red-400 hover:text-red-600 transition-colors"
+                          title="Delete archived batch"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </td>
@@ -147,6 +168,14 @@ export default function ArchivesPage() {
             </table>
           </div>
         </div>
+      )}
+
+      {dialog && (
+        <ConfirmModal
+          {...dialog}
+          onConfirm={() => { dialog.onConfirm(); setDialog(null); }}
+          onCancel={() => setDialog(null)}
+        />
       )}
     </div>
   );
