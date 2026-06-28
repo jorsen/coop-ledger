@@ -940,7 +940,6 @@ export default function CaretakerLedgerPage() {
                   style={{ height: '46px' }}
                 >
                   <option value="active">Active</option>
-                  <option value="paid">Paid</option>
                 </select>
               </div>
               <div>
@@ -1044,7 +1043,6 @@ export default function CaretakerLedgerPage() {
                   style={{ height: '46px' }}
                 >
                   <option value="active">Active</option>
-                  <option value="paid">Paid</option>
                 </select>
               </div>
               <div>
