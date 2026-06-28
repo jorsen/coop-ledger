@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, Plus, Pencil, Trash2, Printer, ClipboardList, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
 import TransactionModal from '@/components/transaction-modal';
 import { usePoll } from '@/hooks/use-poll';
@@ -80,6 +80,8 @@ const fmtDate = (d: string) => {
 export default function CaretakerLedgerPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const batchIdParam = searchParams.get('batchId');
   const [client, setClient] = useState<Client | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [batches, setBatches] = useState<Batch[]>([]);
@@ -119,6 +121,10 @@ export default function CaretakerLedgerPage() {
     const batchData = await batchRes.json();
     if (Array.isArray(batchData)) {
       setBatches(batchData);
+      if (batchIdParam) {
+        const target = batchData.find((b: Batch) => b.id === Number(batchIdParam));
+        if (target) setSelectedBatchId(prev => prev ?? target.id);
+      }
     }
     setLoading(false);
   }, [id, router]);
@@ -293,7 +299,7 @@ export default function CaretakerLedgerPage() {
 
   const txTotalPages = Math.ceil(withComputed.length / PAGE_SIZE);
   const pagedTx = withComputed.slice(txPage * PAGE_SIZE, (txPage + 1) * PAGE_SIZE);
-  const activeBatches = batches.filter(b => b.status !== 'paid');
+  const activeBatches = batches.filter(b => b.status !== 'paid' || b.id === selectedBatchId);
   const batchTotalPages = Math.ceil(activeBatches.length / PAGE_SIZE);
   const pagedBatches = activeBatches.slice(batchPage * PAGE_SIZE, (batchPage + 1) * PAGE_SIZE);
 

@@ -121,7 +121,7 @@ export default function ArchivesPage() {
                   <tr
                     key={batch.id}
                     className="border-b border-gray-50 dark:border-gray-700 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-700/50 cursor-pointer"
-                    onClick={() => router.push(`/batches/${batch.id}`)}
+                    onClick={() => router.push(`/caretakers/${batch.client_id}?batchId=${batch.id}`)}
                   >
                     <td className="px-4 py-3 font-medium text-gray-900 dark:text-white whitespace-nowrap">{batch.client_name}</td>
                     <td className="px-4 py-3 text-gray-500 dark:text-gray-400 whitespace-nowrap">{batch.client_code}</td>
@@ -134,7 +134,7 @@ export default function ArchivesPage() {
                     <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-end">
                         <button
-                          onClick={() => router.push(`/batches/${batch.id}`)}
+                          onClick={() => router.push(`/caretakers/${batch.client_id}?batchId=${batch.id}`)}
                           className="flex items-center gap-1 text-xs text-green-700 dark:text-green-400 hover:text-green-600 font-medium"
                         >
                           <Eye className="w-3.5 h-3.5" /> View
