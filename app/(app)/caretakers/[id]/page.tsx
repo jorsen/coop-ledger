@@ -356,7 +356,7 @@ export default function CaretakerLedgerPage() {
       )}
 
       {/* ── Info card (order 1 on mobile) ── */}
-      {selectedBatch && <div className="md:col-span-2 min-w-0 order-1">
+      {selectedBatch && (<div className="md:col-span-2 min-w-0 order-1">
 
       {/* ── Caretaker info card ───────────────────────────────────────── */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-6 py-5 mb-6 print:rounded-sm print-card">
@@ -404,11 +404,10 @@ export default function CaretakerLedgerPage() {
           </div>
         </div>
       </div>
-      </div>{/* end info card column */}
-      }
+      </div>)}
 
       {/* ── Main content (order 3 on mobile, row 2 on desktop) ── */}
-      {selectedBatch && <div className="md:col-span-2 min-w-0 order-3">
+      {selectedBatch && (<div className="md:col-span-2 min-w-0 order-3">
 
       {/* ── Transactions table ───────────────────────────────────────── */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 print-card">
@@ -766,7 +765,7 @@ export default function CaretakerLedgerPage() {
         </div>
       )}
 
-      </div>}{/* end main content */}
+      </div>)}
 
       {/* ── Batches sidebar (order 2 on mobile, spans both rows on desktop) ── */}
       <div className="md:col-span-1 lg:sticky lg:top-[72px] order-2 print:hidden">
