@@ -356,7 +356,7 @@ export default function CaretakerLedgerPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-start print-layout-grid">
       {/* ── Info card (order 1 on mobile) ── */}
-      <div className="md:col-span-2 min-w-0 order-1">
+      <div className={`${batchIdParam ? 'md:col-span-3' : 'md:col-span-2'} min-w-0 order-1`}>
 
       {/* ── Caretaker info card ───────────────────────────────────────── */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-6 py-5 mb-6 print:rounded-sm print-card">
@@ -407,7 +407,7 @@ export default function CaretakerLedgerPage() {
       </div>
 
       {/* ── Main content (order 3 on mobile, row 2 on desktop) ── */}
-      {selectedBatch && (<div className="md:col-span-2 min-w-0 order-3">
+      {selectedBatch && (<div className={`${batchIdParam ? 'md:col-span-3' : 'md:col-span-2'} min-w-0 order-3`}>
 
       {/* ── Transactions table ───────────────────────────────────────── */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 print-card">
@@ -768,7 +768,7 @@ export default function CaretakerLedgerPage() {
       </div>)}
 
       {/* ── Batches sidebar (order 2 on mobile, spans both rows on desktop) ── */}
-      <div className="md:col-span-1 lg:sticky lg:top-[72px] order-2 print:hidden">
+      {!batchIdParam && <div className="md:col-span-1 lg:sticky lg:top-[72px] order-2 print:hidden">
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
           <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -859,7 +859,7 @@ export default function CaretakerLedgerPage() {
             </>
           )}
         </div>
-      </div>
+      </div>}
 
       </div>{/* end grid */}
 
