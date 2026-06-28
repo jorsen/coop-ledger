@@ -119,10 +119,6 @@ export default function CaretakerLedgerPage() {
     const batchData = await batchRes.json();
     if (Array.isArray(batchData)) {
       setBatches(batchData);
-      if (batchData.length > 0) {
-        const firstActive = batchData.find((b: Batch) => b.status !== 'paid');
-        setSelectedBatchId(prev => prev ?? (firstActive ?? batchData[0]).id);
-      }
     }
     setLoading(false);
   }, [id, router]);
@@ -259,7 +255,7 @@ export default function CaretakerLedgerPage() {
     if (selectedBatchId) fetchPigSales(selectedBatchId);
   }
 
-  const selectedBatch = batches.find(b => b.id === selectedBatchId) ?? batches.find(b => b.status !== 'paid') ?? null;
+  const selectedBatch = batches.find(b => b.id === selectedBatchId) ?? null;
   const batchTransactions = selectedBatch
     ? transactions.filter(t => t.batch_no === selectedBatch.batch_number)
     : transactions;
@@ -352,8 +348,15 @@ export default function CaretakerLedgerPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-start print-layout-grid">
+      {/* ── Placeholder when no batch selected ── */}
+      {!selectedBatch && (
+        <div className="md:col-span-2 min-w-0 order-1 flex items-center justify-center py-24">
+          <p className="text-gray-400 dark:text-gray-500 text-sm">Select a batch from the list to view records.</p>
+        </div>
+      )}
+
       {/* ── Info card (order 1 on mobile) ── */}
-      <div className="md:col-span-2 min-w-0 order-1">
+      {selectedBatch && <div className="md:col-span-2 min-w-0 order-1">
 
       {/* ── Caretaker info card ───────────────────────────────────────── */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-6 py-5 mb-6 print:rounded-sm print-card">
@@ -402,9 +405,10 @@ export default function CaretakerLedgerPage() {
         </div>
       </div>
       </div>{/* end info card column */}
+      }
 
       {/* ── Main content (order 3 on mobile, row 2 on desktop) ── */}
-      <div className="md:col-span-2 min-w-0 order-3">
+      {selectedBatch && <div className="md:col-span-2 min-w-0 order-3">
 
       {/* ── Transactions table ───────────────────────────────────────── */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 print-card">
@@ -762,7 +766,7 @@ export default function CaretakerLedgerPage() {
         </div>
       )}
 
-      </div>{/* end main content */}
+      </div>}{/* end main content */}
 
       {/* ── Batches sidebar (order 2 on mobile, spans both rows on desktop) ── */}
       <div className="md:col-span-1 lg:sticky lg:top-[72px] order-2 print:hidden">
