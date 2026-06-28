@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Plus, Pencil, Trash2, Search, Printer } from 'lucide-react';
 import TransactionModal from '@/components/transaction-modal';
+import ConfirmModal from '@/components/confirm-modal';
 import { usePoll } from '@/hooks/use-poll';
 
 interface Client { id: number; name: string }
@@ -32,6 +33,7 @@ export default function TransactionsPage() {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<{ tx?: Transaction } | null>(null);
+  const [dialog, setDialog] = useState<{ title: string; message: string; variant?: 'default' | 'delete'; onConfirm: () => void } | null>(null);
 
   // Filters
   const [search, setSearch]       = useState('');
@@ -58,10 +60,16 @@ export default function TransactionsPage() {
   useEffect(() => { fetchTransactions(); }, [fetchTransactions]);
   usePoll(fetchTransactions);
 
-  async function handleDelete(id: number) {
-    if (!confirm('Delete this transaction?')) return;
-    await fetch(`/api/transactions/${id}`, { method: 'DELETE' });
-    fetchTransactions();
+  function handleDelete(id: number) {
+    setDialog({
+      title: 'Delete Transaction',
+      message: 'This transaction will be permanently removed.',
+      variant: 'delete',
+      onConfirm: async () => {
+        await fetch(`/api/transactions/${id}`, { method: 'DELETE' });
+        fetchTransactions();
+      },
+    });
   }
 
   const totalDebit  = transactions.reduce((s, t) => s + Number(t.debit), 0);
@@ -236,6 +244,13 @@ export default function TransactionsPage() {
           clients={clients}
           onClose={() => setModal(null)}
           onSave={() => { setModal(null); fetchTransactions(); }}
+        />
+      )}
+      {dialog && (
+        <ConfirmModal
+          {...dialog}
+          onConfirm={() => { dialog.onConfirm(); setDialog(null); }}
+          onCancel={() => setDialog(null)}
         />
       )}
     </div>

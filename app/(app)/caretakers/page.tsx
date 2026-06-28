@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus, Eye, Pencil, Trash2, Search, LayoutGrid, List, StickyNote, Archive } from 'lucide-react';
 import ClientModal from '@/components/client-modal';
+import ConfirmModal from '@/components/confirm-modal';
 import { usePoll } from '@/hooks/use-poll';
 
 interface BatchInfo {
@@ -63,6 +64,7 @@ export default function CaretakersPage() {
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [modal, setModal] = useState<{ mode: 'add' | 'edit'; client?: Client } | null>(null);
+  const [dialog, setDialog] = useState<{ title: string; message: string; variant?: 'default' | 'delete'; onConfirm: () => void } | null>(null);
   const [view, setView] = useState<'card' | 'list'>('list');
 
   useEffect(() => {
@@ -107,10 +109,16 @@ export default function CaretakersPage() {
     });
   }
 
-  async function handleDelete(id: number) {
-    if (!confirm('Delete this caretaker and all their transactions? This cannot be undone.')) return;
-    await fetch(`/api/clients/${id}`, { method: 'DELETE' });
-    fetchClients();
+  function handleDelete(id: number) {
+    setDialog({
+      title: 'Delete Caretaker',
+      message: 'This will permanently delete the caretaker and all their transactions. This cannot be undone.',
+      variant: 'delete',
+      onConfirm: async () => {
+        await fetch(`/api/clients/${id}`, { method: 'DELETE' });
+        fetchClients();
+      },
+    });
   }
 
   if (loading) {
@@ -427,6 +435,13 @@ export default function CaretakersPage() {
           client={modal.client}
           onClose={() => setModal(null)}
           onSave={() => { setModal(null); fetchClients(); }}
+        />
+      )}
+      {dialog && (
+        <ConfirmModal
+          {...dialog}
+          onConfirm={() => { dialog.onConfirm(); setDialog(null); }}
+          onCancel={() => setDialog(null)}
         />
       )}
     </div>

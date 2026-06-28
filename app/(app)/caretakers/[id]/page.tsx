@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, Plus, Pencil, Trash2, Printer, ClipboardList, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
 import TransactionModal from '@/components/transaction-modal';
+import ConfirmModal from '@/components/confirm-modal';
 import { usePoll } from '@/hooks/use-poll';
 
 interface Batch {
@@ -88,6 +89,7 @@ export default function CaretakerLedgerPage() {
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [modal, setModal] = useState<{ tx?: Transaction } | null>(null);
+  const [dialog, setDialog] = useState<{ title: string; message: string; variant?: 'default' | 'delete'; onConfirm: () => void } | null>(null);
   const [batchModal, setBatchModal] = useState(false);
   const [batchForm, setBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', maturity_date: '', heads: '', status: 'active' });
   const [savingBatch, setSavingBatch] = useState(false);
@@ -181,16 +183,28 @@ export default function CaretakerLedgerPage() {
     fetchData();
   }
 
-  async function handleDeleteBatch(batchId: number) {
-    if (!confirm('Delete this batch? Transactions will remain but lose their batch assignment.')) return;
-    await fetch(`/api/batches/${batchId}`, { method: 'DELETE' });
-    fetchData();
+  function handleDeleteBatch(batchId: number) {
+    setDialog({
+      title: 'Delete Batch',
+      message: 'Transactions in this batch will remain but lose their batch assignment.',
+      variant: 'delete',
+      onConfirm: async () => {
+        await fetch(`/api/batches/${batchId}`, { method: 'DELETE' });
+        fetchData();
+      },
+    });
   }
 
-  async function handleDelete(txId: number) {
-    if (!confirm('Delete this transaction?')) return;
-    await fetch(`/api/transactions/${txId}`, { method: 'DELETE' });
-    fetchData();
+  function handleDelete(txId: number) {
+    setDialog({
+      title: 'Delete Transaction',
+      message: 'This transaction will be permanently removed.',
+      variant: 'delete',
+      onConfirm: async () => {
+        await fetch(`/api/transactions/${txId}`, { method: 'DELETE' });
+        fetchData();
+      },
+    });
   }
 
   async function handleCreateExpense() {
@@ -207,10 +221,16 @@ export default function CaretakerLedgerPage() {
     if (selectedBatchId) fetchExpenses(selectedBatchId);
   }
 
-  async function handleDeleteExpense(expId: number) {
-    if (!confirm('Delete this expense?')) return;
-    await fetch(`/api/expenses/${expId}`, { method: 'DELETE' });
-    if (selectedBatchId) fetchExpenses(selectedBatchId);
+  function handleDeleteExpense(expId: number) {
+    setDialog({
+      title: 'Delete Expense',
+      message: 'This expense will be permanently removed.',
+      variant: 'delete',
+      onConfirm: async () => {
+        await fetch(`/api/expenses/${expId}`, { method: 'DELETE' });
+        if (selectedBatchId) fetchExpenses(selectedBatchId);
+      },
+    });
   }
 
   function openAddPigSale() {
@@ -255,10 +275,16 @@ export default function CaretakerLedgerPage() {
     fetchData();
   }
 
-  async function handleDeletePigSale(saleId: number) {
-    if (!confirm('Remove this pig sale?')) return;
-    await fetch(`/api/pig-sales/${saleId}`, { method: 'DELETE' });
-    if (selectedBatchId) fetchPigSales(selectedBatchId);
+  function handleDeletePigSale(saleId: number) {
+    setDialog({
+      title: 'Remove Pig Sale',
+      message: 'This pig sale record will be permanently removed.',
+      variant: 'delete',
+      onConfirm: async () => {
+        await fetch(`/api/pig-sales/${saleId}`, { method: 'DELETE' });
+        if (selectedBatchId) fetchPigSales(selectedBatchId);
+      },
+    });
   }
 
   const selectedBatch = batches.find(b => b.id === selectedBatchId) ?? null;
@@ -1136,6 +1162,14 @@ export default function CaretakerLedgerPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {dialog && (
+        <ConfirmModal
+          {...dialog}
+          onConfirm={() => { dialog.onConfirm(); setDialog(null); }}
+          onCancel={() => setDialog(null)}
+        />
       )}
     </div>
   );

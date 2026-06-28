@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus, Eye, Trash2, ClipboardList } from 'lucide-react';
 import { usePoll } from '@/hooks/use-poll';
+import ConfirmModal from '@/components/confirm-modal';
 
 interface Batch {
   id: number;
@@ -44,6 +45,7 @@ export default function BatchesPage() {
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ batch_date: new Date().toISOString().split('T')[0], notes: '' });
   const [saving, setSaving] = useState(false);
+  const [dialog, setDialog] = useState<{ title: string; message: string; variant?: 'default' | 'delete'; onConfirm: () => void } | null>(null);
 
   const fetchBatches = useCallback(async () => {
     const res = await fetch('/api/batches');
@@ -68,10 +70,16 @@ export default function BatchesPage() {
     fetchBatches();
   }
 
-  async function handleDelete(id: number) {
-    if (!confirm('Delete this batch? Transactions will remain but lose their batch assignment.')) return;
-    await fetch(`/api/batches/${id}`, { method: 'DELETE' });
-    fetchBatches();
+  function handleDelete(id: number) {
+    setDialog({
+      title: 'Delete Batch',
+      message: 'Transactions in this batch will remain but lose their batch assignment.',
+      variant: 'delete',
+      onConfirm: async () => {
+        await fetch(`/api/batches/${id}`, { method: 'DELETE' });
+        fetchBatches();
+      },
+    });
   }
 
   if (loading) {
@@ -201,6 +209,13 @@ export default function BatchesPage() {
             </div>
           </div>
         </div>
+      )}
+      {dialog && (
+        <ConfirmModal
+          {...dialog}
+          onConfirm={() => { dialog.onConfirm(); setDialog(null); }}
+          onCancel={() => setDialog(null)}
+        />
       )}
     </div>
   );
