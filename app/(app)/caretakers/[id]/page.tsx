@@ -348,15 +348,8 @@ export default function CaretakerLedgerPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-start print-layout-grid">
-      {/* ── Placeholder when no batch selected ── */}
-      {!selectedBatch && (
-        <div className="md:col-span-2 min-w-0 order-1 flex items-center justify-center py-24">
-          <p className="text-gray-400 dark:text-gray-500 text-sm">Select a batch from the list to view records.</p>
-        </div>
-      )}
-
       {/* ── Info card (order 1 on mobile) ── */}
-      {selectedBatch && (<div className="md:col-span-2 min-w-0 order-1">
+      <div className="md:col-span-2 min-w-0 order-1">
 
       {/* ── Caretaker info card ───────────────────────────────────────── */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-6 py-5 mb-6 print:rounded-sm print-card">
@@ -404,7 +397,7 @@ export default function CaretakerLedgerPage() {
           </div>
         </div>
       </div>
-      </div>)}
+      </div>
 
       {/* ── Main content (order 3 on mobile, row 2 on desktop) ── */}
       {selectedBatch && (<div className="md:col-span-2 min-w-0 order-3">
