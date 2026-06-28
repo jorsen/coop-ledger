@@ -293,8 +293,9 @@ export default function CaretakerLedgerPage() {
 
   const txTotalPages = Math.ceil(withComputed.length / PAGE_SIZE);
   const pagedTx = withComputed.slice(txPage * PAGE_SIZE, (txPage + 1) * PAGE_SIZE);
-  const batchTotalPages = Math.ceil(batches.length / PAGE_SIZE);
-  const pagedBatches = batches.slice(batchPage * PAGE_SIZE, (batchPage + 1) * PAGE_SIZE);
+  const activeBatches = batches.filter(b => b.status !== 'paid');
+  const batchTotalPages = Math.ceil(activeBatches.length / PAGE_SIZE);
+  const pagedBatches = activeBatches.slice(batchPage * PAGE_SIZE, (batchPage + 1) * PAGE_SIZE);
 
   if (loading) {
     return (
@@ -537,7 +538,7 @@ export default function CaretakerLedgerPage() {
       </div>
 
       {/* ── Other Expenses + Pig Sales ── */}
-      {batches.length > 0 && (
+      {selectedBatch && (
         <div className="mt-6 print:mt-3 grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-5 print:gap-3">
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
           <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
@@ -767,8 +768,8 @@ export default function CaretakerLedgerPage() {
             <div className="flex items-center gap-2">
               <ClipboardList className="w-4 h-4 text-gray-500" />
               <h2 className="font-semibold text-gray-900 dark:text-white">Batches</h2>
-              {batches.length > 0 && (
-                <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full">{batches.length}</span>
+              {activeBatches.length > 0 && (
+                <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full">{activeBatches.length}</span>
               )}
             </div>
             {isLoggedIn && (
@@ -781,12 +782,12 @@ export default function CaretakerLedgerPage() {
             )}
           </div>
 
-          {batches.length === 0 ? (
+          {activeBatches.length === 0 ? (
             <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">No batches yet. Create one to group transactions.</p>
           ) : (
             <>
             <div className="divide-y divide-gray-50 dark:divide-gray-700 max-h-[60vh] overflow-y-auto">
-              {batches.filter(b => b.status !== 'paid').map((b) => {
+              {pagedBatches.map((b) => {
                 const isViewing = b.id === selectedBatchId;
                 return (
                 <div
