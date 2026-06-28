@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Eye, Pencil, Trash2, Search, LayoutGrid, List, StickyNote } from 'lucide-react';
+import { Plus, Eye, Pencil, Trash2, Search, LayoutGrid, List, StickyNote, Archive } from 'lucide-react';
 import ClientModal from '@/components/client-modal';
 import { usePoll } from '@/hooks/use-poll';
 
@@ -128,15 +128,24 @@ export default function CaretakersPage() {
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Caretakers</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Manage cooperative members</p>
         </div>
-        {isLoggedIn && (
+        <div className="flex items-center gap-2 sm:ml-auto">
           <button
-            onClick={() => setModal({ mode: 'add' })}
-            className="flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors sm:ml-auto"
+            onClick={() => router.push('/caretakers/archives')}
+            className="flex items-center gap-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
-            <Plus className="w-4 h-4" />
-            Add Caretaker
+            <Archive className="w-4 h-4" />
+            Archives
           </button>
-        )}
+          {isLoggedIn && (
+            <button
+              onClick={() => setModal({ mode: 'add' })}
+              className="flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Add Caretaker
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Search + view toggle */}
