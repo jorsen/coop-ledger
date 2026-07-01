@@ -444,7 +444,7 @@ export default function CaretakerLedgerPage() {
                 <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">FEEDS</th>
                 <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">TR_DATE</th>
                 <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">NO.OF BAGS</th>
-                <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap hidden xl:table-cell">Price/Bag</th>
+                <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap hidden lg:table-cell print:table-cell">Price/Bag</th>
                 <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">Debit</th>
                 <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 print:hidden whitespace-nowrap hidden xl:table-cell">Delivery Fee</th>
                 <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">Balance</th>
@@ -468,7 +468,7 @@ export default function CaretakerLedgerPage() {
                   <td className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap">{tx.feed_type || '—'}</td>
                   <td className="px-4 py-3 text-blue-600 dark:text-blue-400 whitespace-nowrap">{fmtDate(tx.date)}</td>
                   <td className="px-4 py-3 text-gray-700 dark:text-gray-300 text-right">{Number(tx.bags).toFixed(2)}</td>
-                  <td className="px-4 py-3 text-gray-600 dark:text-gray-400 text-right hidden xl:table-cell">
+                  <td className="px-4 py-3 text-gray-600 dark:text-gray-400 text-right hidden lg:table-cell print:table-cell">
                     {tx.price_per_bag ? num(Number(tx.price_per_bag)) : '—'}
                   </td>
                   <td className="px-4 py-3 text-gray-900 dark:text-white text-right">{num(tx.debit)}</td>
