@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { sql } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
-  const { error } = await requireAuth();
+  const { session, error } = await requireAuth();
   if (error) return error;
 
   try {
@@ -23,10 +25,11 @@ export async function GET(req: NextRequest) {
 
     const logs = await sql`
       SELECT * FROM activity_logs
+      WHERE user_id = ${session.userId}
       ORDER BY created_at DESC
       LIMIT ${limit} OFFSET ${offset}
     `;
-    const [{ count }] = await sql`SELECT COUNT(*)::int AS count FROM activity_logs`;
+    const [{ count }] = await sql`SELECT COUNT(*)::int AS count FROM activity_logs WHERE user_id = ${session.userId}`;
 
     return NextResponse.json({ logs, total: count });
   } catch (err) {

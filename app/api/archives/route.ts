@@ -1,7 +1,13 @@
 import { NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth';
 import { sql } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
+  const { session, error } = await requireAuth();
+  if (error) return error;
+
   await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active'`;
 
   try {
@@ -26,7 +32,7 @@ export async function GET() {
       FROM batches b
       JOIN clients c ON c.id = b.client_id
       LEFT JOIN transactions t ON t.batch_id = b.id
-      WHERE LOWER(TRIM(COALESCE(b.status, 'active'))) = 'paid'
+      WHERE LOWER(TRIM(COALESCE(b.status, 'active'))) = 'paid' AND b.user_id = ${session.userId}
       GROUP BY b.id, c.id
       ORDER BY b.batch_date DESC, b.created_at DESC
     `;

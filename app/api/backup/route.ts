@@ -3,20 +3,21 @@ import { requireAuth } from '@/lib/auth';
 import { sql, rawQuery } from '@/lib/db';
 
 export async function GET() {
-  const { error } = await requireAuth();
+  const { session, error } = await requireAuth();
   if (error) return error;
+  const userId = session.userId;
 
   const [clients, batches, transactions, feedTypes, feedPrices, settings, expenses, pigSales, activityLogs] =
     await Promise.all([
-      sql`SELECT * FROM clients ORDER BY id`,
-      sql`SELECT * FROM batches ORDER BY id`,
-      sql`SELECT * FROM transactions ORDER BY id`,
-      sql`SELECT * FROM feed_types ORDER BY id`,
-      sql`SELECT * FROM feed_prices ORDER BY id`,
-      sql`SELECT * FROM settings ORDER BY key`,
-      sql`SELECT * FROM expenses ORDER BY id`.catch(() => []),
-      sql`SELECT * FROM pig_sales ORDER BY id`.catch(() => []),
-      sql`SELECT * FROM activity_logs ORDER BY id`.catch(() => []),
+      sql`SELECT * FROM clients WHERE user_id = ${userId} ORDER BY id`,
+      sql`SELECT * FROM batches WHERE user_id = ${userId} ORDER BY id`,
+      sql`SELECT * FROM transactions WHERE user_id = ${userId} ORDER BY id`,
+      sql`SELECT * FROM feed_types WHERE user_id = ${userId} ORDER BY id`,
+      sql`SELECT * FROM feed_prices WHERE user_id = ${userId} ORDER BY id`,
+      sql`SELECT * FROM settings WHERE user_id = ${userId} ORDER BY key`,
+      sql`SELECT * FROM expenses WHERE user_id = ${userId} ORDER BY id`.catch(() => []),
+      sql`SELECT * FROM pig_sales WHERE user_id = ${userId} ORDER BY id`.catch(() => []),
+      sql`SELECT * FROM activity_logs WHERE user_id = ${userId} ORDER BY id`.catch(() => []),
     ]);
 
   const backup = {
@@ -56,14 +57,17 @@ const SEQUENCE_TABLES = [
   'feed_types', 'feed_prices', 'expenses', 'pig_sales', 'activity_logs',
 ];
 
-async function restoreTable(tableName: string, rows: Record<string, unknown>[]) {
+async function restoreTable(tableName: string, rows: Record<string, unknown>[], userId: number) {
   if (!rows?.length) return;
   try {
-    const cols = Object.keys(rows[0]);
+    // Force every restored row to belong to the restoring user, regardless
+    // of what user_id (if any) is baked into the uploaded backup file.
+    const taggedRows: Record<string, unknown>[] = rows.map(row => ({ ...row, user_id: userId }));
+    const cols = Object.keys(taggedRows[0]);
     const colList = cols.map(c => `"${c}"`).join(', ');
     // Insert in chunks of 50
-    for (let i = 0; i < rows.length; i += 50) {
-      const chunk = rows.slice(i, i + 50);
+    for (let i = 0; i < taggedRows.length; i += 50) {
+      const chunk = taggedRows.slice(i, i + 50);
       const placeholders = chunk.map(
         (_, ri) => `(${cols.map((_, ci) => `$${ri * cols.length + ci + 1}`).join(', ')})`
       ).join(', ');
@@ -76,8 +80,9 @@ async function restoreTable(tableName: string, rows: Record<string, unknown>[]) 
 }
 
 export async function POST(req: NextRequest) {
-  const { error } = await requireAuth();
+  const { session, error } = await requireAuth();
   if (error) return error;
+  const userId = session.userId;
 
   let backup: any;
   try {
@@ -92,21 +97,22 @@ export async function POST(req: NextRequest) {
 
   const { tables } = backup;
 
-  // Delete in reverse FK dependency order
+  // Delete only this user's rows, in reverse FK dependency order —
+  // other accounts' data is untouched.
   for (const t of TABLES_DELETE_ORDER) {
-    try { await rawQuery(`DELETE FROM "${t}"`); } catch {}
+    try { await rawQuery(`DELETE FROM "${t}" WHERE user_id = $1`, [userId]); } catch {}
   }
 
-  // Restore in FK dependency order
-  await restoreTable('settings',      tables.settings      ?? []);
-  await restoreTable('feed_types',    tables.feed_types    ?? []);
-  await restoreTable('clients',       tables.clients       ?? []);
-  await restoreTable('batches',       tables.batches       ?? []);
-  await restoreTable('feed_prices',   tables.feed_prices   ?? []);
-  await restoreTable('transactions',  tables.transactions  ?? []);
-  await restoreTable('expenses',      tables.expenses      ?? []);
-  await restoreTable('pig_sales',     tables.pig_sales     ?? []);
-  await restoreTable('activity_logs', tables.activity_logs ?? []);
+  // Restore in FK dependency order, re-tagged to the restoring user
+  await restoreTable('settings',      tables.settings      ?? [], userId);
+  await restoreTable('feed_types',    tables.feed_types    ?? [], userId);
+  await restoreTable('clients',       tables.clients       ?? [], userId);
+  await restoreTable('batches',       tables.batches       ?? [], userId);
+  await restoreTable('feed_prices',   tables.feed_prices   ?? [], userId);
+  await restoreTable('transactions',  tables.transactions  ?? [], userId);
+  await restoreTable('expenses',      tables.expenses      ?? [], userId);
+  await restoreTable('pig_sales',     tables.pig_sales     ?? [], userId);
+  await restoreTable('activity_logs', tables.activity_logs ?? [], userId);
 
   // Reset sequences so new inserts don't conflict
   for (const t of SEQUENCE_TABLES) {

@@ -4,6 +4,9 @@ import { sql } from '@/lib/db';
 import { logActivity } from '@/lib/activity';
 
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+  const { session, error } = await requireAuth();
+  if (error) return error;
+
   await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS pig_price_per_kg DECIMAL(10,2) DEFAULT 170`;
   await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active'`;
 
@@ -15,7 +18,7 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
       c.allocation  AS client_allocation
     FROM batches b
     LEFT JOIN clients c ON c.id = b.client_id
-    WHERE b.id = ${params.id}
+    WHERE b.id = ${params.id} AND b.user_id = ${session.userId}
   `;
   if (!batch) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
@@ -27,12 +30,13 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
         FROM feed_prices fp
         JOIN feed_types ft ON ft.id = fp.feed_type_id
         WHERE LOWER(ft.name) = LOWER(t.feed_type)
+          AND ft.user_id = ${session.userId}
           AND fp.effective_date <= t.date
         ORDER BY fp.effective_date DESC LIMIT 1
-      ), (SELECT value::numeric FROM settings WHERE key = 'delivery_fee' LIMIT 1), 0) * t.bags AS delivery_fee
+      ), (SELECT value::numeric FROM settings WHERE key = 'delivery_fee' AND user_id = ${session.userId} LIMIT 1), 0) * t.bags AS delivery_fee
     FROM transactions t
     JOIN clients c ON c.id = t.client_id
-    WHERE t.batch_id = ${params.id}
+    WHERE t.batch_id = ${params.id} AND t.user_id = ${session.userId}
     ORDER BY t.date ASC, t.created_at ASC
   `;
 
@@ -40,7 +44,7 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
-  const { error } = await requireAuth();
+  const { session, error } = await requireAuth();
   if (error) return error;
 
   const { batch_number, batch_date, notes, date_of_application, date_of_hauling, maturity_date, heads, allocation, status } = await req.json();
@@ -63,17 +67,17 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         heads               = ${heads ? Number(heads) : null},
         allocation          = ${allocation ? Number(allocation) : null},
         status              = ${status || 'active'}
-    WHERE id = ${params.id}
+    WHERE id = ${params.id} AND user_id = ${session.userId}
     RETURNING *
   `;
 
   if (!updated) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-  await logActivity('updated', 'batch', updated.id, `Updated batch ${updated.batch_number}`);
+  await logActivity('updated', 'batch', updated.id, `Updated batch ${updated.batch_number}`, session.userId);
   return NextResponse.json(updated);
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
-  const { error } = await requireAuth();
+  const { session, error } = await requireAuth();
   if (error) return error;
 
   await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS pig_price_per_kg DECIMAL(10,2) DEFAULT 170`;
@@ -81,7 +85,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   const { pig_price_per_kg } = await req.json();
   const [updated] = await sql`
     UPDATE batches SET pig_price_per_kg = ${pig_price_per_kg}
-    WHERE id = ${params.id}
+    WHERE id = ${params.id} AND user_id = ${session.userId}
     RETURNING id, pig_price_per_kg
   `;
   if (!updated) return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -89,11 +93,11 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
-  const { error } = await requireAuth();
+  const { session, error } = await requireAuth();
   if (error) return error;
 
-  const [existing] = await sql`SELECT b.batch_number, c.name AS client_name FROM batches b LEFT JOIN clients c ON c.id = b.client_id WHERE b.id = ${params.id}`;
-  await sql`DELETE FROM batches WHERE id = ${params.id}`;
-  if (existing) await logActivity('deleted', 'batch', Number(params.id), `Deleted batch ${existing.batch_number}${existing.client_name ? ` (${existing.client_name})` : ''}`);
+  const [existing] = await sql`SELECT b.batch_number, c.name AS client_name FROM batches b LEFT JOIN clients c ON c.id = b.client_id WHERE b.id = ${params.id} AND b.user_id = ${session.userId}`;
+  await sql`DELETE FROM batches WHERE id = ${params.id} AND user_id = ${session.userId}`;
+  if (existing) await logActivity('deleted', 'batch', Number(params.id), `Deleted batch ${existing.batch_number}${existing.client_name ? ` (${existing.client_name})` : ''}`, session.userId);
   return NextResponse.json({ success: true });
 }

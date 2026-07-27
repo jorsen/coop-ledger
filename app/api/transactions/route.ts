@@ -4,7 +4,7 @@ import { sql } from '@/lib/db';
 import { logActivity } from '@/lib/activity';
 
 export async function GET(req: NextRequest) {
-  const { error } = await requireAuth();
+  const { session, error } = await requireAuth();
   if (error) return error;
 
   const { searchParams } = req.nextUrl;
@@ -19,6 +19,7 @@ export async function GET(req: NextRequest) {
       0 AS delivery_fee
     FROM transactions t
     JOIN clients c ON c.id = t.client_id
+    WHERE t.user_id = ${session.userId}
     ORDER BY t.date DESC, t.created_at DESC
   `;
 
@@ -36,7 +37,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const { error } = await requireAuth();
+  const { session, error } = await requireAuth();
   if (error) return error;
 
   const { client_id, date, feed_type, bags, debit, credit, notes, batch_id } = await req.json();
@@ -45,19 +46,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'client_id and date are required' }, { status: 400 });
   }
 
+  const [client] = await sql`SELECT name FROM clients WHERE id = ${client_id} AND user_id = ${session.userId}`;
+  if (!client) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+
   const resolvedBatchId = batch_id || null;
 
   const [tx] = await sql`
-    INSERT INTO transactions (client_id, date, feed_type, bags, debit, credit, notes, batch_id)
+    INSERT INTO transactions (client_id, date, feed_type, bags, debit, credit, notes, batch_id, user_id)
     VALUES (
       ${client_id}, ${date}, ${feed_type || ''}, ${bags || 0}, ${debit || 0}, ${credit || 0},
-      ${notes || ''}, ${resolvedBatchId}
+      ${notes || ''}, ${resolvedBatchId}, ${session.userId}
     )
     RETURNING *
   `;
 
-  const [client] = await sql`SELECT name FROM clients WHERE id = ${client_id}`;
-  const label = client ? client.name : `client #${client_id}`;
-  await logActivity('created', 'transaction', tx.id, `Added transaction for ${label}: ${feed_type || 'feed'} × ${bags || 0} bags (₱${debit || 0})`);
+  const label = client.name;
+  await logActivity('created', 'transaction', tx.id, `Added transaction for ${label}: ${feed_type || 'feed'} × ${bags || 0} bags (₱${debit || 0})`, session.userId);
   return NextResponse.json(tx, { status: 201 });
 }

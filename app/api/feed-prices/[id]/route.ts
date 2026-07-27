@@ -3,9 +3,9 @@ import { requireAuth } from '@/lib/auth';
 import { sql } from '@/lib/db';
 
 export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
-  const { error } = await requireAuth();
+  const { session, error } = await requireAuth();
   if (error) return error;
 
-  await sql`DELETE FROM feed_prices WHERE id = ${params.id}`;
+  await sql`DELETE FROM feed_prices WHERE id = ${params.id} AND user_id = ${session.userId}`;
   return NextResponse.json({ success: true });
 }

@@ -11,6 +11,7 @@
   "dependencies": {
     "@ducanh2912/next-pwa": "^10.2.9",
     "@neondatabase/serverless": "^0.9.5",
+    "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",
     "iron-session": "^8.0.3",
     "lucide-react": "^0.400.0",
@@ -19,6 +20,7 @@
     "react-dom": "^18"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

@@ -4,6 +4,9 @@ import { sql } from '@/lib/db';
 import { logActivity } from '@/lib/activity';
 
 export async function GET(req: NextRequest) {
+  const { session, error } = await requireAuth();
+  if (error) return error;
+
   await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS pig_price_per_kg DECIMAL(10,2) DEFAULT 170`;
   await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active'`;
   await sql`ALTER TABLE batches DROP CONSTRAINT IF EXISTS batches_status_check`;
@@ -21,7 +24,7 @@ export async function GET(req: NextRequest) {
             COALESCE(SUM(t.debit), 0) AS total_debit
           FROM batches b
           LEFT JOIN transactions t ON t.batch_id = b.id
-          WHERE b.client_id = ${clientId}
+          WHERE b.client_id = ${clientId} AND b.user_id = ${session.userId}
           GROUP BY b.id
           ORDER BY b.batch_date DESC, b.created_at DESC
         `
@@ -33,6 +36,7 @@ export async function GET(req: NextRequest) {
             COALESCE(SUM(t.debit), 0) AS total_debit
           FROM batches b
           LEFT JOIN transactions t ON t.batch_id = b.id
+          WHERE b.user_id = ${session.userId}
           GROUP BY b.id
           ORDER BY b.batch_date DESC, b.created_at DESC
         `;
@@ -44,7 +48,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const { error } = await requireAuth();
+  const { session, error } = await requireAuth();
   if (error) return error;
 
   try {
@@ -60,23 +64,26 @@ export async function POST(req: NextRequest) {
     const dateVal = batch_date || new Date().toISOString().split('T')[0];
     const statusVal = status || 'active';
 
+    const [cl] = client_id ? await sql`SELECT name FROM clients WHERE id = ${client_id} AND user_id = ${session.userId}` : [null];
+    if (client_id && !cl) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+
     let batch;
     if (batch_number?.trim()) {
       const [b] = await sql`
-        INSERT INTO batches (batch_number, client_id, batch_date, notes, date_of_application, date_of_hauling, maturity_date, heads, allocation, status)
+        INSERT INTO batches (batch_number, client_id, batch_date, notes, date_of_application, date_of_hauling, maturity_date, heads, allocation, status, user_id)
         VALUES (${batch_number.trim()}, ${client_id || null}, ${dateVal}, ${notes || ''},
           ${date_of_application || null}, ${date_of_hauling || null}, ${maturity_date || null},
-          ${heads ? Number(heads) : null}, ${allocation ? Number(allocation) : null}, ${statusVal})
+          ${heads ? Number(heads) : null}, ${allocation ? Number(allocation) : null}, ${statusVal}, ${session.userId})
         RETURNING *
       `;
       batch = b;
     } else {
       const tmpName = `__TMP__${Date.now()}`;
       const [inserted] = await sql`
-        INSERT INTO batches (batch_number, client_id, batch_date, notes, date_of_application, date_of_hauling, maturity_date, heads, allocation, status)
+        INSERT INTO batches (batch_number, client_id, batch_date, notes, date_of_application, date_of_hauling, maturity_date, heads, allocation, status, user_id)
         VALUES (${tmpName}, ${client_id || null}, ${dateVal}, ${notes || ''},
           ${date_of_application || null}, ${date_of_hauling || null}, ${maturity_date || null},
-          ${heads ? Number(heads) : null}, ${allocation ? Number(allocation) : null}, ${statusVal})
+          ${heads ? Number(heads) : null}, ${allocation ? Number(allocation) : null}, ${statusVal}, ${session.userId})
         RETURNING id
       `;
       const autoNumber = `BT-${String(inserted.id).padStart(3, '0')}`;
@@ -84,8 +91,7 @@ export async function POST(req: NextRequest) {
       batch = b;
     }
 
-    const [cl] = client_id ? await sql`SELECT name FROM clients WHERE id = ${client_id}` : [null];
-    await logActivity('created', 'batch', batch.id, `Created batch ${batch.batch_number}${cl ? ` for ${cl.name}` : ''}`);
+    await logActivity('created', 'batch', batch.id, `Created batch ${batch.batch_number}${cl ? ` for ${cl.name}` : ''}`, session.userId);
     return NextResponse.json(batch, { status: 201 });
   } catch (err) {
     console.error('POST /api/batches error:', err);

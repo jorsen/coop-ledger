@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { sql } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/migrate  — run once to add delivery_fee_per_bag and update prices
 export async function GET() {
   const { error } = await requireAuth();

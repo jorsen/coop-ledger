@@ -4,7 +4,10 @@ import { sql } from '@/lib/db';
 import { logActivity } from '@/lib/activity';
 
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
-  const [client] = await sql`SELECT * FROM clients WHERE id = ${params.id}`;
+  const { session, error } = await requireAuth();
+  if (error) return error;
+
+  const [client] = await sql`SELECT * FROM clients WHERE id = ${params.id} AND user_id = ${session.userId}`;
   if (!client) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const transactions = await sql`
@@ -16,12 +19,13 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
         FROM feed_prices fp
         JOIN feed_types ft ON ft.id = fp.feed_type_id
         WHERE LOWER(ft.name) = LOWER(t.feed_type)
+          AND ft.user_id = ${session.userId}
           AND fp.effective_date <= t.date
         ORDER BY fp.effective_date DESC LIMIT 1
-      ), (SELECT value::numeric FROM settings WHERE key = 'delivery_fee' LIMIT 1), 0) * t.bags AS delivery_fee
+      ), (SELECT value::numeric FROM settings WHERE key = 'delivery_fee' AND user_id = ${session.userId} LIMIT 1), 0) * t.bags AS delivery_fee
     FROM transactions t
     LEFT JOIN batches b ON b.id = t.batch_id
-    WHERE t.client_id = ${params.id}
+    WHERE t.client_id = ${params.id} AND t.user_id = ${session.userId}
     ORDER BY t.date ASC, t.created_at ASC
   `;
 
@@ -29,7 +33,7 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
-  const { error } = await requireAuth();
+  const { session, error } = await requireAuth();
   if (error) return error;
 
   const { client_code, name, batch_number, status, heads, allocation, date_of_hauling, date_of_application, notes, is_updated } = await req.json();
@@ -55,7 +59,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       notes                = ${notes || null},
       is_updated           = ${is_updated ?? false},
       updated_at           = NOW()
-    WHERE id = ${params.id}
+    WHERE id = ${params.id} AND user_id = ${session.userId}
     RETURNING *
   `;
 
@@ -72,16 +76,16 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       date_of_hauling     = ${date_of_hauling || null},
       heads               = ${heads ? Number(heads) : null}
     WHERE id = (
-      SELECT id FROM batches WHERE client_id = ${params.id} ORDER BY created_at DESC LIMIT 1
+      SELECT id FROM batches WHERE client_id = ${params.id} AND user_id = ${session.userId} ORDER BY created_at DESC LIMIT 1
     )
   `;
 
-  await logActivity('updated', 'caretaker', updated.id, `Updated caretaker ${updated.name} (${updated.client_code})`);
+  await logActivity('updated', 'caretaker', updated.id, `Updated caretaker ${updated.name} (${updated.client_code})`, session.userId);
   return NextResponse.json(updated);
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
-  const { error } = await requireAuth();
+  const { session, error } = await requireAuth();
   if (error) return error;
 
   const body = await req.json();
@@ -91,7 +95,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   const [updated] = await sql`
     UPDATE clients
     SET is_updated = ${body.is_updated ?? false}, updated_at = NOW()
-    WHERE id = ${params.id}
+    WHERE id = ${params.id} AND user_id = ${session.userId}
     RETURNING id, is_updated
   `;
 
@@ -100,11 +104,11 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
-  const { error } = await requireAuth();
+  const { session, error } = await requireAuth();
   if (error) return error;
 
-  const [existing] = await sql`SELECT name, client_code FROM clients WHERE id = ${params.id}`;
-  await sql`DELETE FROM clients WHERE id = ${params.id}`;
-  if (existing) await logActivity('deleted', 'caretaker', Number(params.id), `Deleted caretaker ${existing.name} (${existing.client_code})`);
+  const [existing] = await sql`SELECT name, client_code FROM clients WHERE id = ${params.id} AND user_id = ${session.userId}`;
+  await sql`DELETE FROM clients WHERE id = ${params.id} AND user_id = ${session.userId}`;
+  if (existing) await logActivity('deleted', 'caretaker', Number(params.id), `Deleted caretaker ${existing.name} (${existing.client_code})`, session.userId);
   return NextResponse.json({ success: true });
 }

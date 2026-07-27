@@ -5,7 +5,7 @@ import { sql } from '@/lib/db';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const { error } = await requireAuth();
+  const { session, error } = await requireAuth();
   if (error) return error;
 
   await sql`CREATE TABLE IF NOT EXISTS backup_files (
@@ -16,6 +16,6 @@ export async function GET() {
     data JSONB NOT NULL
   )`;
 
-  const files = await sql`SELECT id, filename, created_at, size_bytes FROM backup_files ORDER BY created_at DESC`;
+  const files = await sql`SELECT id, filename, created_at, size_bytes FROM backup_files WHERE user_id = ${session.userId} ORDER BY created_at DESC`;
   return NextResponse.json(files);
 }

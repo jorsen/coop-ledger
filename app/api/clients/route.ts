@@ -4,6 +4,9 @@ import { sql } from '@/lib/db';
 import { logActivity } from '@/lib/activity';
 
 export async function GET() {
+  const { session, error } = await requireAuth();
+  if (error) return error;
+
   await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active'`;
 
   const clients = await sql`
@@ -36,6 +39,7 @@ export async function GET() {
       ORDER BY b.created_at DESC
       LIMIT 1
     ) lb ON true
+    WHERE c.user_id = ${session.userId}
     GROUP BY c.id, lb.batch_number, lb.heads, lb.date_of_application, lb.date_of_hauling
     ORDER BY c.name ASC
   `;
@@ -44,7 +48,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const { error } = await requireAuth();
+  const { session, error } = await requireAuth();
   if (error) return error;
 
   const { name, batch_number, status, heads, allocation, date_of_hauling, date_of_application, notes, is_updated } = await req.json();
@@ -63,9 +67,9 @@ export async function POST(req: NextRequest) {
 
   // Insert with a temporary code, then update to the zero-padded id
   const [inserted] = await sql`
-    INSERT INTO clients (client_code, name, batch_number, status, heads, allocation, date_of_hauling, date_of_application, notes, is_updated)
+    INSERT INTO clients (client_code, name, batch_number, status, heads, allocation, date_of_hauling, date_of_application, notes, is_updated, user_id)
     VALUES ('TMP', ${name}, ${batch_number || '1'}, ${status || 'active'}, ${heads || 0}, ${allocation || 0},
-      ${date_of_hauling || null}, ${date_of_application || null}, ${notes || null}, ${is_updated ?? false})
+      ${date_of_hauling || null}, ${date_of_application || null}, ${notes || null}, ${is_updated ?? false}, ${session.userId})
     RETURNING id
   `;
 
@@ -75,6 +79,6 @@ export async function POST(req: NextRequest) {
     UPDATE clients SET client_code = ${autoCode} WHERE id = ${inserted.id} RETURNING *
   `;
 
-  await logActivity('created', 'caretaker', client.id, `Created caretaker ${client.name} (${autoCode})`);
+  await logActivity('created', 'caretaker', client.id, `Created caretaker ${client.name} (${autoCode})`, session.userId);
   return NextResponse.json(client, { status: 201 });
 }

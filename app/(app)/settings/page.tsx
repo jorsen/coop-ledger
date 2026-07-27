@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Save, Plus, Trash2, ChevronDown, ChevronUp, Moon, Sun, Pencil, Check, X } from 'lucide-react';
+import { Save, Plus, Trash2, ChevronDown, ChevronUp, Moon, Sun, Pencil, Check, X, UserPlus } from 'lucide-react';
 import { useTheme } from '@/components/theme-provider';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -10,6 +10,12 @@ interface FeedType {
   name: string;
   current_price: number | null;
   price_date: string | null;
+}
+
+interface AppUser {
+  id: number;
+  username: string;
+  created_at: string;
 }
 
 interface FeedPrice {
@@ -353,6 +359,109 @@ function FeedTypeCard({ feedType, onRefresh }: { feedType: FeedType; onRefresh: 
   );
 }
 
+// ── Users ─────────────────────────────────────────────────────────────────────
+function UsersSection() {
+  const [users, setUsers]           = useState<AppUser[]>([]);
+  const [loading, setLoading]       = useState(true);
+  const [username, setUsername]     = useState('');
+  const [password, setPassword]     = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [creating, setCreating]     = useState(false);
+  const [error, setError]           = useState('');
+
+  const fetchUsers = useCallback(async () => {
+    const res = await fetch('/api/users');
+    if (res.ok) setUsers(await res.json());
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { fetchUsers(); }, [fetchUsers]);
+
+  async function handleCreateUser(e: React.FormEvent) {
+    e.preventDefault();
+    setError('');
+    if (password !== confirmPassword) { setError('Passwords do not match.'); return; }
+    setCreating(true);
+    const res = await fetch('/api/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    });
+    setCreating(false);
+    if (!res.ok) { setError((await res.json()).error ?? 'Failed to create user.'); return; }
+    setUsername('');
+    setPassword('');
+    setConfirmPassword('');
+    fetchUsers();
+  }
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 mb-6">
+      <div className="px-6 py-5">
+        <h2 className="text-sm font-semibold text-gray-800 dark:text-white mb-1">Users</h2>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+          Each account has its own separate caretakers, batches, and records.
+        </p>
+
+        {loading ? (
+          <div className="h-9 w-full max-w-sm bg-gray-100 dark:bg-gray-700 rounded-lg animate-pulse mb-4" />
+        ) : (
+          <ul className="mb-5 space-y-1.5">
+            {users.map(u => (
+              <li key={u.id} className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                <span className="w-2 h-2 bg-green-500 rounded-full shrink-0" />
+                {u.username}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <form onSubmit={handleCreateUser} className="flex flex-wrap items-end gap-3">
+          <div>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
+            <input
+              value={username}
+              onChange={e => setUsername(e.target.value)}
+              placeholder="e.g. newcaretaker"
+              className="w-40 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              className="w-40 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm Password</label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={e => setConfirmPassword(e.target.value)}
+              className="w-40 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={creating}
+            className="flex items-center gap-1.5 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50"
+          >
+            <UserPlus className="w-3.5 h-3.5" />
+            {creating ? 'Creating…' : 'Create User'}
+          </button>
+        </form>
+        {error && <p className="text-sm text-red-600 mt-2">{error}</p>}
+      </div>
+    </div>
+  );
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function SettingsPage() {
   const { theme, toggle } = useTheme();
@@ -446,6 +555,9 @@ export default function SettingsPage() {
           </button>
         </div>
       </div>
+
+      {/* ── Users ───────────────────────────────────────────────────────── */}
+      <UsersSection />
 
       {/* ── Delivery fee ────────────────────────────────────────────────── */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 mb-6">

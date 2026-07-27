@@ -3,7 +3,7 @@ import { requireAuth } from '@/lib/auth';
 import { sql } from '@/lib/db';
 
 export async function GET() {
-  const { error } = await requireAuth();
+  const { session, error } = await requireAuth();
   if (error) return error;
 
   const feedTypes = await sql`
@@ -19,7 +19,7 @@ export async function GET() {
       ORDER BY effective_date DESC
       LIMIT 1
     ) fp ON true
-    WHERE ft.active = true
+    WHERE ft.active = true AND ft.user_id = ${session.userId}
     ORDER BY ft.name ASC
   `;
 
@@ -27,14 +27,14 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const { error } = await requireAuth();
+  const { session, error } = await requireAuth();
   if (error) return error;
 
   const { name } = await req.json();
   if (!name) return NextResponse.json({ error: 'name is required' }, { status: 400 });
 
   const [feedType] = await sql`
-    INSERT INTO feed_types (name) VALUES (${name}) RETURNING *
+    INSERT INTO feed_types (name, user_id) VALUES (${name}, ${session.userId}) RETURNING *
   `;
 
   return NextResponse.json(feedType, { status: 201 });

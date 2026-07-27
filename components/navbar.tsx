@@ -22,10 +22,14 @@ export default function Navbar() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState<string | null>(null);
   const { theme, toggle } = useTheme();
 
   useEffect(() => {
-    fetch('/api/auth/session').then(r => r.json()).then(d => setIsLoggedIn(d.isLoggedIn));
+    fetch('/api/auth/session').then(r => r.json()).then(d => {
+      setIsLoggedIn(d.isLoggedIn);
+      setUsername(d.username ?? null);
+    });
   }, [pathname]);
 
   async function handleLogout() {
@@ -69,10 +73,10 @@ export default function Navbar() {
 
         {/* Desktop right */}
         <div className="hidden lg:flex items-center gap-4 shrink-0 ml-auto">
-          {isLoggedIn && (
+          {isLoggedIn && username && (
             <span className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-300">
               <span className="w-2 h-2 bg-green-500 rounded-full" />
-              1 online
+              {username}
             </span>
           )}
           <button

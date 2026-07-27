@@ -3,12 +3,12 @@ import { requireAuth } from '@/lib/auth';
 import { sql } from '@/lib/db';
 
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
-  const { error } = await requireAuth();
+  const { session, error } = await requireAuth();
   if (error) return error;
 
   const prices = await sql`
     SELECT * FROM feed_prices
-    WHERE feed_type_id = ${params.id}
+    WHERE feed_type_id = ${params.id} AND user_id = ${session.userId}
     ORDER BY effective_date DESC
   `;
 
@@ -16,42 +16,42 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
-  const { error } = await requireAuth();
+  const { session, error } = await requireAuth();
   if (error) return error;
 
   const { name, active } = await req.json();
 
-  const [existing] = await sql`SELECT name FROM feed_types WHERE id = ${params.id}`;
+  const [existing] = await sql`SELECT name FROM feed_types WHERE id = ${params.id} AND user_id = ${session.userId}`;
   if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const [updated] = await sql`
     UPDATE feed_types
     SET name = ${name}, active = ${active}
-    WHERE id = ${params.id}
+    WHERE id = ${params.id} AND user_id = ${session.userId}
     RETURNING *
   `;
 
   if (existing.name.trim() !== name.trim()) {
-    await sql`UPDATE transactions SET feed_type = ${name} WHERE LOWER(TRIM(feed_type)) = LOWER(TRIM(${existing.name}))`;
+    await sql`UPDATE transactions SET feed_type = ${name} WHERE LOWER(TRIM(feed_type)) = LOWER(TRIM(${existing.name})) AND user_id = ${session.userId}`;
   }
 
   return NextResponse.json(updated);
 }
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
-  const { error } = await requireAuth();
+  const { session, error } = await requireAuth();
   if (error) return error;
 
   const { old_name } = await req.json();
   if (!old_name) return NextResponse.json({ error: 'old_name is required' }, { status: 400 });
 
-  const [ft] = await sql`SELECT name FROM feed_types WHERE id = ${params.id}`;
+  const [ft] = await sql`SELECT name FROM feed_types WHERE id = ${params.id} AND user_id = ${session.userId}`;
   if (!ft) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const result = await sql`
     UPDATE transactions
     SET feed_type = ${ft.name}
-    WHERE LOWER(TRIM(feed_type)) = LOWER(TRIM(${old_name}))
+    WHERE LOWER(TRIM(feed_type)) = LOWER(TRIM(${old_name})) AND user_id = ${session.userId}
     RETURNING id
   `;
 
@@ -59,9 +59,9 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
-  const { error } = await requireAuth();
+  const { session, error } = await requireAuth();
   if (error) return error;
 
-  await sql`UPDATE feed_types SET active = false WHERE id = ${params.id}`;
+  await sql`UPDATE feed_types SET active = false WHERE id = ${params.id} AND user_id = ${session.userId}`;
   return NextResponse.json({ success: true });
 }
