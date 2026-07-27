@@ -701,6 +701,13 @@ export default function BatchDetailPage() {
                     <td className="px-4 py-3 text-right text-gray-900 dark:text-white">₱{num(totalPigSalesAmount)}</td>
                     {isLoggedIn && <td />}
                   </tr>
+                  <tr className="bg-gray-50 dark:bg-gray-900 font-semibold">
+                    <td colSpan={3} className="px-4 py-3 text-right text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">Net (Pig Sales − Capital)</td>
+                    <td className={`px-4 py-3 text-right ${totalPigSalesAmount - (balance + totalInterest + totalDeliveryFee + totalOtherExpenses) >= 0 ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}>
+                      ₱{num(totalPigSalesAmount - (balance + totalInterest + totalDeliveryFee + totalOtherExpenses))}
+                    </td>
+                    {isLoggedIn && <td />}
+                  </tr>
                 </tbody>
               </table>
             </div>
