@@ -701,19 +701,32 @@ export default function BatchDetailPage() {
                     <td className="px-4 py-3 text-right text-gray-900 dark:text-white">₱{num(totalPigSalesAmount)}</td>
                     {isLoggedIn && <td />}
                   </tr>
-                  <tr className="bg-gray-50 dark:bg-gray-900 font-semibold">
-                    <td colSpan={3} className="px-4 py-3 text-right text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">Profit</td>
-                    <td className={`px-4 py-3 text-right ${(totalPigSalesAmount - (balance + totalInterest + totalDeliveryFee + totalOtherExpenses)) / 2 >= 0 ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}>
-                      ₱{num((totalPigSalesAmount - (balance + totalInterest + totalDeliveryFee + totalOtherExpenses)) / 2)}
-                    </td>
-                    {isLoggedIn && <td />}
-                  </tr>
                 </tbody>
               </table>
             </div>
           )}
         </div>
       </div>{/* end 2-col grid */}
+
+      {/* ── Profit summary ── */}
+      <div className="mt-6 print:mt-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 px-6 py-4">
+        <div className="w-full max-w-xs mx-auto sm:mx-0 space-y-1.5 text-sm">
+          <div className="flex justify-between">
+            <span className="text-gray-600 dark:text-gray-400">Total Capital</span>
+            <span className="font-medium text-gray-900 dark:text-white">₱{num(balance + totalInterest + totalDeliveryFee + totalOtherExpenses)}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-600 dark:text-gray-400">Total Pig Sales</span>
+            <span className="font-medium text-gray-900 dark:text-white">₱{num(totalPigSalesAmount)}</span>
+          </div>
+          <div className="flex justify-between border-t border-gray-200 dark:border-gray-700 pt-1.5 mt-1">
+            <span className="font-bold text-gray-900 dark:text-white">Profit</span>
+            <span className={`font-bold underline ${(totalPigSalesAmount - (balance + totalInterest + totalDeliveryFee + totalOtherExpenses)) / 2 >= 0 ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}>
+              ₱{num((totalPigSalesAmount - (balance + totalInterest + totalDeliveryFee + totalOtherExpenses)) / 2)}
+            </span>
+          </div>
+        </div>
+      </div>
 
       </div>{/* end main content */}
 
