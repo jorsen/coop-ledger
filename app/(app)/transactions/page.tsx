@@ -80,7 +80,7 @@ export default function TransactionsPage() {
     <div>
       {/* Print header */}
       <div className="hidden print:block mb-6 border-b border-gray-300 pb-4">
-        <p className="text-lg font-bold">Feed Cooperative — Transactions</p>
+        <p className="text-lg font-bold">Feeds Ledger — Transactions</p>
         <p className="text-sm mt-1">
           {(search || clientId || fromDate || toDate)
             ? `Filtered: ${[search, fromDate && `From ${fromDate}`, toDate && `To ${toDate}`].filter(Boolean).join(' · ')}`

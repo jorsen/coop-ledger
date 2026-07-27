@@ -66,9 +66,9 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/dashboard" className="flex items-center gap-2 shrink-0" onClick={() => setOpen(false)}>
           <div className="w-8 h-8 bg-green-800 rounded-lg flex items-center justify-center text-white font-bold text-xs">
-            FC
+            FL
           </div>
-          <span className="font-semibold text-green-800 dark:text-green-400 text-sm hidden lg:block">Feed Cooperative</span>
+          <span className="font-semibold text-green-800 dark:text-green-400 text-sm hidden lg:block">Feeds Ledger</span>
         </Link>
 
         {/* Desktop nav */}
@@ -159,7 +159,7 @@ export default function Navbar() {
 
         {/* Mobile: active label + hamburger */}
         <span className="lg:hidden flex-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-          {NAV_LINKS.find(l => pathname.startsWith(l.href))?.label ?? 'Feed Cooperative'}
+          {NAV_LINKS.find(l => pathname.startsWith(l.href))?.label ?? 'Feeds Ledger'}
         </span>
         {isLoggedIn ? (
           <button

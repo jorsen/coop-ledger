@@ -1,6 +1,6 @@
 {
-  "name": "Feed Cooperative Ledger",
-  "short_name": "Coop Ledger",
+  "name": "Feeds Ledger",
+  "short_name": "Feeds Ledger",
   "description": "Feed cooperative transaction and batch management system",
   "start_url": "/",
   "display": "standalone",

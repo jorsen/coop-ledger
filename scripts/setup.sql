@@ -1,4 +1,4 @@
--- Feed Cooperative Ledger — database setup
+-- Feeds Ledger — database setup
 -- Run this in your Neon SQL editor before starting the app
 
 CREATE TABLE IF NOT EXISTS clients (

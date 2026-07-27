@@ -6,13 +6,13 @@ import ThemeProvider from '@/components/theme-provider';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Feed Cooperative',
+  title: 'Feeds Ledger',
   description: 'Feed cooperative transaction and batch management system',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Coop Ledger',
+    title: 'Feeds Ledger',
   },
   formatDetection: { telephone: false },
   icons: {
