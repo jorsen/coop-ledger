@@ -740,6 +740,10 @@ export default function CaretakerLedgerPage() {
               <span className="font-medium text-gray-900 dark:text-white">₱{num(totalPigSalesAmount)}</span>
             </div>
             <div className="flex justify-between border-t border-gray-200 dark:border-gray-700 pt-1.5 mt-1">
+              <span className="text-gray-600 dark:text-gray-400">Total</span>
+              <span className="font-medium text-gray-900 dark:text-white">₱{num(totalPigSalesAmount - (balance + totalInterest + totalDeliveryFee + totalOtherExpenses))}</span>
+            </div>
+            <div className="flex justify-between">
               <span className="font-bold text-gray-900 dark:text-white">Profit</span>
               <span className={`font-bold underline ${(totalPigSalesAmount - (balance + totalInterest + totalDeliveryFee + totalOtherExpenses)) / 2 >= 0 ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}>
                 ₱{num((totalPigSalesAmount - (balance + totalInterest + totalDeliveryFee + totalOtherExpenses)) / 2)}
