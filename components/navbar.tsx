@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Users, FileText, Settings, LogOut, Menu, X, Moon, Sun, CalendarDays, Activity, DatabaseBackup } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, Settings, LogOut, LogIn, Menu, X, Moon, Sun, CalendarDays, Activity, DatabaseBackup } from 'lucide-react';
 import clsx from 'clsx';
 import { useTheme } from '@/components/theme-provider';
 
@@ -97,6 +97,23 @@ export default function Navbar() {
         <span className="lg:hidden flex-1 text-sm font-medium text-gray-700 dark:text-gray-200">
           {NAV_LINKS.find(l => pathname.startsWith(l.href))?.label ?? 'Feed Cooperative'}
         </span>
+        {isLoggedIn ? (
+          <button
+            onClick={handleLogout}
+            className="lg:hidden p-1.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+            aria-label="Logout"
+          >
+            <LogOut className="w-5 h-5" />
+          </button>
+        ) : (
+          <Link
+            href="/login"
+            className="lg:hidden p-1.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+            aria-label="Login"
+          >
+            <LogIn className="w-5 h-5" />
+          </Link>
+        )}
         <button
           className="lg:hidden p-1.5 text-gray-600 dark:text-gray-400 hover:text-gray-900"
           onClick={() => setOpen((v) => !v)}
