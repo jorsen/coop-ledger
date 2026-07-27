@@ -82,7 +82,7 @@ export default function Navbar() {
           >
             {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
-          {isLoggedIn && (
+          {isLoggedIn ? (
             <button
               onClick={handleLogout}
               className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
@@ -90,6 +90,14 @@ export default function Navbar() {
               <LogOut className="w-4 h-4" />
               Logout
             </button>
+          ) : (
+            <Link
+              href="/login"
+              className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+            >
+              <LogIn className="w-4 h-4" />
+              Login
+            </Link>
           )}
         </div>
 
@@ -152,7 +160,7 @@ export default function Navbar() {
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               {theme === 'dark' ? 'Light mode' : 'Dark mode'}
             </button>
-            {isLoggedIn && (
+            {isLoggedIn ? (
               <button
                 onClick={() => { setOpen(false); handleLogout(); }}
                 className="flex items-center gap-3 px-3 py-2.5 w-full text-left rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -160,6 +168,15 @@ export default function Navbar() {
                 <LogOut className="w-4 h-4" />
                 Logout
               </button>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-3 px-3 py-2.5 w-full text-left rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                <LogIn className="w-4 h-4" />
+                Login
+              </Link>
             )}
           </div>
         </div>
