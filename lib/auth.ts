@@ -19,3 +19,15 @@ export async function requireAuth(): Promise<
   }
   return { session: session as typeof session & { userId: number }, error: null };
 }
+
+export async function requireAdmin(): Promise<
+  { session: Awaited<ReturnType<typeof getSession>> & { userId: number }; error: null } |
+  { session: null; error: NextResponse }
+> {
+  const result = await requireAuth();
+  if (result.error) return result;
+  if (!result.session.isAdmin) {
+    return { session: null, error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) };
+  }
+  return result;
+}

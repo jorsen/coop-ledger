@@ -7,7 +7,7 @@ export async function GET() {
   const { error } = await requireAuth();
   if (error) return error;
 
-  const users = await sql`SELECT id, username, created_at FROM users ORDER BY created_at ASC`;
+  const users = await sql`SELECT id, username, is_admin, created_at FROM users ORDER BY created_at ASC`;
   return NextResponse.json(users);
 }
 

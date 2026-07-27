@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Save, Plus, Trash2, ChevronDown, ChevronUp, Moon, Sun, Pencil, Check, X, UserPlus } from 'lucide-react';
+import { Save, Plus, Trash2, ChevronDown, ChevronUp, Moon, Sun, Pencil, Check, X, UserPlus, KeyRound, ShieldCheck } from 'lucide-react';
 import { useTheme } from '@/components/theme-provider';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -15,6 +15,7 @@ interface FeedType {
 interface AppUser {
   id: number;
   username: string;
+  is_admin: boolean;
   created_at: string;
 }
 
@@ -363,11 +364,16 @@ function FeedTypeCard({ feedType, onRefresh }: { feedType: FeedType; onRefresh: 
 function UsersSection() {
   const [users, setUsers]           = useState<AppUser[]>([]);
   const [loading, setLoading]       = useState(true);
+  const [isAdmin, setIsAdmin]       = useState(false);
   const [username, setUsername]     = useState('');
   const [password, setPassword]     = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [creating, setCreating]     = useState(false);
   const [error, setError]           = useState('');
+  const [resetId, setResetId]       = useState<number | null>(null);
+  const [resetPassword, setResetPassword] = useState('');
+  const [resetting, setResetting]   = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const fetchUsers = useCallback(async () => {
     const res = await fetch('/api/users');
@@ -376,6 +382,9 @@ function UsersSection() {
   }, []);
 
   useEffect(() => { fetchUsers(); }, [fetchUsers]);
+  useEffect(() => {
+    fetch('/api/auth/session').then(r => r.json()).then(d => setIsAdmin(d.isAdmin === true));
+  }, []);
 
   async function handleCreateUser(e: React.FormEvent) {
     e.preventDefault();
@@ -395,6 +404,31 @@ function UsersSection() {
     fetchUsers();
   }
 
+  async function handleResetPassword(userId: number) {
+    if (!resetPassword) return;
+    setResetting(true);
+    setError('');
+    const res = await fetch(`/api/users/${userId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: resetPassword }),
+    });
+    setResetting(false);
+    if (!res.ok) { setError((await res.json()).error ?? 'Failed to reset password.'); return; }
+    setResetId(null);
+    setResetPassword('');
+  }
+
+  async function handleDeleteUser(userId: number, username: string) {
+    if (!confirm(`Permanently delete "${username}" and all of their records?`)) return;
+    setDeletingId(userId);
+    setError('');
+    const res = await fetch(`/api/users/${userId}`, { method: 'DELETE' });
+    setDeletingId(null);
+    if (!res.ok) { setError((await res.json()).error ?? 'Failed to delete user.'); return; }
+    fetchUsers();
+  }
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 mb-6">
       <div className="px-6 py-5">
@@ -408,9 +442,58 @@ function UsersSection() {
         ) : (
           <ul className="mb-5 space-y-1.5">
             {users.map(u => (
-              <li key={u.id} className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                <span className="w-2 h-2 bg-green-500 rounded-full shrink-0" />
-                {u.username}
+              <li key={u.id}>
+                <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 py-1">
+                  <span className="w-2 h-2 bg-green-500 rounded-full shrink-0" />
+                  {u.username}
+                  {u.is_admin && (
+                    <span className="flex items-center gap-1 text-xs bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-1.5 py-0.5 rounded">
+                      <ShieldCheck className="w-3 h-3" /> Admin
+                    </span>
+                  )}
+                  {isAdmin && (
+                    <div className="ml-auto flex items-center gap-1">
+                      <button
+                        onClick={() => { setResetId(resetId === u.id ? null : u.id); setResetPassword(''); }}
+                        className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                        title="Reset password"
+                      >
+                        <KeyRound className="w-3.5 h-3.5" />
+                      </button>
+                      {!u.is_admin && (
+                        <button
+                          onClick={() => handleDeleteUser(u.id, u.username)}
+                          disabled={deletingId === u.id}
+                          className="p-1 text-red-400 hover:text-red-600 disabled:opacity-50"
+                          title="Delete user"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+                {resetId === u.id && (
+                  <div className="flex items-center gap-2 pl-4 pb-2">
+                    <input
+                      type="password"
+                      value={resetPassword}
+                      onChange={e => setResetPassword(e.target.value)}
+                      placeholder="New password"
+                      className="w-40 border border-gray-300 dark:border-gray-600 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+                    />
+                    <button
+                      onClick={() => handleResetPassword(u.id)}
+                      disabled={resetting || !resetPassword}
+                      className="text-xs font-medium bg-green-800 text-white px-2.5 py-1.5 rounded-lg hover:bg-green-700 disabled:opacity-50"
+                    >
+                      {resetting ? 'Saving…' : 'Save'}
+                    </button>
+                    <button onClick={() => setResetId(null)} className="p-1 text-gray-400 hover:text-gray-600">
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
               </li>
             ))}
           </ul>

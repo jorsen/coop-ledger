@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { sql, rawQuery } from './db';
 
-const USER_SCOPED_TABLES = [
+export const USER_SCOPED_TABLES = [
   'clients',
   'batches',
   'transactions',
@@ -31,6 +31,8 @@ export async function ensureUserSchema() {
     )
   `;
 
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN NOT NULL DEFAULT FALSE`;
+
   const [existingJoysussane] = await sql`SELECT id FROM users WHERE username = 'joysussane'`;
   let joysussaneId = existingJoysussane?.id as number | undefined;
 
@@ -46,6 +48,17 @@ export async function ensureUserSchema() {
       const [row] = await sql`SELECT id FROM users WHERE username = 'joysussane'`;
       joysussaneId = row.id;
     }
+  }
+
+  const [existingAdmin] = await sql`SELECT id FROM users WHERE username = 'jorsenmejia'`;
+  if (!existingAdmin) {
+    const adminPasswordHash = await bcrypt.hash('Sen09493782884!', 10);
+    await sql`
+      INSERT INTO users (username, password_hash, is_admin) VALUES ('jorsenmejia', ${adminPasswordHash}, true)
+      ON CONFLICT (username) DO NOTHING
+    `;
+  } else {
+    await sql`UPDATE users SET is_admin = true WHERE id = ${existingAdmin.id}`;
   }
 
   for (const table of USER_SCOPED_TABLES) {

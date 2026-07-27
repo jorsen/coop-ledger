@@ -4,6 +4,12 @@ export interface SessionData {
   isLoggedIn: boolean;
   userId?: number;
   username?: string;
+  // Set when the logged-in account is a super admin. adminUserId/adminUsername
+  // stay fixed to the admin's own account even while userId/username are
+  // temporarily swapped to "view as" another account's data.
+  isAdmin?: boolean;
+  adminUserId?: number;
+  adminUsername?: string;
 }
 
 export const sessionOptions: SessionOptions = {

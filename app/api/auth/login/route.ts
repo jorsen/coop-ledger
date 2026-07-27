@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Username and password are required' }, { status: 401 });
   }
 
-  const [user] = await sql`SELECT id, username, password_hash FROM users WHERE username = ${username}`;
+  const [user] = await sql`SELECT id, username, password_hash, is_admin FROM users WHERE username = ${username}`;
   if (!user || !(await bcrypt.compare(password, user.password_hash))) {
     return NextResponse.json({ error: 'Invalid username or password' }, { status: 401 });
   }
@@ -23,6 +23,15 @@ export async function POST(req: NextRequest) {
   session.isLoggedIn = true;
   session.userId = user.id;
   session.username = user.username;
+  if (user.is_admin) {
+    session.isAdmin = true;
+    session.adminUserId = user.id;
+    session.adminUsername = user.username;
+  } else {
+    session.isAdmin = false;
+    session.adminUserId = undefined;
+    session.adminUsername = undefined;
+  }
   await session.save();
 
   return NextResponse.json({ success: true });

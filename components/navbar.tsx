@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Users, FileText, Settings, LogOut, LogIn, Menu, X, Moon, Sun, CalendarDays, Activity, DatabaseBackup } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, Settings, LogOut, LogIn, Menu, X, Moon, Sun, CalendarDays, Activity, DatabaseBackup, ChevronDown, ShieldCheck } from 'lucide-react';
 import clsx from 'clsx';
 import { useTheme } from '@/components/theme-provider';
 
@@ -23,18 +23,40 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [adminUsername, setAdminUsername] = useState<string | null>(null);
+  const [allUsers, setAllUsers] = useState<{ id: number; username: string }[]>([]);
+  const [switcherOpen, setSwitcherOpen] = useState(false);
   const { theme, toggle } = useTheme();
 
+  const loadSession = useCallback(async () => {
+    const d = await (await fetch('/api/auth/session')).json();
+    setIsLoggedIn(d.isLoggedIn);
+    setUsername(d.username ?? null);
+    setIsAdmin(d.isAdmin === true);
+    setAdminUsername(d.adminUsername ?? null);
+  }, []);
+
+  useEffect(() => { loadSession(); }, [pathname, loadSession]);
+
   useEffect(() => {
-    fetch('/api/auth/session').then(r => r.json()).then(d => {
-      setIsLoggedIn(d.isLoggedIn);
-      setUsername(d.username ?? null);
-    });
-  }, [pathname]);
+    if (isAdmin) fetch('/api/users').then(r => r.json()).then(setAllUsers);
+  }, [isAdmin]);
 
   async function handleLogout() {
     await fetch('/api/auth/logout', { method: 'POST' });
     router.push('/login');
+    router.refresh();
+  }
+
+  async function switchUser(userId: number) {
+    await fetch('/api/admin/switch-user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId }),
+    });
+    setSwitcherOpen(false);
+    await loadSession();
     router.refresh();
   }
 
@@ -73,11 +95,41 @@ export default function Navbar() {
 
         {/* Desktop right */}
         <div className="hidden lg:flex items-center gap-4 shrink-0 ml-auto">
-          {isLoggedIn && username && (
-            <span className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-300">
-              <span className="w-2 h-2 bg-green-500 rounded-full" />
-              {username}
-            </span>
+          {isLoggedIn && isAdmin ? (
+            <div className="relative">
+              <button
+                onClick={() => setSwitcherOpen(v => !v)}
+                className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-lg px-2.5 py-1 hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-green-700 dark:text-green-400" />
+                Viewing as: <span className="font-medium text-gray-900 dark:text-white">{username}</span>
+                <ChevronDown className="w-3.5 h-3.5" />
+              </button>
+              {switcherOpen && (
+                <div className="absolute right-0 mt-1 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 z-40">
+                  {allUsers.map(u => (
+                    <button
+                      key={u.id}
+                      onClick={() => switchUser(u.id)}
+                      className={clsx(
+                        'flex items-center gap-2 w-full text-left px-3 py-1.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-700',
+                        u.username === username ? 'text-green-700 dark:text-green-400 font-medium' : 'text-gray-700 dark:text-gray-300'
+                      )}
+                    >
+                      {u.username === adminUsername && <ShieldCheck className="w-3 h-3 shrink-0" />}
+                      {u.username}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            isLoggedIn && username && (
+              <span className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-300">
+                <span className="w-2 h-2 bg-green-500 rounded-full" />
+                {username}
+              </span>
+            )
           )}
           <button
             onClick={toggle}
@@ -156,6 +208,27 @@ export default function Navbar() {
               </Link>
             );
           })}
+          {isLoggedIn && isAdmin && (
+            <div className="pt-2 border-t border-gray-100 dark:border-gray-700">
+              <p className="px-3 pb-1 text-xs font-medium text-gray-400 dark:text-gray-500 flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-green-700 dark:text-green-400" /> Viewing as
+              </p>
+              {allUsers.map(u => (
+                <button
+                  key={u.id}
+                  onClick={() => switchUser(u.id)}
+                  className={clsx(
+                    'flex items-center gap-3 px-3 py-2 w-full text-left rounded-lg text-sm',
+                    u.username === username
+                      ? 'text-green-700 dark:text-green-400 font-medium bg-green-50 dark:bg-green-900/20'
+                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                  )}
+                >
+                  {u.username}
+                </button>
+              ))}
+            </div>
+          )}
           <div className="pt-2 border-t border-gray-100 dark:border-gray-700">
             <button
               onClick={toggle}
