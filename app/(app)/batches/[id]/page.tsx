@@ -21,6 +21,7 @@ interface Batch {
   client_code: string | null;
   pig_price_per_kg: number | null;
   status: string | null;
+  transaction_type: 'cash' | 'semi_dispersal' | null;
 }
 
 interface Expense {
@@ -51,6 +52,7 @@ interface BatchSummary {
   maturity_date?: string | null;
   heads?: number | null;
   status?: string | null;
+  transaction_type?: 'cash' | 'semi_dispersal' | null;
 }
 
 const PAGE_SIZE = 10;
@@ -99,7 +101,7 @@ export default function BatchDetailPage() {
   const [expPage, setExpPage] = useState(0);
   const [batchPage, setBatchPage] = useState(0);
   const [editBatch, setEditBatch] = useState<BatchSummary | null>(null);
-  const [editBatchForm, setEditBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', maturity_date: '', heads: '', status: 'active' });
+  const [editBatchForm, setEditBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', maturity_date: '', heads: '', status: 'active', transaction_type: 'semi_dispersal' });
   const [savingEditBatch, setSavingEditBatch] = useState(false);
   const [pigSales, setPigSales] = useState<PigSale[]>([]);
   const [pigSaleModal, setPigSaleModal] = useState<PigSale | 'new' | null>(null);
@@ -274,6 +276,7 @@ export default function BatchDetailPage() {
       maturity_date: b.maturity_date?.split('T')[0] ?? '',
       heads: b.heads != null ? String(b.heads) : '',
       status: b.status ?? 'active',
+      transaction_type: b.transaction_type ?? 'semi_dispersal',
     });
   }
 
@@ -284,6 +287,7 @@ export default function BatchDetailPage() {
   const balance          = totalDebit - totalCredit;
 
   const maturityDate = batch?.maturity_date ?? null;
+  const isCash = batch?.transaction_type === 'cash';
 
   const withComputed = transactions.map((tx, i) => {
     const runningBalance = transactions
@@ -296,7 +300,7 @@ export default function BatchDetailPage() {
     if (maturityDate) {
       days     = Math.max(0, Math.round((new Date(maturityDate).getTime() - new Date(tx.date).getTime()) / (1000 * 60 * 60 * 24)));
       dffs1    = Math.round(d * 0.03 * days / 360 * 100) / 100;
-      interest = Math.round(d * 0.06 * days / 360 * 100) / 100;
+      interest = isCash ? 0 : Math.round(d * 0.06 * days / 360 * 100) / 100;
     }
     return { ...tx, runningBalance, days, dffs1, interest };
   });
@@ -389,6 +393,12 @@ export default function BatchDetailPage() {
                 const cls = s === 'active' ? 'bg-green-100 text-green-800' : s === 'on-going' ? 'bg-yellow-100 text-yellow-800' : s === 'paid' ? 'bg-blue-100 text-blue-800' : s === 'completed' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-500';
                 return <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${cls}`}>{s.charAt(0).toUpperCase() + s.slice(1)}</span>;
               })()}
+            </div>
+            <div>
+              <p className="text-xs font-medium text-gray-600 mb-0.5 dark:text-gray-400">TRANSACTION TYPE</p>
+              <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${batch.transaction_type === 'cash' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400'}`}>
+                {batch.transaction_type === 'cash' ? 'Cash' : 'Semi-Dispersal'}
+              </span>
             </div>
             <div>
               <p className="text-xs font-medium text-gray-600 mb-0.5 dark:text-gray-400"># OF HEADS</p>
@@ -760,6 +770,9 @@ export default function BatchDetailPage() {
                       {isViewing && (
                         <span className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 text-xs font-semibold px-2 py-0.5 rounded">Viewing</span>
                       )}
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${b.transaction_type === 'cash' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400'}`}>
+                        {b.transaction_type === 'cash' ? 'Cash' : 'Semi-Dispersal'}
+                      </span>
                       <span className="text-sm text-gray-500 dark:text-gray-400">{fmtDate(b.batch_date)}</span>
                     </div>
                     {/* Row 2: stats + actions */}
@@ -962,6 +975,18 @@ export default function BatchDetailPage() {
                   <option value="active">Active</option>
                   <option value="paid">Paid</option>
                 </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Transaction Type</label>
+                <select
+                  value={editBatchForm.transaction_type}
+                  onChange={e => setEditBatchForm(f => ({ ...f, transaction_type: e.target.value }))}
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+                >
+                  <option value="semi_dispersal">Semi-Dispersal</option>
+                  <option value="cash">Cash</option>
+                </select>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Interest only applies to Semi-Dispersal batches.</p>
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>

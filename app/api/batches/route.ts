@@ -11,6 +11,9 @@ export async function GET(req: NextRequest) {
   await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active'`;
   await sql`ALTER TABLE batches DROP CONSTRAINT IF EXISTS batches_status_check`;
   await sql`ALTER TABLE batches ADD CONSTRAINT batches_status_check CHECK (status IN ('active','inactive','paid','completed','on-going'))`;
+  await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS transaction_type VARCHAR(20) DEFAULT 'semi_dispersal'`;
+  await sql`ALTER TABLE batches DROP CONSTRAINT IF EXISTS batches_transaction_type_check`;
+  await sql`ALTER TABLE batches ADD CONSTRAINT batches_transaction_type_check CHECK (transaction_type IN ('cash','semi_dispersal'))`;
 
   const clientId = req.nextUrl.searchParams.get('client_id');
 
@@ -52,7 +55,7 @@ export async function POST(req: NextRequest) {
   if (error) return error;
 
   try {
-    const { batch_date, notes, client_id, batch_number, date_of_application, date_of_hauling, maturity_date, heads, allocation, status } = await req.json();
+    const { batch_date, notes, client_id, batch_number, date_of_application, date_of_hauling, maturity_date, heads, allocation, status, transaction_type } = await req.json();
 
     await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS date_of_application DATE`;
     await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS date_of_hauling DATE`;
@@ -60,9 +63,11 @@ export async function POST(req: NextRequest) {
     await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS heads INTEGER`;
     await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS allocation DECIMAL(12,2)`;
     await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active'`;
+    await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS transaction_type VARCHAR(20) DEFAULT 'semi_dispersal'`;
 
     const dateVal = batch_date || new Date().toISOString().split('T')[0];
     const statusVal = status || 'active';
+    const transactionTypeVal = transaction_type === 'cash' ? 'cash' : 'semi_dispersal';
 
     const [cl] = client_id ? await sql`SELECT name FROM clients WHERE id = ${client_id} AND user_id = ${session.userId}` : [null];
     if (client_id && !cl) return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -70,20 +75,20 @@ export async function POST(req: NextRequest) {
     let batch;
     if (batch_number?.trim()) {
       const [b] = await sql`
-        INSERT INTO batches (batch_number, client_id, batch_date, notes, date_of_application, date_of_hauling, maturity_date, heads, allocation, status, user_id)
+        INSERT INTO batches (batch_number, client_id, batch_date, notes, date_of_application, date_of_hauling, maturity_date, heads, allocation, status, transaction_type, user_id)
         VALUES (${batch_number.trim()}, ${client_id || null}, ${dateVal}, ${notes || ''},
           ${date_of_application || null}, ${date_of_hauling || null}, ${maturity_date || null},
-          ${heads ? Number(heads) : null}, ${allocation ? Number(allocation) : null}, ${statusVal}, ${session.userId})
+          ${heads ? Number(heads) : null}, ${allocation ? Number(allocation) : null}, ${statusVal}, ${transactionTypeVal}, ${session.userId})
         RETURNING *
       `;
       batch = b;
     } else {
       const tmpName = `__TMP__${Date.now()}`;
       const [inserted] = await sql`
-        INSERT INTO batches (batch_number, client_id, batch_date, notes, date_of_application, date_of_hauling, maturity_date, heads, allocation, status, user_id)
+        INSERT INTO batches (batch_number, client_id, batch_date, notes, date_of_application, date_of_hauling, maturity_date, heads, allocation, status, transaction_type, user_id)
         VALUES (${tmpName}, ${client_id || null}, ${dateVal}, ${notes || ''},
           ${date_of_application || null}, ${date_of_hauling || null}, ${maturity_date || null},
-          ${heads ? Number(heads) : null}, ${allocation ? Number(allocation) : null}, ${statusVal}, ${session.userId})
+          ${heads ? Number(heads) : null}, ${allocation ? Number(allocation) : null}, ${statusVal}, ${transactionTypeVal}, ${session.userId})
         RETURNING id
       `;
       const autoNumber = `BT-${String(inserted.id).padStart(3, '0')}`;

@@ -9,6 +9,7 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
 
   await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS pig_price_per_kg DECIMAL(10,2) DEFAULT 170`;
   await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active'`;
+  await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS transaction_type VARCHAR(20) DEFAULT 'semi_dispersal'`;
 
   const [batch] = await sql`
     SELECT b.*,
@@ -47,7 +48,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   const { session, error } = await requireAuth();
   if (error) return error;
 
-  const { batch_number, batch_date, notes, date_of_application, date_of_hauling, maturity_date, heads, allocation, status } = await req.json();
+  const { batch_number, batch_date, notes, date_of_application, date_of_hauling, maturity_date, heads, allocation, status, transaction_type } = await req.json();
 
   await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS date_of_application DATE`;
   await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS date_of_hauling DATE`;
@@ -55,6 +56,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS heads INTEGER`;
   await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS allocation DECIMAL(12,2)`;
   await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active'`;
+  await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS transaction_type VARCHAR(20) DEFAULT 'semi_dispersal'`;
 
   const [updated] = await sql`
     UPDATE batches
@@ -66,7 +68,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         maturity_date       = ${maturity_date || null},
         heads               = ${heads ? Number(heads) : null},
         allocation          = ${allocation ? Number(allocation) : null},
-        status              = ${status || 'active'}
+        status              = ${status || 'active'},
+        transaction_type    = ${transaction_type === 'cash' ? 'cash' : 'semi_dispersal'}
     WHERE id = ${params.id} AND user_id = ${session.userId}
     RETURNING *
   `;

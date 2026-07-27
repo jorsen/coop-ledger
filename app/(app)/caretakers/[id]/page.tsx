@@ -21,6 +21,7 @@ interface Batch {
   total_debit: number;
   pig_price_per_kg: number | null;
   status: string | null;
+  transaction_type: 'cash' | 'semi_dispersal' | null;
 }
 
 interface Client {
@@ -91,10 +92,10 @@ export default function CaretakerLedgerPage() {
   const [modal, setModal] = useState<{ tx?: Transaction } | null>(null);
   const [dialog, setDialog] = useState<{ title: string; message: string; variant?: 'default' | 'delete'; onConfirm: () => void } | null>(null);
   const [batchModal, setBatchModal] = useState(false);
-  const [batchForm, setBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', maturity_date: '', heads: '', status: 'active' });
+  const [batchForm, setBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', maturity_date: '', heads: '', status: 'active', transaction_type: 'semi_dispersal' });
   const [savingBatch, setSavingBatch] = useState(false);
   const [editBatch, setEditBatch] = useState<Batch | null>(null);
-  const [editBatchForm, setEditBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', maturity_date: '', heads: '', status: 'active' });
+  const [editBatchForm, setEditBatchForm] = useState({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', maturity_date: '', heads: '', status: 'active', transaction_type: 'semi_dispersal' });
   const [savingEditBatch, setSavingEditBatch] = useState(false);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [expenseModal, setExpenseModal] = useState(false);
@@ -165,7 +166,7 @@ export default function CaretakerLedgerPage() {
     });
     setSavingBatch(false);
     setBatchModal(false);
-    setBatchForm({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', maturity_date: '', heads: '', status: 'active' });
+    setBatchForm({ batch_number: '', batch_date: '', notes: '', date_of_application: '', date_of_hauling: '', maturity_date: '', heads: '', status: 'active', transaction_type: 'semi_dispersal' });
     fetchData();
   }
 
@@ -299,6 +300,7 @@ export default function CaretakerLedgerPage() {
   const balance          = totalDebit - totalCredit;
 
   const maturityDate = selectedBatch?.maturity_date ?? null;
+  const isCash = selectedBatch?.transaction_type === 'cash';
 
   const withComputed = batchTransactions.map((tx, i) => {
     const runningBalance = batchTransactions
@@ -311,7 +313,7 @@ export default function CaretakerLedgerPage() {
     if (maturityDate) {
       days     = Math.max(0, Math.round((new Date(maturityDate).getTime() - new Date(tx.date).getTime()) / (1000 * 60 * 60 * 24)));
       dffs1    = Math.round(d * 0.03 * days / 360 * 100) / 100;
-      interest = Math.round(d * 0.06 * days / 360 * 100) / 100;
+      interest = isCash ? 0 : Math.round(d * 0.06 * days / 360 * 100) / 100;
     }
     return { ...tx, runningBalance, days, dffs1, interest };
   });
@@ -411,6 +413,12 @@ export default function CaretakerLedgerPage() {
                 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400';
               return <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${cls}`}>{s.charAt(0).toUpperCase() + s.slice(1)}</span>;
             })()}
+          </div>
+          <div>
+            <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">TRANSACTION TYPE</p>
+            <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${selectedBatch?.transaction_type === 'cash' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400'}`}>
+              {selectedBatch?.transaction_type === 'cash' ? 'Cash' : 'Semi-Dispersal'}
+            </span>
           </div>
           <div>
             <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5"># OF HEADS</p>
@@ -874,6 +882,9 @@ export default function CaretakerLedgerPage() {
                         'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400';
                       return <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${cls}`}>{s.charAt(0).toUpperCase() + s.slice(1)}</span>;
                     })()}
+                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${b.transaction_type === 'cash' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400'}`}>
+                      {b.transaction_type === 'cash' ? 'Cash' : 'Semi-Dispersal'}
+                    </span>
                     <span className="text-sm text-gray-500 dark:text-gray-400">{fmtDate(b.batch_date)}</span>
                     {b.notes && <span className="text-xs text-gray-900 dark:text-gray-500 truncate max-w-[160px]">{b.notes}</span>}
                   </div>
@@ -892,7 +903,7 @@ export default function CaretakerLedgerPage() {
                       {isLoggedIn && (
                         <>
                           <button
-                            onClick={() => { setEditBatch(b); setEditBatchForm({ batch_number: b.batch_number, batch_date: b.batch_date?.toString().slice(0, 10) ?? '', notes: b.notes, date_of_application: b.date_of_application?.toString().slice(0, 10) ?? '', date_of_hauling: b.date_of_hauling?.toString().slice(0, 10) ?? '', maturity_date: b.maturity_date?.toString().slice(0, 10) ?? '', heads: b.heads ? String(b.heads) : '', status: b.status ?? 'active' }); }}
+                            onClick={() => { setEditBatch(b); setEditBatchForm({ batch_number: b.batch_number, batch_date: b.batch_date?.toString().slice(0, 10) ?? '', notes: b.notes, date_of_application: b.date_of_application?.toString().slice(0, 10) ?? '', date_of_hauling: b.date_of_hauling?.toString().slice(0, 10) ?? '', maturity_date: b.maturity_date?.toString().slice(0, 10) ?? '', heads: b.heads ? String(b.heads) : '', status: b.status ?? 'active', transaction_type: b.transaction_type ?? 'semi_dispersal' }); }}
                             className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
                           >
                             <Pencil className="w-3.5 h-3.5" />
@@ -1003,6 +1014,19 @@ export default function CaretakerLedgerPage() {
                 </select>
               </div>
               <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Transaction Type</label>
+                <select
+                  value={batchForm.transaction_type}
+                  onChange={(e) => setBatchForm((f) => ({ ...f, transaction_type: e.target.value }))}
+                  className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                  style={{ height: '46px' }}
+                >
+                  <option value="semi_dispersal">Semi-Dispersal</option>
+                  <option value="cash">Cash</option>
+                </select>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Interest only applies to Semi-Dispersal batches.</p>
+              </div>
+              <div>
                 <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
                 <textarea
                   value={batchForm.notes}
@@ -1105,6 +1129,19 @@ export default function CaretakerLedgerPage() {
                   <option value="active">Active</option>
                   <option value="paid">Paid</option>
                 </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Transaction Type</label>
+                <select
+                  value={editBatchForm.transaction_type}
+                  onChange={(e) => setEditBatchForm((f) => ({ ...f, transaction_type: e.target.value }))}
+                  className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                  style={{ height: '46px' }}
+                >
+                  <option value="semi_dispersal">Semi-Dispersal</option>
+                  <option value="cash">Cash</option>
+                </select>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Interest only applies to Semi-Dispersal batches.</p>
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>

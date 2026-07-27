@@ -15,6 +15,16 @@ interface Batch {
   total_bags: number;
   total_debit: number;
   status: string | null;
+  transaction_type: 'cash' | 'semi_dispersal' | null;
+}
+
+function TransactionTypeBadge({ type }: { type: string | null }) {
+  const isCash = type === 'cash';
+  return (
+    <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${isCash ? 'bg-amber-100 text-amber-800' : 'bg-indigo-100 text-indigo-800'}`}>
+      {isCash ? 'Cash' : 'Semi-Dispersal'}
+    </span>
+  );
 }
 
 function StatusBadge({ status }: { status: string | null }) {
@@ -43,7 +53,7 @@ export default function BatchesPage() {
   const [batches, setBatches] = useState<Batch[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState({ batch_date: new Date().toISOString().split('T')[0], notes: '' });
+  const [form, setForm] = useState({ batch_date: new Date().toISOString().split('T')[0], notes: '', transaction_type: 'semi_dispersal' });
   const [saving, setSaving] = useState(false);
   const [dialog, setDialog] = useState<{ title: string; message: string; variant?: 'default' | 'delete'; onConfirm: () => void } | null>(null);
 
@@ -66,7 +76,7 @@ export default function BatchesPage() {
     });
     setSaving(false);
     setShowModal(false);
-    setForm({ batch_date: new Date().toISOString().split('T')[0], notes: '' });
+    setForm({ batch_date: new Date().toISOString().split('T')[0], notes: '', transaction_type: 'semi_dispersal' });
     fetchBatches();
   }
 
@@ -123,7 +133,10 @@ export default function BatchesPage() {
                 </span>
                 <p className="text-sm text-gray-500">{fmtDate(b.batch_date)}</p>
               </div>
-              <StatusBadge status={b.status} />
+              <div className="flex flex-col items-end gap-1">
+                <StatusBadge status={b.status} />
+                <TransactionTypeBadge type={b.transaction_type} />
+              </div>
             </div>
             {b.notes && <p className="text-xs text-gray-900 dark:text-gray-400 mb-3 line-clamp-2">{b.notes}</p>}
 
@@ -180,6 +193,18 @@ export default function BatchesPage() {
                   onChange={(e) => setForm((f) => ({ ...f, batch_date: e.target.value }))}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
                 />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Transaction Type</label>
+                <select
+                  value={form.transaction_type}
+                  onChange={(e) => setForm((f) => ({ ...f, transaction_type: e.target.value }))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
+                >
+                  <option value="semi_dispersal">Semi-Dispersal</option>
+                  <option value="cash">Cash</option>
+                </select>
+                <p className="text-xs text-gray-400 mt-1">Interest only applies to Semi-Dispersal batches.</p>
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Notes</label>
