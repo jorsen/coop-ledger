@@ -12,6 +12,7 @@ interface Log {
   entity_id: number | null;
   description: string;
   created_at: string;
+  username: string | null;
 }
 
 const PAGE_SIZE = 20;
@@ -52,6 +53,7 @@ export default function ActivityPage() {
   const [page, setPage]   = useState(0);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter]   = useState<string>('all');
+  const [userFilter, setUserFilter] = useState<string>('all');
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
   const fetchLogs = useCallback(async () => {
@@ -74,11 +76,11 @@ export default function ActivityPage() {
   useEffect(() => { if (isAdmin) fetchLogs(); }, [isAdmin, fetchLogs]);
   usePoll(isAdmin ? fetchLogs : () => {}, 3000);
 
-  const filtered = filter === 'all' ? logs : logs.filter(l =>
-    filter === 'created' || filter === 'updated' || filter === 'deleted'
-      ? l.action === filter
-      : l.entity_type === filter
-  );
+  const userOptions = Array.from(new Set(logs.map(l => l.username).filter((u): u is string => !!u))).sort();
+
+  const filtered = logs
+    .filter(l => filter === 'all' || (filter === 'created' || filter === 'updated' || filter === 'deleted' ? l.action === filter : l.entity_type === filter))
+    .filter(l => userFilter === 'all' || l.username === userFilter);
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paged = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
@@ -97,11 +99,11 @@ export default function ActivityPage() {
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
           <Activity className="w-6 h-6 text-green-700" /> Activity Log
         </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{total} total actions recorded</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{total} total actions recorded across all accounts</p>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-2 mb-4">
+      <div className="flex flex-wrap items-center gap-2 mb-4">
         {[
           { key: 'all',         label: 'All' },
           { key: 'created',     label: 'Created' },
@@ -124,6 +126,16 @@ export default function ActivityPage() {
             {f.label}
           </button>
         ))}
+        {userOptions.length > 0 && (
+          <select
+            value={userFilter}
+            onChange={e => { setUserFilter(e.target.value); setPage(0); }}
+            className="ml-auto text-xs font-medium border border-gray-200 dark:border-gray-700 rounded-full px-3 py-1 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-800"
+          >
+            <option value="all">All users</option>
+            {userOptions.map(u => <option key={u} value={u}>{u}</option>)}
+          </select>
+        )}
       </div>
 
       {filtered.length === 0 ? (
@@ -147,6 +159,11 @@ export default function ActivityPage() {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-gray-800 dark:text-gray-200">{log.description}</p>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      {log.username && (
+                        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                          {log.username}
+                        </span>
+                      )}
                       <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${entityColor}`}>
                         {log.entity_type}
                       </span>
