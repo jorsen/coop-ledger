@@ -745,6 +745,9 @@ export default function CaretakerLedgerPage() {
                 ₱{num((totalPigSalesAmount - (balance + totalInterest + totalDeliveryFee + totalOtherExpenses)) / 2)}
               </span>
             </div>
+            <p className="text-xs text-gray-400 dark:text-gray-500 text-right">
+              (₱{num(totalPigSalesAmount)} − ₱{num(balance + totalInterest + totalDeliveryFee + totalOtherExpenses)}) ÷ 2
+            </p>
           </div>
         </div>
         </>
