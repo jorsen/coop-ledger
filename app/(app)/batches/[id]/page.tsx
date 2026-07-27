@@ -527,7 +527,7 @@ export default function BatchDetailPage() {
                   </div>
                 )}
                 <div className="flex justify-between border-t border-gray-200 pt-1.5 mt-1 dark:border-gray-700">
-                  <span className="font-bold text-gray-900 dark:text-white">Total</span>
+                  <span className="font-bold text-gray-900 dark:text-white">Total Capital</span>
                   <span className="font-bold text-gray-900 underline dark:text-white">{num(balance + totalInterest + totalDeliveryFee + totalOtherExpenses)}</span>
                 </div>
               </div>
@@ -544,7 +544,7 @@ export default function BatchDetailPage() {
                 <div className="flex justify-between"><span>Interest</span><span className="font-medium">{num(totalInterest)}</span></div>
                 <div className="flex justify-between"><span>Del Fee</span><span className="font-medium">{num(totalDeliveryFee)}</span></div>
                 {totalOtherExpenses > 0 && <div className="flex justify-between"><span>Other Exp</span><span className="font-medium">{num(totalOtherExpenses)}</span></div>}
-                <div className="flex justify-between border-t border-gray-300 pt-0.5 font-bold"><span>Total</span><span className="underline">{num(balance + totalInterest + totalDeliveryFee + totalOtherExpenses)}</span></div>
+                <div className="flex justify-between border-t border-gray-300 pt-0.5 font-bold"><span>Total Capital</span><span className="underline">{num(balance + totalInterest + totalDeliveryFee + totalOtherExpenses)}</span></div>
               </div>
             </div>
           </div>
