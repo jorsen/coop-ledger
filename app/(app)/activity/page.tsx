@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { Plus, Pencil, Trash2, Activity, ChevronLeft, ChevronRight } from 'lucide-react';
 import { usePoll } from '@/hooks/use-poll';
 
@@ -45,11 +46,13 @@ function fullDate(dateStr: string) {
 }
 
 export default function ActivityPage() {
+  const router = useRouter();
   const [logs, setLogs]   = useState<Log[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage]   = useState(0);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter]   = useState<string>('all');
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
   const fetchLogs = useCallback(async () => {
     const res = await fetch(`/api/activity?limit=200&offset=0`);
@@ -61,8 +64,15 @@ export default function ActivityPage() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { fetchLogs(); }, [fetchLogs]);
-  usePoll(fetchLogs, 3000);
+  useEffect(() => {
+    fetch('/api/auth/session').then(r => r.json()).then(d => {
+      setIsAdmin(d.isAdmin === true);
+      if (d.isAdmin !== true) router.replace('/dashboard');
+    });
+  }, [router]);
+
+  useEffect(() => { if (isAdmin) fetchLogs(); }, [isAdmin, fetchLogs]);
+  usePoll(isAdmin ? fetchLogs : () => {}, 3000);
 
   const filtered = filter === 'all' ? logs : logs.filter(l =>
     filter === 'created' || filter === 'updated' || filter === 'deleted'
@@ -73,7 +83,7 @@ export default function ActivityPage() {
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paged = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
-  if (loading) {
+  if (loading || isAdmin !== true) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="w-6 h-6 border-2 border-green-800 border-t-transparent rounded-full animate-spin" />

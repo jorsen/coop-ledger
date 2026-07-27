@@ -8,13 +8,13 @@ import clsx from 'clsx';
 import { useTheme } from '@/components/theme-provider';
 
 const NAV_LINKS = [
-  { href: '/dashboard',    label: 'Dashboard',    icon: LayoutDashboard, public: true  },
-  { href: '/caretakers',   label: 'Caretakers',   icon: Users,           public: true  },
-  { href: '/calendar',     label: 'Calendar',     icon: CalendarDays,    public: true  },
-  { href: '/transactions', label: 'Transactions', icon: FileText,        public: false },
-  { href: '/activity',     label: 'Activity',     icon: Activity,        public: false },
-  { href: '/settings',     label: 'Settings',     icon: Settings,        public: false },
-  { href: '/backup',       label: 'Backup',       icon: DatabaseBackup,  public: false },
+  { href: '/dashboard',    label: 'Dashboard',    icon: LayoutDashboard, public: true,  adminOnly: false },
+  { href: '/caretakers',   label: 'Caretakers',   icon: Users,           public: true,  adminOnly: false },
+  { href: '/calendar',     label: 'Calendar',     icon: CalendarDays,    public: true,  adminOnly: false },
+  { href: '/transactions', label: 'Transactions', icon: FileText,        public: false, adminOnly: false },
+  { href: '/activity',     label: 'Activity',     icon: Activity,        public: false, adminOnly: true  },
+  { href: '/settings',     label: 'Settings',     icon: Settings,        public: false, adminOnly: false },
+  { href: '/backup',       label: 'Backup',       icon: DatabaseBackup,  public: false, adminOnly: false },
 ];
 
 export default function Navbar() {
@@ -73,7 +73,7 @@ export default function Navbar() {
 
         {/* Desktop nav */}
         <nav className="hidden lg:flex items-center gap-1 flex-1">
-          {NAV_LINKS.filter(l => isLoggedIn || l.public).map(({ href, label, icon: Icon }) => {
+          {NAV_LINKS.filter(l => (isLoggedIn || l.public) && (!l.adminOnly || isAdmin)).map(({ href, label, icon: Icon }) => {
             const active = pathname.startsWith(href);
             return (
               <Link
@@ -189,7 +189,7 @@ export default function Navbar() {
       {/* Mobile dropdown */}
       {open && (
         <div className="lg:hidden border-t border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3 space-y-1">
-          {NAV_LINKS.filter(l => isLoggedIn || l.public).map(({ href, label, icon: Icon }) => {
+          {NAV_LINKS.filter(l => (isLoggedIn || l.public) && (!l.adminOnly || isAdmin)).map(({ href, label, icon: Icon }) => {
             const active = pathname.startsWith(href);
             return (
               <Link
