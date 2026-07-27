@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { requireAuth, requireAdmin } from '@/lib/auth';
+import { requireAdmin } from '@/lib/auth';
 import { sql } from '@/lib/db';
 
 export async function GET() {
-  const { error } = await requireAuth();
+  const { error } = await requireAdmin();
   if (error) return error;
 
   const users = await sql`SELECT id, username, is_admin, created_at FROM users ORDER BY created_at ASC`;

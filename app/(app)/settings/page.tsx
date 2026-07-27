@@ -381,10 +381,12 @@ function UsersSection() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { fetchUsers(); }, [fetchUsers]);
   useEffect(() => {
-    fetch('/api/auth/session').then(r => r.json()).then(d => setIsAdmin(d.isAdmin === true));
-  }, []);
+    fetch('/api/auth/session').then(r => r.json()).then(d => {
+      setIsAdmin(d.isAdmin === true);
+      if (d.isAdmin === true) fetchUsers(); else setLoading(false);
+    });
+  }, [fetchUsers]);
 
   async function handleCreateUser(e: React.FormEvent) {
     e.preventDefault();
@@ -428,6 +430,8 @@ function UsersSection() {
     if (!res.ok) { setError((await res.json()).error ?? 'Failed to delete user.'); return; }
     fetchUsers();
   }
+
+  if (!isAdmin) return null;
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 mb-6">
