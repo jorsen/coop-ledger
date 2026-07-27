@@ -695,7 +695,7 @@ export default function BatchDetailPage() {
                     </tr>
                   ))}
                   <tr className="border-t-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 font-semibold">
-                    <td className="px-4 py-3 text-right text-xs text-gray-500 dark:text-gray-400">Total Pig Sales</td>
+                    <td className="px-4 py-3 text-right text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">Total Pig Sales</td>
                     <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{fmtKg(totalPigSalesKg)} kg</td>
                     <td className="px-4 py-3" />
                     <td className="px-4 py-3 text-right text-gray-900 dark:text-white">₱{num(totalPigSalesAmount)}</td>
