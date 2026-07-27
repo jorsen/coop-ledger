@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Save, Plus, Trash2, ChevronDown, ChevronUp, Moon, Sun, Pencil, Check, X, UserPlus, KeyRound, ShieldCheck } from 'lucide-react';
+import { Save, Plus, Trash2, ChevronDown, ChevronUp, Moon, Sun, Pencil, Check, X, UserPlus, KeyRound, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import { useTheme } from '@/components/theme-provider';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -367,11 +367,14 @@ function UsersSection() {
   const [isAdmin, setIsAdmin]       = useState(false);
   const [username, setUsername]     = useState('');
   const [password, setPassword]     = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [creating, setCreating]     = useState(false);
   const [error, setError]           = useState('');
   const [resetId, setResetId]       = useState<number | null>(null);
   const [resetPassword, setResetPassword] = useState('');
+  const [showResetPassword, setShowResetPassword] = useState(false);
   const [resetting, setResetting]   = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
@@ -479,13 +482,24 @@ function UsersSection() {
                 </div>
                 {resetId === u.id && (
                   <div className="flex items-center gap-2 pl-4 pb-2">
-                    <input
-                      type="password"
-                      value={resetPassword}
-                      onChange={e => setResetPassword(e.target.value)}
-                      placeholder="New password"
-                      className="w-40 border border-gray-300 dark:border-gray-600 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
-                    />
+                    <div className="relative">
+                      <input
+                        type={showResetPassword ? 'text' : 'password'}
+                        value={resetPassword}
+                        onChange={e => setResetPassword(e.target.value)}
+                        placeholder="New password"
+                        className="w-40 border border-gray-300 dark:border-gray-600 rounded-lg pl-2.5 pr-7 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowResetPassword(v => !v)}
+                        className="absolute right-1.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                        tabIndex={-1}
+                        aria-label={showResetPassword ? 'Hide password' : 'Show password'}
+                      >
+                        {showResetPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
                     <button
                       onClick={() => handleResetPassword(u.id)}
                       disabled={resetting || !resetPassword}
@@ -511,29 +525,54 @@ function UsersSection() {
                 value={username}
                 onChange={e => setUsername(e.target.value)}
                 placeholder="e.g. newcaretaker"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
                 className="w-40 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                 required
               />
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                className="w-40 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
-                required
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  className="w-40 border border-gray-300 dark:border-gray-600 rounded-lg pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(v => !v)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  tabIndex={-1}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm Password</label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)}
-                className="w-40 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
-                required
-              />
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={e => setConfirmPassword(e.target.value)}
+                  className="w-40 border border-gray-300 dark:border-gray-600 rounded-lg pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(v => !v)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  tabIndex={-1}
+                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
             <button
               type="submit"
