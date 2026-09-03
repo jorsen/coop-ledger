@@ -238,7 +238,10 @@ export default function CaretakersPage() {
                   <p className="text-xs line-clamp-2 leading-tight text-amber-800 dark:text-amber-300">{client.notes}</p>
                 </div>
               )}
-              <p className="text-xs text-gray-400 dark:text-gray-500 mb-3 mt-1">{client.transaction_count} transaction(s) · Updated {fmtDateTime(client.updated_at)}</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mb-3 mt-1">
+                {client.transaction_count} transaction(s) · Updated{' '}
+                <span className={client.is_updated ? '' : 'text-red-600 dark:text-red-400'}>{fmtDateTime(client.updated_at)}</span>
+              </p>
               <div className="grid grid-cols-4 gap-x-3 gap-y-3 py-3 border-t border-gray-100 dark:border-gray-700 mb-3">
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">Batch / Heads</p>
@@ -402,7 +405,7 @@ export default function CaretakersPage() {
                         : client.transaction_count
                       }
                     </td>
-                    <td className="px-4 py-3 text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                    <td className={`px-4 py-3 whitespace-nowrap ${client.is_updated ? 'text-gray-500 dark:text-gray-400' : 'text-red-600 dark:text-red-400 font-medium'}`}>
                       {fmtDateTime(client.updated_at)}
                     </td>
                     <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
