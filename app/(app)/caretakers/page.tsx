@@ -43,11 +43,6 @@ const fmtDate = (d: string | null) => {
   return `${parseInt(m)}/${parseInt(day)}/${y}`;
 };
 
-const fmtDateTime = (d: string | null) => {
-  if (!d) return '—';
-  return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-};
-
 function StatusBadge({ status }: { status: string }) {
   const cls =
     status === 'active'    ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
@@ -221,13 +216,13 @@ export default function CaretakersPage() {
                   <select
                     value={client.is_updated ? 'updated' : 'not-updated'}
                     onChange={e => handleToggleUpdated(client.id, e.target.value === 'updated')}
-                    className={`w-full text-xs font-medium bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 outline-none cursor-pointer focus:ring-1 focus:ring-green-700 ${client.is_updated ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'}`}
+                    className={`w-full text-xs font-medium bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 outline-none cursor-pointer focus:ring-1 focus:ring-green-700 ${client.is_updated ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
                   >
                     <option value="updated">Updated</option>
                     <option value="not-updated">Not Updated</option>
                   </select>
                 ) : (
-                  <span className={`text-xs font-medium ${client.is_updated ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'}`}>
+                  <span className={`text-xs font-medium ${client.is_updated ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                     {client.is_updated ? 'Updated' : 'Not Updated'}
                   </span>
                 )}
@@ -238,10 +233,7 @@ export default function CaretakersPage() {
                   <p className="text-xs line-clamp-2 leading-tight text-amber-800 dark:text-amber-300">{client.notes}</p>
                 </div>
               )}
-              <p className="text-xs text-gray-400 dark:text-gray-500 mb-3 mt-1">
-                {client.transaction_count} transaction(s) · Updated{' '}
-                <span className={client.is_updated ? '' : 'text-red-600 dark:text-red-400'}>{fmtDateTime(client.updated_at)}</span>
-              </p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mb-3 mt-1">{client.transaction_count} transaction(s)</p>
               <div className="grid grid-cols-4 gap-x-3 gap-y-3 py-3 border-t border-gray-100 dark:border-gray-700 mb-3">
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">Batch / Heads</p>
@@ -328,7 +320,6 @@ export default function CaretakersPage() {
                   <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">APP. DATE</th>
                   <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">HAULING DATE</th>
                   <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">TX</th>
-                  <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">LAST UPDATED</th>
                   <th className="text-right text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">ACTION</th>
                 </tr>
               </thead>
@@ -346,13 +337,13 @@ export default function CaretakersPage() {
                         <select
                           value={client.is_updated ? 'updated' : 'not-updated'}
                           onChange={e => handleToggleUpdated(client.id, e.target.value === 'updated')}
-                          className={`text-xs font-medium bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 outline-none cursor-pointer focus:ring-1 focus:ring-green-700 ${client.is_updated ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'}`}
+                          className={`text-xs font-medium bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 outline-none cursor-pointer focus:ring-1 focus:ring-green-700 ${client.is_updated ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
                         >
                           <option value="updated">Updated</option>
                           <option value="not-updated">Not Updated</option>
                         </select>
                       ) : (
-                        <span className={`text-xs font-medium ${client.is_updated ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'}`}>
+                        <span className={`text-xs font-medium ${client.is_updated ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                           {client.is_updated ? 'Updated' : 'Not Updated'}
                         </span>
                       )}
@@ -404,9 +395,6 @@ export default function CaretakersPage() {
                           ))}</div>
                         : client.transaction_count
                       }
-                    </td>
-                    <td className={`px-4 py-3 whitespace-nowrap ${client.is_updated ? 'text-gray-500 dark:text-gray-400' : 'text-red-600 dark:text-red-400 font-medium'}`}>
-                      {fmtDateTime(client.updated_at)}
                     </td>
                     <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                       <div className="flex items-center justify-end gap-2">
