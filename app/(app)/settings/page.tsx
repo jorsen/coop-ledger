@@ -33,6 +33,9 @@ const peso = (n: number) =>
 const fmtDate = (d: string) =>
   new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
+const fmtPriceDate = (d: string) =>
+  Date.now() - new Date(d).getTime() > 7 * 24 * 60 * 60 * 1000 ? 'Not Updated' : fmtDate(d);
+
 // ── Add Feed Type modal ───────────────────────────────────────────────────────
 function AddFeedTypeModal({ onClose, onSave }: { onClose: () => void; onSave: () => void }) {
   const [name, setName]       = useState('');
@@ -264,7 +267,7 @@ function FeedTypeCard({ feedType, onRefresh }: { feedType: FeedType; onRefresh: 
           )}
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
             {feedType.current_price
-              ? <>Current: <span className="font-semibold text-green-700">{peso(feedType.current_price)}</span> / bag (as of {fmtDate(feedType.price_date!)})</>
+              ? <>Current: <span className="font-semibold text-green-700">{peso(feedType.current_price)}</span> / bag (as of {fmtPriceDate(feedType.price_date!)})</>
               : <span className="text-amber-600">No price set yet</span>}
           </p>
         </div>
