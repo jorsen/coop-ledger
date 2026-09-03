@@ -61,9 +61,13 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [pricePerBag, setPricePerBag] = useState(0);
+  // Raw notes text as stored, kept aside so a failed/blank date parse never
+  // wipes out the original value when saving.
+  const [originalNotes, setOriginalNotes] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!client) { setForm(EMPTY); return; }
+    if (!client) { setForm(EMPTY); setOriginalNotes(null); return; }
+    setOriginalNotes(client.notes ?? null);
     setForm({
       ...client,
       date_of_application: client.date_of_application?.toString().slice(0, 10) ?? '',
@@ -95,10 +99,15 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
       const url  = mode === 'add' ? '/api/clients' : `/api/clients/${client!.id}`;
       const method = mode === 'add' ? 'POST' : 'PUT';
 
+      // Only replace the stored notes text when the date field actually holds a
+      // parseable value; otherwise keep whatever was originally there so an
+      // unparseable/blank date never silently erases existing notes.
+      const notesToSave = form.notes ? isoToNotes(form.notes) : (originalNotes ?? '');
+
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, notes: isoToNotes(form.notes ?? '') }),
+        body: JSON.stringify({ ...form, notes: notesToSave }),
       });
 
       if (!res.ok) {
