@@ -27,13 +27,16 @@ interface ClientModalProps {
 // the ISO format the date input needs, tolerating 1- or 2-digit month/day and
 // 2- or 4-digit year, with either "-" or "/" as the separator.
 function notesToISO(notes: string | null | undefined): string {
-  if (!notes) return '';
-  if (/^\d{4}-\d{2}-\d{2}$/.test(notes)) return notes;
-  const m = notes.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{2}|\d{4})$/);
+  const trimmed = notes?.trim();
+  if (!trimmed) return '';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return trimmed;
+  // Separator can be any non-digit character (-, /, en/em dash, space, dot, ...).
+  const m = trimmed.match(/^(\d{1,2})\D+(\d{1,2})\D+(\d{2}|\d{4})$/);
   if (!m) return '';
   const [, mo, day, yr] = m;
   const year = yr.length === 2 ? `20${yr}` : yr;
-  return `${year}-${mo.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  const iso = `${year}-${mo.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  return /^\d{4}-\d{2}-\d{2}$/.test(iso) && !isNaN(new Date(iso).getTime()) ? iso : '';
 }
 
 function isoToNotes(iso: string): string {
