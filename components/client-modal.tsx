@@ -23,6 +23,17 @@ interface ClientModalProps {
   onSave: () => void;
 }
 
+// Existing notes are stored as MM-DD-YY; convert to/from the ISO format the date input needs.
+function notesToISO(notes: string | null | undefined): string {
+  const m = notes?.match(/^(\d{2})-(\d{2})-(\d{2})$/);
+  return m ? `20${m[3]}-${m[1]}-${m[2]}` : '';
+}
+
+function isoToNotes(iso: string): string {
+  const m = iso.match(/^\d{2}(\d{2})-(\d{2})-(\d{2})$/);
+  return m ? `${m[2]}-${m[3]}-${m[1]}` : '';
+}
+
 const EMPTY: Client = {
   client_code: '',
   name: '',
@@ -47,6 +58,7 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
       ...client,
       date_of_application: client.date_of_application?.toString().slice(0, 10) ?? '',
       date_of_hauling: client.date_of_hauling?.toString().slice(0, 10) ?? '',
+      notes: notesToISO(client.notes),
     });
   }, [client]);
 
@@ -76,7 +88,7 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, notes: isoToNotes(form.notes ?? '') }),
       });
 
       if (!res.ok) {
