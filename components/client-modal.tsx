@@ -137,12 +137,11 @@ export default function ClientModal({ mode, client, onClose, onSave }: ClientMod
           {/* Notes */}
           <div>
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Notes</label>
-            <textarea
+            <input
+              type="date"
               value={form.notes ?? ''}
               onChange={(e) => set('notes', e.target.value)}
-              rows={3}
-              placeholder="Optional notes…"
-              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 resize-none"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
             />
           </div>
 
