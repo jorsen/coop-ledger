@@ -23,15 +23,22 @@ interface ClientModalProps {
   onSave: () => void;
 }
 
-// Existing notes are stored as MM-DD-YY; convert to/from the ISO format the date input needs.
+// Existing notes are stored as M-D-YY / MM-DD-YY (or already ISO); convert to/from
+// the ISO format the date input needs, tolerating 1- or 2-digit month/day and
+// 2- or 4-digit year, with either "-" or "/" as the separator.
 function notesToISO(notes: string | null | undefined): string {
-  const m = notes?.match(/^(\d{2})-(\d{2})-(\d{2})$/);
-  return m ? `20${m[3]}-${m[1]}-${m[2]}` : '';
+  if (!notes) return '';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(notes)) return notes;
+  const m = notes.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{2}|\d{4})$/);
+  if (!m) return '';
+  const [, mo, day, yr] = m;
+  const year = yr.length === 2 ? `20${yr}` : yr;
+  return `${year}-${mo.padStart(2, '0')}-${day.padStart(2, '0')}`;
 }
 
 function isoToNotes(iso: string): string {
-  const m = iso.match(/^\d{2}(\d{2})-(\d{2})-(\d{2})$/);
-  return m ? `${m[2]}-${m[3]}-${m[1]}` : '';
+  const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return m ? `${m[2]}-${m[3]}-${m[1].slice(2)}` : '';
 }
 
 const EMPTY: Client = {
