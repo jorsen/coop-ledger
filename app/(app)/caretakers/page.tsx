@@ -69,6 +69,12 @@ function isNotesStale(notes: string | null | undefined): boolean {
   return Date.now() - date.getTime() > WEEK_MS;
 }
 
+// A caretaker manually marked "Updated" reverts to "Not Updated" once their
+// note is more than a week old and hasn't been refreshed.
+function isEffectivelyUpdated(client: { is_updated: boolean; notes: string | null }): boolean {
+  return client.is_updated && !isNotesStale(client.notes);
+}
+
 function StatusBadge({ status }: { status: string }) {
   const cls =
     status === 'active'    ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
@@ -122,8 +128,8 @@ export default function CaretakersPage() {
       c.client_code.toLowerCase().includes(search.toLowerCase());
     const matchesUpdated =
       updatedFilter === 'all' ||
-      (updatedFilter === 'updated' && c.is_updated) ||
-      (updatedFilter === 'not-updated' && !c.is_updated);
+      (updatedFilter === 'updated' && isEffectivelyUpdated(c)) ||
+      (updatedFilter === 'not-updated' && !isEffectivelyUpdated(c));
     return matchesSearch && matchesUpdated;
   });
 
@@ -240,21 +246,21 @@ export default function CaretakersPage() {
               <div className="mt-1.5" onClick={e => e.stopPropagation()}>
                 {isLoggedIn ? (
                   <select
-                    value={client.is_updated ? 'updated' : 'not-updated'}
+                    value={isEffectivelyUpdated(client) ? 'updated' : 'not-updated'}
                     onChange={e => handleToggleUpdated(client.id, e.target.value === 'updated')}
-                    className={`w-full text-xs font-medium bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 outline-none cursor-pointer focus:ring-1 focus:ring-green-700 ${client.is_updated ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
+                    className={`w-full text-xs font-medium bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 outline-none cursor-pointer focus:ring-1 focus:ring-green-700 ${isEffectivelyUpdated(client) ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
                   >
                     <option value="updated">Updated</option>
                     <option value="not-updated">Not Updated</option>
                   </select>
                 ) : (
-                  <span className={`text-xs font-medium ${client.is_updated ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                    {client.is_updated ? 'Updated' : 'Not Updated'}
+                  <span className={`text-xs font-medium ${isEffectivelyUpdated(client) ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                    {isEffectivelyUpdated(client) ? 'Updated' : 'Not Updated'}
                   </span>
                 )}
               </div>
               {client.notes && (() => {
-                const stale = !client.is_updated && isNotesStale(client.notes);
+                const stale = isNotesStale(client.notes);
                 return (
                   <div className={`flex items-start gap-1.5 mt-1.5 rounded-md px-2 py-1.5 border ${stale ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700/40' : 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700/40'}`}>
                     <StickyNote className={`w-3 h-3 shrink-0 mt-0.5 ${stale ? 'text-red-500' : 'text-amber-500'}`} />
@@ -364,20 +370,20 @@ export default function CaretakersPage() {
                     <td className="px-4 py-3 w-px whitespace-nowrap" onClick={e => e.stopPropagation()}>
                       {isLoggedIn ? (
                         <select
-                          value={client.is_updated ? 'updated' : 'not-updated'}
+                          value={isEffectivelyUpdated(client) ? 'updated' : 'not-updated'}
                           onChange={e => handleToggleUpdated(client.id, e.target.value === 'updated')}
-                          className={`text-xs font-medium bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 outline-none cursor-pointer focus:ring-1 focus:ring-green-700 ${client.is_updated ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
+                          className={`text-xs font-medium bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 outline-none cursor-pointer focus:ring-1 focus:ring-green-700 ${isEffectivelyUpdated(client) ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
                         >
                           <option value="updated">Updated</option>
                           <option value="not-updated">Not Updated</option>
                         </select>
                       ) : (
-                        <span className={`text-xs font-medium ${client.is_updated ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                          {client.is_updated ? 'Updated' : 'Not Updated'}
+                        <span className={`text-xs font-medium ${isEffectivelyUpdated(client) ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                          {isEffectivelyUpdated(client) ? 'Updated' : 'Not Updated'}
                         </span>
                       )}
                       {client.notes && (() => {
-                        const stale = !client.is_updated && isNotesStale(client.notes);
+                        const stale = isNotesStale(client.notes);
                         return (
                           <div className={`flex items-start gap-1 mt-1 rounded px-1.5 py-1 border ${stale ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700/40' : 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700/40'}`} title={client.notes}>
                             <StickyNote className={`w-3 h-3 shrink-0 mt-0.5 ${stale ? 'text-red-500' : 'text-amber-500'}`} />
