@@ -253,12 +253,15 @@ export default function CaretakersPage() {
                   </span>
                 )}
               </div>
-              {client.notes && (
-                <div className={`flex items-start gap-1.5 mt-1.5 rounded-md px-2 py-1.5 border ${isNotesStale(client.notes) ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700/40' : 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700/40'}`}>
-                  <StickyNote className={`w-3 h-3 shrink-0 mt-0.5 ${isNotesStale(client.notes) ? 'text-red-500' : 'text-amber-500'}`} />
-                  <p className={`text-xs line-clamp-2 leading-tight ${isNotesStale(client.notes) ? 'text-red-800 dark:text-red-300' : 'text-amber-800 dark:text-amber-300'}`}>{client.notes}</p>
-                </div>
-              )}
+              {client.notes && (() => {
+                const stale = !client.is_updated && isNotesStale(client.notes);
+                return (
+                  <div className={`flex items-start gap-1.5 mt-1.5 rounded-md px-2 py-1.5 border ${stale ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700/40' : 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700/40'}`}>
+                    <StickyNote className={`w-3 h-3 shrink-0 mt-0.5 ${stale ? 'text-red-500' : 'text-amber-500'}`} />
+                    <p className={`text-xs line-clamp-2 leading-tight ${stale ? 'text-red-800 dark:text-red-300' : 'text-amber-800 dark:text-amber-300'}`}>{client.notes}</p>
+                  </div>
+                );
+              })()}
               <p className="text-xs text-gray-400 dark:text-gray-500 mb-3 mt-1">{client.transaction_count} transaction(s)</p>
               <div className="grid grid-cols-4 gap-x-3 gap-y-3 py-3 border-t border-gray-100 dark:border-gray-700 mb-3">
                 <div>
@@ -373,12 +376,15 @@ export default function CaretakersPage() {
                           {client.is_updated ? 'Updated' : 'Not Updated'}
                         </span>
                       )}
-                      {client.notes && (
-                        <div className={`flex items-start gap-1 mt-1 rounded px-1.5 py-1 border ${isNotesStale(client.notes) ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700/40' : 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700/40'}`} title={client.notes}>
-                          <StickyNote className={`w-3 h-3 shrink-0 mt-0.5 ${isNotesStale(client.notes) ? 'text-red-500' : 'text-amber-500'}`} />
-                          <p className={`text-xs truncate leading-tight ${isNotesStale(client.notes) ? 'text-red-800 dark:text-red-300' : 'text-amber-800 dark:text-amber-300'}`}>{client.notes}</p>
-                        </div>
-                      )}
+                      {client.notes && (() => {
+                        const stale = !client.is_updated && isNotesStale(client.notes);
+                        return (
+                          <div className={`flex items-start gap-1 mt-1 rounded px-1.5 py-1 border ${stale ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700/40' : 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700/40'}`} title={client.notes}>
+                            <StickyNote className={`w-3 h-3 shrink-0 mt-0.5 ${stale ? 'text-red-500' : 'text-amber-500'}`} />
+                            <p className={`text-xs truncate leading-tight ${stale ? 'text-red-800 dark:text-red-300' : 'text-amber-800 dark:text-amber-300'}`}>{client.notes}</p>
+                          </div>
+                        );
+                      })()}
                     </td>
                     <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
                       {client.all_batches?.length > 1
