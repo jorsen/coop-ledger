@@ -94,6 +94,7 @@ export default function CaretakersPage() {
   const [clients, setClients] = useState<Client[]>([]);
   const [search, setSearch] = useState('');
   const [updatedFilter, setUpdatedFilter] = useState<'all' | 'updated' | 'not-updated'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [modal, setModal] = useState<{ mode: 'add' | 'edit'; client?: Client } | null>(null);
@@ -130,7 +131,11 @@ export default function CaretakersPage() {
       updatedFilter === 'all' ||
       (updatedFilter === 'updated' && isEffectivelyUpdated(c)) ||
       (updatedFilter === 'not-updated' && !isEffectivelyUpdated(c));
-    return matchesSearch && matchesUpdated;
+    const matchesStatus =
+      statusFilter === 'all' ||
+      (statusFilter === 'active' && c.status !== 'inactive') ||
+      (statusFilter === 'inactive' && c.status === 'inactive');
+    return matchesSearch && matchesUpdated && matchesStatus;
   });
 
   async function handleToggleUpdated(id: number, value: boolean) {
@@ -209,6 +214,15 @@ export default function CaretakersPage() {
           <option value="updated">Updated</option>
           <option value="not-updated">Not Updated</option>
         </select>
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value as 'all' | 'active' | 'inactive')}
+          className="border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 shrink-0"
+        >
+          <option value="all">All Statuses</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
         <div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shrink-0">
           <button
             onClick={() => toggleView('card')}
@@ -238,6 +252,9 @@ export default function CaretakersPage() {
             <div key={client.id} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
               <div className="flex items-start justify-between mb-1">
                 <h3 className="font-semibold text-gray-900 dark:text-white text-sm">{client.name}</h3>
+                <span className={`text-[11px] font-medium px-2 py-0.5 rounded shrink-0 ${client.status === 'inactive' ? 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400' : 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400'}`}>
+                  {client.status === 'inactive' ? 'Inactive' : 'Active'}
+                </span>
               </div>
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 ID: {client.client_code}
@@ -348,6 +365,7 @@ export default function CaretakersPage() {
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
                   <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">NAME</th>
+                  <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">STATUS</th>
                   <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">ID</th>
                   <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">NOTES</th>
                   <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 py-3 whitespace-nowrap">BATCH #</th>
@@ -366,6 +384,11 @@ export default function CaretakersPage() {
                     onClick={() => router.push(`/caretakers/${client.id}`)}
                   >
                     <td className="px-4 py-3 font-medium text-gray-900 dark:text-white whitespace-nowrap">{client.name}</td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className={`text-[11px] font-medium px-2 py-0.5 rounded ${client.status === 'inactive' ? 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400' : 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400'}`}>
+                        {client.status === 'inactive' ? 'Inactive' : 'Active'}
+                      </span>
+                    </td>
                     <td className="px-4 py-3 text-gray-500 dark:text-gray-400 whitespace-nowrap">{client.client_code}</td>
                     <td className="px-4 py-3 w-px whitespace-nowrap" onClick={e => e.stopPropagation()}>
                       {isLoggedIn ? (
