@@ -43,6 +43,32 @@ const fmtDate = (d: string | null) => {
   return `${parseInt(m)}/${parseInt(day)}/${y}`;
 };
 
+// Notes are stored as M-D-YY / MM-DD-YY (or already ISO); parse tolerantly
+// so we can tell whether the note is more than a week old.
+function parseNotesDate(notes: string | null | undefined): Date | null {
+  const trimmed = notes?.trim();
+  if (!trimmed) return null;
+  const iso = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (iso) {
+    const d = new Date(`${trimmed}T00:00:00`);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  const m = trimmed.match(/^(\d{1,2})\D+(\d{1,2})\D+(\d{2}|\d{4})$/);
+  if (!m) return null;
+  const [, mo, day, yr] = m;
+  const year = yr.length === 2 ? `20${yr}` : yr;
+  const d = new Date(`${year}-${mo.padStart(2, '0')}-${day.padStart(2, '0')}T00:00:00`);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+function isNotesStale(notes: string | null | undefined): boolean {
+  const date = parseNotesDate(notes);
+  if (!date) return false;
+  return Date.now() - date.getTime() > WEEK_MS;
+}
+
 function StatusBadge({ status }: { status: string }) {
   const cls =
     status === 'active'    ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
@@ -228,9 +254,9 @@ export default function CaretakersPage() {
                 )}
               </div>
               {client.notes && (
-                <div className="flex items-start gap-1.5 mt-1.5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded-md px-2 py-1.5">
-                  <StickyNote className="w-3 h-3 shrink-0 mt-0.5 text-amber-500" />
-                  <p className="text-xs line-clamp-2 leading-tight text-amber-800 dark:text-amber-300">{client.notes}</p>
+                <div className={`flex items-start gap-1.5 mt-1.5 rounded-md px-2 py-1.5 border ${isNotesStale(client.notes) ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700/40' : 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700/40'}`}>
+                  <StickyNote className={`w-3 h-3 shrink-0 mt-0.5 ${isNotesStale(client.notes) ? 'text-red-500' : 'text-amber-500'}`} />
+                  <p className={`text-xs line-clamp-2 leading-tight ${isNotesStale(client.notes) ? 'text-red-800 dark:text-red-300' : 'text-amber-800 dark:text-amber-300'}`}>{client.notes}</p>
                 </div>
               )}
               <p className="text-xs text-gray-400 dark:text-gray-500 mb-3 mt-1">{client.transaction_count} transaction(s)</p>
@@ -348,9 +374,9 @@ export default function CaretakersPage() {
                         </span>
                       )}
                       {client.notes && (
-                        <div className="flex items-start gap-1 mt-1 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded px-1.5 py-1" title={client.notes}>
-                          <StickyNote className="w-3 h-3 shrink-0 mt-0.5 text-amber-500" />
-                          <p className="text-xs truncate leading-tight text-amber-800 dark:text-amber-300">{client.notes}</p>
+                        <div className={`flex items-start gap-1 mt-1 rounded px-1.5 py-1 border ${isNotesStale(client.notes) ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700/40' : 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700/40'}`} title={client.notes}>
+                          <StickyNote className={`w-3 h-3 shrink-0 mt-0.5 ${isNotesStale(client.notes) ? 'text-red-500' : 'text-amber-500'}`} />
+                          <p className={`text-xs truncate leading-tight ${isNotesStale(client.notes) ? 'text-red-800 dark:text-red-300' : 'text-amber-800 dark:text-amber-300'}`}>{client.notes}</p>
                         </div>
                       )}
                     </td>
