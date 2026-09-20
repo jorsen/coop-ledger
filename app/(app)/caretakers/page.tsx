@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Plus, Eye, Pencil, Trash2, Search, LayoutGrid, List, StickyNote, Archive } from 'lucide-react';
 import ClientModal from '@/components/client-modal';
 import ConfirmModal from '@/components/confirm-modal';
+import HeadBatchesPanel from '@/components/head-batches-panel';
 import { usePoll } from '@/hooks/use-poll';
 import { isNotesStale, isEffectivelyUpdated } from '@/lib/notes-date';
 
@@ -69,6 +70,7 @@ export default function CaretakersPage() {
   const [modal, setModal] = useState<{ mode: 'add' | 'edit'; client?: Client } | null>(null);
   const [dialog, setDialog] = useState<{ title: string; message: string; variant?: 'default' | 'delete'; onConfirm: () => void } | null>(null);
   const [view, setView] = useState<'card' | 'list'>('list');
+  const [tab, setTab] = useState<'caretakers' | 'batches'>('caretakers');
 
   useEffect(() => {
     const saved = localStorage.getItem('caretakers-view') as 'card' | 'list' | null;
@@ -128,14 +130,6 @@ export default function CaretakersPage() {
     });
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="w-6 h-6 border-2 border-green-800 border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-start gap-4 mb-6">
@@ -143,26 +137,54 @@ export default function CaretakersPage() {
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Caretakers</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Manage cooperative members</p>
         </div>
-        <div className="flex items-center gap-2 sm:ml-auto">
-          <button
-            onClick={() => router.push('/caretakers/archives')}
-            className="flex items-center gap-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-          >
-            <Archive className="w-4 h-4" />
-            Archives
-          </button>
-          {isLoggedIn && (
+        {tab === 'caretakers' && (
+          <div className="flex items-center gap-2 sm:ml-auto">
             <button
-              onClick={() => setModal({ mode: 'add' })}
-              className="flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+              onClick={() => router.push('/caretakers/archives')}
+              className="flex items-center gap-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
-              <Plus className="w-4 h-4" />
-              Add Caretaker
+              <Archive className="w-4 h-4" />
+              Archives
             </button>
-          )}
-        </div>
+            {isLoggedIn && (
+              <button
+                onClick={() => setModal({ mode: 'add' })}
+                className="flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                Add Caretaker
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
+      {/* Tabs */}
+      <div className="flex items-center border-b border-gray-200 dark:border-gray-700 mb-6">
+        <button
+          onClick={() => setTab('caretakers')}
+          className={`px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === 'caretakers' ? 'border-green-800 text-green-800 dark:text-green-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
+        >
+          Caretakers
+        </button>
+        <button
+          onClick={() => setTab('batches')}
+          className={`px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === 'batches' ? 'border-green-800 text-green-800 dark:text-green-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
+        >
+          Batches
+        </button>
+      </div>
+
+      {tab === 'batches' && <HeadBatchesPanel isLoggedIn={isLoggedIn} />}
+
+      {tab === 'caretakers' && loading && (
+        <div className="flex items-center justify-center h-64">
+          <div className="w-6 h-6 border-2 border-green-800 border-t-transparent rounded-full animate-spin" />
+        </div>
+      )}
+
+      {tab === 'caretakers' && !loading && (
+      <>
       {/* Search + view toggle */}
       <div className="flex items-center gap-3 mb-6 flex-wrap">
         <div className="relative max-w-xs flex-1 min-w-[160px]">
@@ -458,6 +480,8 @@ export default function CaretakersPage() {
             </table>
           </div>
         </div>
+      )}
+      </>
       )}
 
       {modal && (
