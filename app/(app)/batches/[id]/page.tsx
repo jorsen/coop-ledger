@@ -367,9 +367,9 @@ export default function BatchDetailPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-5 items-start print-layout-grid">
+      <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-5 items-start print-layout-grid">
       {/* ── Info card (order 1 on mobile) ── */}
-      <div className="md:col-span-2 xl:col-span-3 min-w-0 order-1">
+      <div className="md:col-span-2 xl:col-span-4 min-w-0 order-1">
 
       {batch.client_name && (
         <div className="bg-white rounded-xl border border-gray-200 px-6 py-5 mb-4 text-sm print:rounded-sm print-card dark:bg-gray-800 dark:border-gray-700">
@@ -423,7 +423,7 @@ export default function BatchDetailPage() {
       </div>{/* end info card column */}
 
       {/* ── Main content (order 3 on mobile, row 2 on desktop) ── */}
-      <div className="md:col-span-2 xl:col-span-3 min-w-0 order-3">
+      <div className="md:col-span-2 xl:col-span-4 min-w-0 order-3">
 
       {batch.notes && <p className="text-sm text-gray-500 mb-4">{batch.notes}</p>}
 
@@ -433,18 +433,18 @@ export default function BatchDetailPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50 dark:bg-gray-900 dark:border-gray-700">
-                <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3 dark:text-gray-400 whitespace-nowrap">FEEDS</th>
-                <th className="text-left text-xs font-semibold text-gray-600 px-4 py-3 dark:text-gray-400 whitespace-nowrap">TR_DATE</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 dark:text-gray-400 whitespace-nowrap">NO.OF BAGS</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 dark:text-gray-400 whitespace-nowrap">Price/Bag</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 dark:text-gray-400 whitespace-nowrap">Debit</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden dark:text-gray-400 hidden xl:table-cell whitespace-nowrap">Delivery Fee</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 dark:text-gray-400 whitespace-nowrap">Balance</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden dark:text-gray-400 hidden xl:table-cell whitespace-nowrap">DFFS</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 dark:text-gray-400 hidden sm:table-cell whitespace-nowrap">Interest</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden dark:text-gray-400 hidden xl:table-cell whitespace-nowrap"># of Days</th>
-                <th className="text-right text-xs font-semibold text-gray-600 px-4 py-3 print:hidden dark:text-gray-400 hidden xl:table-cell whitespace-nowrap">Date Maturity</th>
-                <th className="px-4 py-3 print:hidden" />
+                <th className="text-left text-xs font-semibold text-gray-600 px-3 py-3 dark:text-gray-400 whitespace-nowrap">FEEDS</th>
+                <th className="text-left text-xs font-semibold text-gray-600 px-3 py-3 dark:text-gray-400 whitespace-nowrap">TR_DATE</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-3 py-3 dark:text-gray-400 whitespace-nowrap">NO.OF BAGS</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-3 py-3 dark:text-gray-400 whitespace-nowrap">Price/Bag</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-3 py-3 dark:text-gray-400 whitespace-nowrap">Debit</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-3 py-3 print:hidden dark:text-gray-400 hidden xl:table-cell whitespace-nowrap">Delivery Fee</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-3 py-3 dark:text-gray-400 whitespace-nowrap">Balance</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-3 py-3 print:hidden dark:text-gray-400 hidden xl:table-cell whitespace-nowrap">DFFS</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-3 py-3 dark:text-gray-400 hidden sm:table-cell whitespace-nowrap">Interest</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-3 py-3 print:hidden dark:text-gray-400 hidden xl:table-cell whitespace-nowrap"># of Days</th>
+                <th className="text-right text-xs font-semibold text-gray-600 px-3 py-3 print:hidden dark:text-gray-400 hidden xl:table-cell whitespace-nowrap">Date Maturity</th>
+                <th className="px-3 py-3 print:hidden" />
               </tr>
             </thead>
             <tbody>
@@ -457,20 +457,20 @@ export default function BatchDetailPage() {
               )}
               {withComputed.map((tx) => (
                 <tr key={tx.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 dark:border-gray-700 dark:hover:bg-gray-700/50">
-                  <td className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap">{tx.feed_type || '—'}</td>
-                  <td className="px-4 py-3 text-blue-600 dark:text-blue-400 whitespace-nowrap">{fmtDate(tx.date)}</td>
-                  <td className="px-4 py-3 text-gray-700 text-right dark:text-gray-300">{Number(tx.bags).toFixed(2)}</td>
-                  <td className="px-4 py-3 text-gray-600 text-right dark:text-gray-400">
+                  <td className="px-3 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap">{tx.feed_type || '—'}</td>
+                  <td className="px-3 py-3 text-blue-600 dark:text-blue-400 whitespace-nowrap">{fmtDate(tx.date)}</td>
+                  <td className="px-3 py-3 text-gray-700 text-right dark:text-gray-300">{Number(tx.bags).toFixed(2)}</td>
+                  <td className="px-3 py-3 text-gray-600 text-right dark:text-gray-400">
                     {tx.price_per_bag ? num(Number(tx.price_per_bag)) : '—'}
                   </td>
-                  <td className="px-4 py-3 text-gray-900 text-right dark:text-white">{num(tx.debit)}</td>
-                  <td className="px-4 py-3 text-gray-600 text-right print:hidden dark:text-gray-400 hidden xl:table-cell">{num(Number(tx.delivery_fee ?? 0))}</td>
-                  <td className="px-4 py-3 font-semibold text-gray-900 text-right dark:text-white">{num(tx.runningBalance)}</td>
-                  <td className="px-4 py-3 text-gray-600 text-right print:hidden dark:text-gray-400 hidden xl:table-cell">{num(tx.dffs1)}</td>
-                  <td className="px-4 py-3 text-gray-600 text-right dark:text-gray-400 hidden sm:table-cell">{num(tx.interest)}</td>
-                  <td className="px-4 py-3 text-gray-500 text-right print:hidden dark:text-gray-400 hidden xl:table-cell">{tx.days}</td>
-                  <td className="px-4 py-3 text-green-700 dark:text-green-400 text-right whitespace-nowrap print:hidden hidden xl:table-cell">{maturityDate ? fmtDate(maturityDate) : '—'}</td>
-                  <td className="px-4 py-3 print:hidden">
+                  <td className="px-3 py-3 text-gray-900 text-right dark:text-white">{num(tx.debit)}</td>
+                  <td className="px-3 py-3 text-gray-600 text-right print:hidden dark:text-gray-400 hidden xl:table-cell">{num(Number(tx.delivery_fee ?? 0))}</td>
+                  <td className="px-3 py-3 font-semibold text-gray-900 text-right dark:text-white">{num(tx.runningBalance)}</td>
+                  <td className="px-3 py-3 text-gray-600 text-right print:hidden dark:text-gray-400 hidden xl:table-cell">{num(tx.dffs1)}</td>
+                  <td className="px-3 py-3 text-gray-600 text-right dark:text-gray-400 hidden sm:table-cell">{num(tx.interest)}</td>
+                  <td className="px-3 py-3 text-gray-500 text-right print:hidden dark:text-gray-400 hidden xl:table-cell">{tx.days}</td>
+                  <td className="px-3 py-3 text-green-700 dark:text-green-400 text-right whitespace-nowrap print:hidden hidden xl:table-cell">{maturityDate ? fmtDate(maturityDate) : '—'}</td>
+                  <td className="px-3 py-3 print:hidden">
                     {isLoggedIn && (
                       <div className="flex items-center justify-end gap-2">
                         <button onClick={() => setModal({ tx })} className="p-1 text-gray-400 hover:text-gray-600">
@@ -487,16 +487,16 @@ export default function BatchDetailPage() {
 
               {withComputed.length > 0 && (
                 <tr className="border-t-2 border-gray-300 bg-gray-50 font-semibold text-sm dark:bg-gray-900 dark:border-gray-700">
-                  <td colSpan={2} className="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">Total</td>
-                  <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{Number(totalBags).toFixed(2)}</td>
-                  <td className="px-4 py-3 print:hidden hidden xl:table-cell" />
-                  <td className="px-4 py-3 text-right text-gray-900 dark:text-white">{num(totalDebit)}</td>
-                  <td className="px-4 py-3 text-right text-gray-600 print:hidden dark:text-gray-400 hidden xl:table-cell">{num(totalDeliveryFee)}</td>
-                  <td className="px-4 py-3 text-right text-gray-900 dark:text-white">{num(balance)}</td>
-                  <td className="px-4 py-3 text-right text-gray-700 print:hidden dark:text-gray-300 hidden xl:table-cell">{num(totalDffs1)}</td>
-                  <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300 hidden sm:table-cell">{num(totalInterest)}</td>
-                  <td className="px-4 py-3 print:hidden hidden xl:table-cell" />
-                  <td className="px-4 py-3 print:hidden hidden xl:table-cell" />
+                  <td colSpan={2} className="px-3 py-3 text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">Total</td>
+                  <td className="px-3 py-3 text-right text-gray-700 dark:text-gray-300">{Number(totalBags).toFixed(2)}</td>
+                  <td className="px-3 py-3 print:hidden hidden xl:table-cell" />
+                  <td className="px-3 py-3 text-right text-gray-900 dark:text-white">{num(totalDebit)}</td>
+                  <td className="px-3 py-3 text-right text-gray-600 print:hidden dark:text-gray-400 hidden xl:table-cell">{num(totalDeliveryFee)}</td>
+                  <td className="px-3 py-3 text-right text-gray-900 dark:text-white">{num(balance)}</td>
+                  <td className="px-3 py-3 text-right text-gray-700 print:hidden dark:text-gray-300 hidden xl:table-cell">{num(totalDffs1)}</td>
+                  <td className="px-3 py-3 text-right text-gray-700 dark:text-gray-300 hidden sm:table-cell">{num(totalInterest)}</td>
+                  <td className="px-3 py-3 print:hidden hidden xl:table-cell" />
+                  <td className="px-3 py-3 print:hidden hidden xl:table-cell" />
                   <td className="print:hidden" />
                 </tr>
               )}
