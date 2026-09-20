@@ -62,7 +62,7 @@ export default function CaretakersPage() {
   const router = useRouter();
   const [clients, setClients] = useState<Client[]>([]);
   const [search, setSearch] = useState('');
-  const [updatedFilter, setUpdatedFilter] = useState<'all' | 'updated' | 'not-updated'>('all');
+  const [updatedFilter, setUpdatedFilter] = useState<'all' | 'updated' | 'not-updated'>('not-updated');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('active');
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
