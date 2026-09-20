@@ -367,9 +367,9 @@ export default function BatchDetailPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-start print-layout-grid">
+      <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-5 items-start print-layout-grid">
       {/* ── Info card (order 1 on mobile) ── */}
-      <div className="md:col-span-2 min-w-0 order-1">
+      <div className="md:col-span-2 xl:col-span-3 min-w-0 order-1">
 
       {batch.client_name && (
         <div className="bg-white rounded-xl border border-gray-200 px-6 py-5 mb-4 text-sm print:rounded-sm print-card dark:bg-gray-800 dark:border-gray-700">
@@ -423,7 +423,7 @@ export default function BatchDetailPage() {
       </div>{/* end info card column */}
 
       {/* ── Main content (order 3 on mobile, row 2 on desktop) ── */}
-      <div className="md:col-span-2 min-w-0 order-3">
+      <div className="md:col-span-2 xl:col-span-3 min-w-0 order-3">
 
       {batch.notes && <p className="text-sm text-gray-500 mb-4">{batch.notes}</p>}
 
