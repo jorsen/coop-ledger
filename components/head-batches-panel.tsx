@@ -1,10 +1,12 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import HeadBatchModal, { HeadBatch } from '@/components/head-batch-modal';
 import ConfirmModal from '@/components/confirm-modal';
 import { usePoll } from '@/hooks/use-poll';
+
+const PAGE_SIZE = 20;
 
 interface HeadBatchRow extends HeadBatch {
   id: number;
@@ -25,6 +27,7 @@ export default function HeadBatchesPanel({ isLoggedIn }: { isLoggedIn: boolean }
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<{ batch?: HeadBatchRow } | null>(null);
   const [dialog, setDialog] = useState<{ title: string; message: string; variant?: 'default' | 'delete'; onConfirm: () => void } | null>(null);
+  const [page, setPage] = useState(0);
 
   const fetchData = useCallback(async () => {
     const res = await fetch('/api/head-batches');
@@ -70,6 +73,10 @@ export default function HeadBatchesPanel({ isLoggedIn }: { isLoggedIn: boolean }
 
   const pct = Math.min(100, Math.round((headsInUse / maxHeads) * 100));
   const overCapacity = headsInUse > maxHeads;
+
+  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages - 1);
+  const pagedRows = rows.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
 
   return (
     <div>
@@ -119,7 +126,7 @@ export default function HeadBatchesPanel({ isLoggedIn }: { isLoggedIn: boolean }
                 </tr>
               </thead>
               <tbody>
-                {rows.map((row) => (
+                {pagedRows.map((row) => (
                   <tr key={row.id} className="border-b border-gray-50 dark:border-gray-700 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-700/50">
                     <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">{row.batch_no}</td>
                     <td className="px-4 py-3 text-gray-800 dark:text-gray-200 whitespace-nowrap">{row.name}</td>
@@ -158,6 +165,23 @@ export default function HeadBatchesPanel({ isLoggedIn }: { isLoggedIn: boolean }
               </tbody>
             </table>
           </div>
+
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between px-5 py-3 border-t border-gray-100 dark:border-gray-700">
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                {currentPage * PAGE_SIZE + 1}–{Math.min((currentPage + 1) * PAGE_SIZE, rows.length)} of {rows.length}
+              </span>
+              <div className="flex items-center gap-1">
+                <button onClick={() => setPage(p => p - 1)} disabled={currentPage === 0} className="p-1.5 rounded text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30">
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <span className="text-xs text-gray-600 dark:text-gray-400 px-1">{currentPage + 1} / {totalPages}</span>
+                <button onClick={() => setPage(p => p + 1)} disabled={currentPage >= totalPages - 1} className="p-1.5 rounded text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30">
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
