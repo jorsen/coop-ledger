@@ -749,16 +749,18 @@ export default function BatchDetailPage() {
 
       {/* ── Batches sidebar (order 2 on mobile, spans both rows on desktop) ── */}
       <div className="md:col-span-1 lg:sticky lg:top-[72px] order-2 print:hidden">
-        {allBatches.length > 0 && (
+        {(() => {
+          const visibleBatches = allBatches.filter(b => b.status !== 'paid' || b.id === Number(id));
+          return visibleBatches.length > 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
             <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center gap-2">
               <ClipboardList className="w-4 h-4 text-gray-500" />
               <h2 className="font-semibold text-gray-900 dark:text-white">Batches</h2>
               <span className="text-xs text-gray-400 dark:text-gray-500">— {batch.client_name}</span>
-              <span className="ml-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full">{allBatches.length}</span>
+              <span className="ml-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full">{visibleBatches.length}</span>
             </div>
             <div className="divide-y divide-gray-50 dark:divide-gray-700 max-h-[60vh] overflow-y-auto">
-              {allBatches.map((b) => {
+              {visibleBatches.map((b) => {
                 const isViewing = b.id === Number(id);
                 return (
                   <div key={b.id} className={`px-4 sm:px-6 py-3 flex flex-col gap-1.5 ${isViewing ? 'bg-green-50 dark:bg-green-900/10' : 'hover:bg-gray-50/50 dark:hover:bg-gray-700/50'}`}>
@@ -812,7 +814,8 @@ export default function BatchDetailPage() {
               })}
             </div>
           </div>
-        )}
+          );
+        })()}
       </div>
 
       </div>{/* end grid */}
