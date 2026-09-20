@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { isEffectivelyUpdated } from '@/lib/notes-date';
 
-// The cron fires every Monday 01:00 UTC (see vercel.json's "0 1 * * 1"); find
-// the next occurrence of that so the notification can tell readers when to
-// expect the following reminder.
+// The cron fires every Monday 12:00 UTC / 8:00 PM Manila (see vercel.json's
+// "0 12 * * 1"); find the next occurrence of that so the notification can
+// tell readers when to expect the following reminder.
 function nextMondayManila(now = new Date()): Date {
   const d = new Date(now);
-  d.setUTCHours(1, 0, 0, 0);
+  d.setUTCHours(12, 0, 0, 0);
   const day = d.getUTCDay();
   let diff = (1 - day + 7) % 7;
   if (diff === 0 && d <= now) diff = 7;
