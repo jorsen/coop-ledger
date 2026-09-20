@@ -2,8 +2,9 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Plus, Pencil, Trash2, Printer, ChevronLeft, ChevronRight, ClipboardList, Eye } from 'lucide-react';
+import { ArrowLeft, Plus, Pencil, Trash2, Printer, ChevronLeft, ChevronRight, ClipboardList, Eye, Upload } from 'lucide-react';
 import TransactionModal from '@/components/transaction-modal';
+import ImportPhotoModal from '@/components/import-photo-modal';
 import ConfirmModal from '@/components/confirm-modal';
 import { usePoll } from '@/hooks/use-poll';
 
@@ -92,6 +93,8 @@ export default function BatchDetailPage() {
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [modal, setModal] = useState<{ tx?: Transaction } | null>(null);
+  const [importModal, setImportModal] = useState(false);
+  const [feedTypes, setFeedTypes] = useState<{ id: number; name: string; current_price: number | null }[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [expenseModal, setExpenseModal] = useState(false);
   const [expenseForm, setExpenseForm] = useState({ item: '', quantity: '1', price: '' });
@@ -128,6 +131,7 @@ export default function BatchDetailPage() {
 
   useEffect(() => {
     fetch('/api/clients').then((r) => r.json()).then(setClients);
+    fetch('/api/feed-types').then((r) => r.json()).then(setFeedTypes);
   }, []);
 
   const fetchExpenses = useCallback(async () => {
@@ -357,12 +361,20 @@ export default function BatchDetailPage() {
             <Printer className="w-4 h-4" /> Print
           </button>
           {isLoggedIn && (
-            <button
-              onClick={() => setModal({})}
-              className="flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700"
-            >
-              <Plus className="w-4 h-4" /> Add Transaction
-            </button>
+            <>
+              <button
+                onClick={() => setImportModal(true)}
+                className="flex items-center gap-2 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+              >
+                <Upload className="w-4 h-4" /> Import from Photo
+              </button>
+              <button
+                onClick={() => setModal({})}
+                className="flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700"
+              >
+                <Plus className="w-4 h-4" /> Add Transaction
+              </button>
+            </>
           )}
         </div>
       </div>
@@ -895,6 +907,16 @@ export default function BatchDetailPage() {
           defaultBatchId={batch.id}
           onClose={() => setModal(null)}
           onSave={() => { setModal(null); fetchData(); }}
+        />
+      )}
+
+      {importModal && batch.client_id && (
+        <ImportPhotoModal
+          clientId={batch.client_id}
+          batchId={batch.id}
+          feedTypes={feedTypes}
+          onClose={() => setImportModal(false)}
+          onSave={() => { setImportModal(false); fetchData(); }}
         />
       )}
 
