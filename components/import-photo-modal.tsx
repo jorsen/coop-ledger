@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { X, Upload, Loader2, Trash2, Plus } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Upload, Loader2, Trash2, Plus, Clipboard } from 'lucide-react';
 
 interface FeedType { id: number; name: string; current_price: number | null }
 
@@ -29,7 +29,7 @@ function closestFeedType(word: string, names: string[]): string {
     const n = name.toUpperCase().replace(/[^A-Z]/g, '');
     if (!n) continue;
     let shared = 0;
-    for (const ch of new Set(w)) if (n.includes(ch)) shared++;
+    for (const ch of Array.from(new Set(w))) if (n.includes(ch)) shared++;
     const score = shared / Math.max(w.length, n.length) + (n.startsWith(w.slice(0, 3)) ? 0.5 : 0);
     if (score > bestScore) { bestScore = score; best = name; }
   }
@@ -71,6 +71,35 @@ export default function ImportPhotoModal({ clientId, batchId, feedTypes, onClose
     setImagePreview(URL.createObjectURL(file));
     setRows([]);
     setError('');
+  }
+
+  // Let Ctrl+V paste a copied screenshot/image straight in while this modal is open.
+  useEffect(() => {
+    function onPaste(e: ClipboardEvent) {
+      const item = Array.from(e.clipboardData?.items ?? []).find(i => i.type.startsWith('image/'));
+      const file = item?.getAsFile();
+      if (file) handleFile(file);
+    }
+    window.addEventListener('paste', onPaste);
+    return () => window.removeEventListener('paste', onPaste);
+  }, []);
+
+  async function pasteFromClipboard() {
+    setError('');
+    try {
+      const items = await navigator.clipboard.read();
+      for (const item of items) {
+        const type = item.types.find(t => t.startsWith('image/'));
+        if (type) {
+          const blob = await item.getType(type);
+          handleFile(new File([blob], 'pasted-image.png', { type }));
+          return;
+        }
+      }
+      setError('No image found on the clipboard.');
+    } catch {
+      setError('Could not read the clipboard. Try Ctrl+V instead, or copy the image again.');
+    }
   }
 
   async function runOcr() {
@@ -156,16 +185,26 @@ export default function ImportPhotoModal({ clientId, batchId, feedTypes, onClose
 
         <div className="p-6 space-y-4">
           {!imagePreview && (
-            <label className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg py-10 cursor-pointer hover:border-green-700 text-gray-500 dark:text-gray-400">
+            <div className="flex flex-col items-center justify-center gap-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg py-10 text-gray-500 dark:text-gray-400">
               <Upload className="w-6 h-6" />
-              <span className="text-sm">Click to choose a photo of the ledger sheet</span>
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
-              />
-            </label>
+              <label className="text-sm cursor-pointer hover:text-green-700 dark:hover:text-green-400">
+                Click to choose a photo of the ledger sheet
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
+                />
+              </label>
+              <span className="text-xs text-gray-400 dark:text-gray-500">or press Ctrl+V to paste a copied image</span>
+              <button
+                type="button"
+                onClick={pasteFromClipboard}
+                className="flex items-center gap-1.5 text-xs border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
+                <Clipboard className="w-3.5 h-3.5" /> Paste from Clipboard
+              </button>
+            </div>
           )}
 
           {imagePreview && (
