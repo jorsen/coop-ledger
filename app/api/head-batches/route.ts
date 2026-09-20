@@ -3,7 +3,7 @@ import { requireAuth } from '@/lib/auth';
 import { sql } from '@/lib/db';
 import { logActivity } from '@/lib/activity';
 
-export const MAX_HEADS = 200;
+const MAX_HEADS = 200;
 
 async function ensureTable() {
   await sql`
