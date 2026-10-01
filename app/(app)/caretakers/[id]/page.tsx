@@ -358,29 +358,13 @@ export default function CaretakerLedgerPage() {
       </div>
 
       {/* ── Top bar ──────────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between mb-4 print:hidden">
+      <div className="flex items-center mb-4 print:hidden">
         <button
           onClick={() => router.push('/caretakers')}
           className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 py-2 whitespace-nowrap"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Caretakers
         </button>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => window.print()}
-            className="flex items-center gap-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800"
-          >
-            <Printer className="w-4 h-4" /> Print
-          </button>
-          {isLoggedIn && (
-            <button
-              onClick={() => setModal({})}
-              className="flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700"
-            >
-              <Plus className="w-4 h-4" /> Add Transaction
-            </button>
-          )}
-        </div>
       </div>
 
       <div className="flex flex-col gap-5 print-layout-grid">
@@ -425,14 +409,12 @@ export default function CaretakerLedgerPage() {
       {/* ── Batches strip ── */}
       {!batchIdParam && <div className="min-w-0 print:hidden">
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-          <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <ClipboardList className="w-4 h-4 text-gray-500" />
-              <h2 className="font-semibold text-gray-900 dark:text-white">Batches</h2>
-              {activeBatches.length > 0 && (
-                <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full">{activeBatches.length}</span>
-              )}
-            </div>
+          <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center gap-3">
+            <ClipboardList className="w-4 h-4 text-gray-500" />
+            <h2 className="font-semibold text-gray-900 dark:text-white">Batches</h2>
+            {activeBatches.length > 0 && (
+              <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full">{activeBatches.length}</span>
+            )}
             {isLoggedIn && (
               <button
                 onClick={() => setBatchModal(true)}
@@ -525,6 +507,22 @@ export default function CaretakerLedgerPage() {
 
       {/* ── Selected batch details ───────────────────────────────────── */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-6 py-5 mb-6 print:rounded-sm print-card">
+        <div className="flex items-center justify-end gap-2 mb-4 print:hidden">
+          <button
+            onClick={() => window.print()}
+            className="flex items-center gap-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800"
+          >
+            <Printer className="w-4 h-4" /> Print
+          </button>
+          {isLoggedIn && (
+            <button
+              onClick={() => setModal({})}
+              className="flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700"
+            >
+              <Plus className="w-4 h-4" /> Add Transaction
+            </button>
+          )}
+        </div>
         <div className="flex flex-wrap items-start gap-x-10 gap-y-4 text-sm print:gap-x-6 print:gap-y-1 print:text-xs">
           <div>
             <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">BATCH #</p>
