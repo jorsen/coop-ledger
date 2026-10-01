@@ -383,9 +383,9 @@ export default function CaretakerLedgerPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-start print-layout-grid">
-      {/* ── Info card (order 1 on mobile) ── */}
-      <div className={`${batchIdParam ? 'md:col-span-3' : 'md:col-span-2'} min-w-0 order-1`}>
+      <div className="flex flex-col gap-5 print-layout-grid">
+      {/* ── Info card ── */}
+      <div className="min-w-0">
 
       {/* ── Caretaker info card ───────────────────────────────────────── */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-6 py-5 mb-6 print:rounded-sm print-card">
@@ -474,8 +474,112 @@ export default function CaretakerLedgerPage() {
       </div>
       </div>
 
-      {/* ── Main content (order 3 on mobile, row 2 on desktop) ── */}
-      {selectedBatch && (<div className={`${batchIdParam ? 'md:col-span-3' : 'md:col-span-2'} min-w-0 order-3`}>
+      {/* ── Batches strip ── */}
+      {!batchIdParam && <div className="min-w-0 print:hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+          <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ClipboardList className="w-4 h-4 text-gray-500" />
+              <h2 className="font-semibold text-gray-900 dark:text-white">Batches</h2>
+              {activeBatches.length > 0 && (
+                <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full">{activeBatches.length}</span>
+              )}
+            </div>
+            {isLoggedIn && (
+              <button
+                onClick={() => setBatchModal(true)}
+                className="flex items-center gap-1.5 text-sm text-green-800 dark:text-green-400 font-medium hover:text-green-700"
+              >
+                <Plus className="w-4 h-4" /> New Batch
+              </button>
+            )}
+          </div>
+
+          {activeBatches.length === 0 ? (
+            <div className="flex flex-col items-center text-center gap-2 py-10 px-6">
+              <ClipboardList className="w-8 h-8 text-gray-300 dark:text-gray-600" />
+              <p className="text-sm text-gray-400 dark:text-gray-500">No batches yet.</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500">Create one to start grouping transactions.</p>
+              {isLoggedIn && (
+                <button
+                  onClick={() => setBatchModal(true)}
+                  className="mt-2 inline-flex items-center gap-1.5 text-sm text-green-800 dark:text-green-400 font-medium hover:text-green-700"
+                >
+                  <Plus className="w-4 h-4" /> Create first batch
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="overflow-x-auto px-4 py-4">
+              <div className="flex gap-3" style={{ minWidth: 'max-content' }}>
+                {pagedBatches.map((b) => {
+                  const isViewing = b.id === selectedBatchId;
+                  return (
+                    <div
+                      key={b.id}
+                      onClick={() => { setSelectedBatchId(b.id); setTxPage(0); }}
+                      className={`shrink-0 w-60 cursor-pointer rounded-lg border px-3 py-2.5 ${isViewing ? 'border-green-700 bg-green-50 dark:bg-green-900/10' : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50/50 dark:hover:bg-gray-700/50'}`}
+                    >
+                      <div className="flex items-center gap-1.5 flex-wrap mb-1.5">
+                        <span className="bg-green-800 text-white text-xs font-bold px-2 py-0.5 rounded">
+                          {b.batch_number}
+                        </span>
+                        {isViewing && (
+                          <span className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 text-[10px] font-semibold px-1.5 py-0.5 rounded">Viewing</span>
+                        )}
+                        {(() => {
+                          const s = b.status ?? 'active';
+                          const cls =
+                            s === 'active'    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
+                            s === 'on-going'  ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                            s === 'paid'      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' :
+                            s === 'completed' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' :
+                            'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400';
+                          return <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${cls}`}>{s.charAt(0).toUpperCase() + s.slice(1)}</span>;
+                        })()}
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-1.5">
+                        <span>{b.transaction_count} tx · {b.total_bags} bags</span>
+                        <span className="font-medium text-gray-700 dark:text-gray-300">{num(b.total_debit)}</span>
+                      </div>
+                      <div className="flex items-center justify-between" onClick={e => e.stopPropagation()}>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">{fmtDate(b.batch_date)}</span>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => router.push(`/batches/${b.id}`)}
+                            className="text-green-700 dark:text-green-400 hover:text-green-600"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                          </button>
+                          {isLoggedIn && (
+                            <>
+                              <button
+                                onClick={() => { setEditBatch(b); setEditBatchForm({ batch_number: b.batch_number, batch_date: b.batch_date?.toString().slice(0, 10) ?? '', notes: b.notes, date_of_application: b.date_of_application?.toString().slice(0, 10) ?? '', date_of_hauling: b.date_of_hauling?.toString().slice(0, 10) ?? '', maturity_date: b.maturity_date?.toString().slice(0, 10) ?? '', heads: b.heads ? String(b.heads) : '', status: b.status ?? 'active', transaction_type: b.transaction_type ?? 'semi_dispersal' }); }}
+                                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+                              >
+                                <Pencil className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteBatch(b.id)}
+                                className="text-red-400 hover:text-red-600"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>}
+
+      {/* ── Main content ── */}
+      {selectedBatch && (<div className="min-w-0">
 
       {/* ── Transactions table ───────────────────────────────────────── */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 print-card">
@@ -863,115 +967,6 @@ export default function CaretakerLedgerPage() {
       )}
 
       </div>)}
-
-      {/* ── Batches sidebar (order 2 on mobile, spans both rows on desktop) ── */}
-      {!batchIdParam && <div className="md:col-span-1 lg:sticky lg:top-[72px] order-2 print:hidden">
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-          <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <ClipboardList className="w-4 h-4 text-gray-500" />
-              <h2 className="font-semibold text-gray-900 dark:text-white">Batches</h2>
-              {activeBatches.length > 0 && (
-                <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full">{activeBatches.length}</span>
-              )}
-            </div>
-            {isLoggedIn && (
-              <button
-                onClick={() => setBatchModal(true)}
-                className="flex items-center gap-1.5 text-sm text-green-800 dark:text-green-400 font-medium hover:text-green-700"
-              >
-                <Plus className="w-4 h-4" /> New Batch
-              </button>
-            )}
-          </div>
-
-          {activeBatches.length === 0 ? (
-            <div className="flex flex-col items-center text-center gap-2 py-10 px-6">
-              <ClipboardList className="w-8 h-8 text-gray-300 dark:text-gray-600" />
-              <p className="text-sm text-gray-400 dark:text-gray-500">No batches yet.</p>
-              <p className="text-xs text-gray-400 dark:text-gray-500">Create one to start grouping transactions.</p>
-              {isLoggedIn && (
-                <button
-                  onClick={() => setBatchModal(true)}
-                  className="mt-2 inline-flex items-center gap-1.5 text-sm text-green-800 dark:text-green-400 font-medium hover:text-green-700"
-                >
-                  <Plus className="w-4 h-4" /> Create first batch
-                </button>
-              )}
-            </div>
-          ) : (
-            <>
-            <div className="divide-y divide-gray-50 dark:divide-gray-700 max-h-[60vh] overflow-y-auto">
-              {pagedBatches.map((b) => {
-                const isViewing = b.id === selectedBatchId;
-                return (
-                <div
-                  key={b.id}
-                  onClick={() => { setSelectedBatchId(b.id); setTxPage(0); }}
-                  className={`px-4 sm:px-6 py-3 flex flex-col gap-1.5 cursor-pointer ${isViewing ? 'bg-green-50 dark:bg-green-900/10' : 'hover:bg-gray-50/50 dark:hover:bg-gray-700/50'}`}
-                >
-                  {/* Row 1: badge + date */}
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="bg-green-800 text-white text-xs font-bold px-2 py-0.5 rounded">
-                      {b.batch_number}
-                    </span>
-                    {isViewing && (
-                      <span className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 text-xs font-semibold px-2 py-0.5 rounded">Viewing</span>
-                    )}
-                    {(() => {
-                      const s = b.status ?? 'active';
-                      const cls =
-                        s === 'active'    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
-                        s === 'on-going'  ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                        s === 'paid'      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' :
-                        s === 'completed' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' :
-                        'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400';
-                      return <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${cls}`}>{s.charAt(0).toUpperCase() + s.slice(1)}</span>;
-                    })()}
-                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${b.transaction_type === 'cash' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400'}`}>
-                      {b.transaction_type === 'cash' ? 'Cash' : 'Semi-Dispersal'}
-                    </span>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">{fmtDate(b.batch_date)}</span>
-                    {b.notes && <span className="text-xs text-gray-900 dark:text-gray-500 truncate max-w-[160px]">{b.notes}</span>}
-                  </div>
-                  {/* Row 2: stats + actions */}
-                  <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400" onClick={e => e.stopPropagation()}>
-                    <span>{b.transaction_count} tx</span>
-                    <span>{b.total_bags} bags</span>
-                    <span className="font-medium text-gray-700 dark:text-gray-300">{num(b.total_debit)}</span>
-                    <div className="ml-auto flex items-center gap-2">
-                      <button
-                        onClick={() => router.push(`/batches/${b.id}`)}
-                        className="flex items-center gap-1 text-green-700 dark:text-green-400 hover:text-green-600"
-                      >
-                        <Eye className="w-3.5 h-3.5" /> View
-                      </button>
-                      {isLoggedIn && (
-                        <>
-                          <button
-                            onClick={() => { setEditBatch(b); setEditBatchForm({ batch_number: b.batch_number, batch_date: b.batch_date?.toString().slice(0, 10) ?? '', notes: b.notes, date_of_application: b.date_of_application?.toString().slice(0, 10) ?? '', date_of_hauling: b.date_of_hauling?.toString().slice(0, 10) ?? '', maturity_date: b.maturity_date?.toString().slice(0, 10) ?? '', heads: b.heads ? String(b.heads) : '', status: b.status ?? 'active', transaction_type: b.transaction_type ?? 'semi_dispersal' }); }}
-                            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
-                          >
-                            <Pencil className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteBatch(b.id)}
-                            className="text-red-400 hover:text-red-600"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                );
-              })}
-            </div>
-            </>
-          )}
-        </div>
-      </div>}
 
       </div>{/* end grid */}
 
