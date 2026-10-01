@@ -25,6 +25,14 @@ export function isNotesStale(notes: string | null | undefined): boolean {
   return Date.now() - date.getTime() > WEEK_MS;
 }
 
+// Matches the MM-DD-YY convention already used in caretakers' notes.
+export function formatNotesDate(date: Date = new Date()): string {
+  const mo = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const yr = String(date.getFullYear()).slice(-2);
+  return `${mo}-${day}-${yr}`;
+}
+
 // A caretaker manually marked "Updated" reverts to "Not Updated" once their
 // note is more than a week old and hasn't been refreshed.
 export function isEffectivelyUpdated(client: { is_updated: boolean; notes: string | null }): boolean {

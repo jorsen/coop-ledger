@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { sql } from '@/lib/db';
 import { logActivity } from '@/lib/activity';
+import { formatNotesDate } from '@/lib/notes-date';
 
 export async function GET(req: NextRequest) {
   const { session, error } = await requireAuth();
@@ -60,7 +61,7 @@ export async function POST(req: NextRequest) {
     RETURNING *
   `;
 
-  await sql`UPDATE clients SET is_updated = true, updated_at = NOW() WHERE id = ${client_id} AND user_id = ${session.userId}`;
+  await sql`UPDATE clients SET is_updated = true, notes = ${formatNotesDate()}, updated_at = NOW() WHERE id = ${client_id} AND user_id = ${session.userId}`;
 
   const label = client.name;
   await logActivity('created', 'transaction', tx.id, `Added transaction for ${label}: ${feed_type || 'feed'} × ${bags || 0} bags (₱${debit || 0})`, session.userId);
