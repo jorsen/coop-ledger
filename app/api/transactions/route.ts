@@ -60,6 +60,8 @@ export async function POST(req: NextRequest) {
     RETURNING *
   `;
 
+  await sql`UPDATE clients SET is_updated = true, updated_at = NOW() WHERE id = ${client_id} AND user_id = ${session.userId}`;
+
   const label = client.name;
   await logActivity('created', 'transaction', tx.id, `Added transaction for ${label}: ${feed_type || 'feed'} × ${bags || 0} bags (₱${debit || 0})`, session.userId);
   return NextResponse.json(tx, { status: 201 });
