@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { ArrowLeft, Plus, Pencil, Trash2, Printer, ClipboardList, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Plus, Pencil, Trash2, Printer, ClipboardList, ChevronLeft, ChevronRight } from 'lucide-react';
 import TransactionModal from '@/components/transaction-modal';
 import ConfirmModal from '@/components/confirm-modal';
 import { usePoll } from '@/hooks/use-poll';
@@ -493,12 +493,6 @@ export default function CaretakerLedgerPage() {
                       <div className="flex items-center justify-between" onClick={e => e.stopPropagation()}>
                         <span className="text-xs text-gray-500 dark:text-gray-400">{fmtDate(b.batch_date)}</span>
                         <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => router.push(`/batches/${b.id}`)}
-                            className="text-green-700 dark:text-green-400 hover:text-green-600"
-                          >
-                            <Eye className="w-3.5 h-3.5" />
-                          </button>
                           {isLoggedIn && (
                             <>
                               <button
