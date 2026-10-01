@@ -389,55 +389,88 @@ export default function CaretakerLedgerPage() {
 
       {/* ── Caretaker info card ───────────────────────────────────────── */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-6 py-5 mb-6 print:rounded-sm print-card">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-4 text-sm print:grid-cols-4 print:gap-x-6 print:gap-y-1 print:text-xs">
-          <div>
-            <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">NAME</p>
-            <p className="font-bold text-gray-900 dark:text-white">{client.name}</p>
+        {selectedBatch ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-4 text-sm print:grid-cols-4 print:gap-x-6 print:gap-y-1 print:text-xs">
+            <div>
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">NAME</p>
+              <p className="font-bold text-gray-900 dark:text-white">{client.name}</p>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">BATCH #</p>
+              <p className="font-semibold text-blue-600 dark:text-blue-400">{selectedBatch.batch_number}</p>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">CARETAKER ID</p>
+              <p className="font-semibold text-gray-700 dark:text-gray-300">{client.client_code}</p>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">STATUS</p>
+              {(() => {
+                const s = selectedBatch.status ?? 'active';
+                const cls =
+                  s === 'active'    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
+                  s === 'on-going'  ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                  s === 'paid'      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' :
+                  s === 'completed' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' :
+                  'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400';
+                return <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${cls}`}>{s.charAt(0).toUpperCase() + s.slice(1)}</span>;
+              })()}
+            </div>
+            <div>
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">TRANSACTION TYPE</p>
+              <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${selectedBatch.transaction_type === 'cash' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400'}`}>
+                {selectedBatch.transaction_type === 'cash' ? 'Cash' : 'Semi-Dispersal'}
+              </span>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5"># OF HEADS</p>
+              <p className="font-semibold text-gray-900 dark:text-white">{selectedBatch.heads ?? '—'}</p>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">DATE OF APPLICATION</p>
+              <p className="font-semibold text-gray-900 dark:text-white">{selectedBatch.date_of_application ? fmtDate(selectedBatch.date_of_application) : '—'}</p>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">DATE OF HAULING</p>
+              <p className="font-semibold text-red-600">{selectedBatch.date_of_hauling ? fmtDate(selectedBatch.date_of_hauling) : '—'}</p>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">MATURITY DATE</p>
+              <p className="font-semibold text-green-700 dark:text-green-400">{selectedBatch.maturity_date ? fmtDate(selectedBatch.maturity_date) : '—'}</p>
+            </div>
           </div>
-          <div>
-            <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">BATCH #</p>
-            <p className="font-semibold text-blue-600 dark:text-blue-400">{selectedBatch?.batch_number || '—'}</p>
+        ) : (
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-x-8 gap-y-3 text-sm">
+              <div>
+                <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">NAME</p>
+                <p className="font-bold text-gray-900 dark:text-white">{client.name}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">CARETAKER ID</p>
+                <p className="font-semibold text-gray-700 dark:text-gray-300">{client.client_code}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">STATUS</p>
+                <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${client.status === 'inactive' ? 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400' : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'}`}>
+                  {client.status === 'inactive' ? 'Inactive' : 'Active'}
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/40 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3">
+              <ClipboardList className="w-4 h-4 shrink-0" />
+              <span>No batch yet for this caretaker.</span>
+              {isLoggedIn && (
+                <button
+                  onClick={() => setBatchModal(true)}
+                  className="inline-flex items-center gap-1 text-green-800 dark:text-green-400 font-medium hover:text-green-700 whitespace-nowrap"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Create one
+                </button>
+              )}
+            </div>
           </div>
-          <div>
-            <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">CARETAKER ID</p>
-            <p className="font-semibold text-gray-700 dark:text-gray-300">{client.client_code}</p>
-          </div>
-          <div>
-            <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">STATUS</p>
-            {(() => {
-              const s = selectedBatch?.status ?? 'active';
-              const cls =
-                s === 'active'    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
-                s === 'on-going'  ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                s === 'paid'      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' :
-                s === 'completed' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' :
-                'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400';
-              return <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${cls}`}>{s.charAt(0).toUpperCase() + s.slice(1)}</span>;
-            })()}
-          </div>
-          <div>
-            <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">TRANSACTION TYPE</p>
-            <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${selectedBatch?.transaction_type === 'cash' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400'}`}>
-              {selectedBatch?.transaction_type === 'cash' ? 'Cash' : 'Semi-Dispersal'}
-            </span>
-          </div>
-          <div>
-            <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5"># OF HEADS</p>
-            <p className="font-semibold text-gray-900 dark:text-white">{selectedBatch?.heads ?? '—'}</p>
-          </div>
-          <div>
-            <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">DATE OF APPLICATION</p>
-            <p className="font-semibold text-gray-900 dark:text-white">{selectedBatch?.date_of_application ? fmtDate(selectedBatch.date_of_application) : '—'}</p>
-          </div>
-          <div>
-            <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">DATE OF HAULING</p>
-            <p className="font-semibold text-red-600">{selectedBatch?.date_of_hauling ? fmtDate(selectedBatch.date_of_hauling) : '—'}</p>
-          </div>
-          <div>
-            <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">MATURITY DATE</p>
-            <p className="font-semibold text-green-700 dark:text-green-400">{selectedBatch?.maturity_date ? fmtDate(selectedBatch.maturity_date) : '—'}</p>
-          </div>
-        </div>
+        )}
       </div>
       </div>
 
@@ -853,7 +886,19 @@ export default function CaretakerLedgerPage() {
           </div>
 
           {activeBatches.length === 0 ? (
-            <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">No batches yet. Create one to group transactions.</p>
+            <div className="flex flex-col items-center text-center gap-2 py-10 px-6">
+              <ClipboardList className="w-8 h-8 text-gray-300 dark:text-gray-600" />
+              <p className="text-sm text-gray-400 dark:text-gray-500">No batches yet.</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500">Create one to start grouping transactions.</p>
+              {isLoggedIn && (
+                <button
+                  onClick={() => setBatchModal(true)}
+                  className="mt-2 inline-flex items-center gap-1.5 text-sm text-green-800 dark:text-green-400 font-medium hover:text-green-700"
+                >
+                  <Plus className="w-4 h-4" /> Create first batch
+                </button>
+              )}
+            </div>
           ) : (
             <>
             <div className="divide-y divide-gray-50 dark:divide-gray-700 max-h-[60vh] overflow-y-auto">
