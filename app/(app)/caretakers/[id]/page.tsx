@@ -525,32 +525,28 @@ export default function CaretakerLedgerPage() {
 
       {/* ── Selected batch details ───────────────────────────────────── */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-6 py-5 mb-6 print:rounded-sm print-card">
-        <div className="flex flex-wrap gap-x-12 gap-y-4 text-sm print:gap-x-6 print:gap-y-1 print:text-xs">
-          <div className="space-y-3">
-            <div>
-              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">BATCH #</p>
-              <p className="font-semibold text-blue-600 dark:text-blue-400 whitespace-nowrap">{selectedBatch.batch_number}</p>
-            </div>
-            <div>
-              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5"># OF HEADS</p>
-              <p className="font-semibold text-gray-900 dark:text-white">{selectedBatch.heads ?? '—'}</p>
-            </div>
-            <div>
-              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">TRANSACTION TYPE</p>
-              <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap ${selectedBatch.transaction_type === 'cash' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400'}`}>
-                {selectedBatch.transaction_type === 'cash' ? 'Cash' : 'Semi-Dispersal'}
-              </span>
-            </div>
+        <div className="flex flex-wrap items-start gap-x-10 gap-y-4 text-sm print:gap-x-6 print:gap-y-1 print:text-xs">
+          <div>
+            <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">BATCH #</p>
+            <p className="font-semibold text-blue-600 dark:text-blue-400 whitespace-nowrap">{selectedBatch.batch_number}</p>
           </div>
-          <div className="space-y-3">
-            <div>
-              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">DATE OF APPLICATION</p>
-              <p className="font-semibold text-gray-900 dark:text-white whitespace-nowrap">{selectedBatch.date_of_application ? fmtDate(selectedBatch.date_of_application) : '—'}</p>
-            </div>
-            <div>
-              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">DATE OF HAULING</p>
-              <p className="font-semibold text-red-600 whitespace-nowrap">{selectedBatch.date_of_hauling ? fmtDate(selectedBatch.date_of_hauling) : '—'}</p>
-            </div>
+          <div>
+            <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5"># OF HEADS</p>
+            <p className="font-semibold text-gray-900 dark:text-white">{selectedBatch.heads ?? '—'}</p>
+          </div>
+          <div>
+            <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">TRANSACTION TYPE</p>
+            <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap ${selectedBatch.transaction_type === 'cash' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400'}`}>
+              {selectedBatch.transaction_type === 'cash' ? 'Cash' : 'Semi-Dispersal'}
+            </span>
+          </div>
+          <div>
+            <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">DATE OF APPLICATION</p>
+            <p className="font-semibold text-gray-900 dark:text-white whitespace-nowrap">{selectedBatch.date_of_application ? fmtDate(selectedBatch.date_of_application) : '—'}</p>
+          </div>
+          <div>
+            <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">DATE OF HAULING</p>
+            <p className="font-semibold text-red-600 whitespace-nowrap">{selectedBatch.date_of_hauling ? fmtDate(selectedBatch.date_of_hauling) : '—'}</p>
           </div>
           <div>
             <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">MATURITY DATE</p>
