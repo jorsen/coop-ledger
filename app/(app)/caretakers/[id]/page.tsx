@@ -507,7 +507,9 @@ export default function CaretakerLedgerPage() {
 
       {/* ── Selected batch details ───────────────────────────────────── */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-6 py-5 mb-6 print:rounded-sm print-card">
-        <div className="flex items-center justify-end gap-2 mb-4 print:hidden">
+        <div className="flex items-center justify-between gap-2 mb-4 print:hidden">
+          <h2 className="font-semibold text-gray-900 dark:text-white">Transaction Details</h2>
+          <div className="flex items-center gap-2">
           <button
             onClick={() => window.print()}
             className="flex items-center gap-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800"
@@ -522,6 +524,7 @@ export default function CaretakerLedgerPage() {
               <Plus className="w-4 h-4" /> Add Transaction
             </button>
           )}
+          </div>
         </div>
         <div className="flex flex-wrap items-start gap-x-10 gap-y-4 text-sm print:gap-x-6 print:gap-y-1 print:text-xs">
           <div>
