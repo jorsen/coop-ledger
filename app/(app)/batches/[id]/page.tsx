@@ -121,7 +121,6 @@ export default function BatchDetailPage() {
     const { transactions: txs, ...batchData } = data;
     setBatch(batchData);
     setTransactions(Array.isArray(txs) ? txs : []);
-    setTxPage(0);
     if (batchData.client_id) {
       const br = await fetch(`/api/batches?client_id=${batchData.client_id}`);
       if (br.ok) setAllBatches(await br.json());
@@ -317,7 +316,8 @@ export default function BatchDetailPage() {
   const totalPigSalesKg = pigSales.reduce((s, p) => s + Number(p.weight_kg), 0);
 
   const txTotalPages = Math.ceil(withComputed.length / PAGE_SIZE);
-  const pagedTx = withComputed.slice(txPage * PAGE_SIZE, (txPage + 1) * PAGE_SIZE);
+  const safeTxPage = txTotalPages > 0 ? Math.min(txPage, txTotalPages - 1) : 0;
+  const pagedTx = withComputed.slice(safeTxPage * PAGE_SIZE, (safeTxPage + 1) * PAGE_SIZE);
   const expTotalPages = Math.ceil(expenses.length / PAGE_SIZE);
   const pagedExp = expenses.slice(expPage * PAGE_SIZE, (expPage + 1) * PAGE_SIZE);
   const batchTotalPages = Math.ceil(allBatches.length / PAGE_SIZE);

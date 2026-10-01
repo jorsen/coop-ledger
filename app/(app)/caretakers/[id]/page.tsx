@@ -326,7 +326,8 @@ export default function CaretakerLedgerPage() {
   const totalPigSalesKg = pigSales.reduce((s, p) => s + Number(p.weight_kg), 0);
 
   const txTotalPages = Math.ceil(withComputed.length / PAGE_SIZE);
-  const pagedTx = withComputed.slice(txPage * PAGE_SIZE, (txPage + 1) * PAGE_SIZE);
+  const safeTxPage = txTotalPages > 0 ? Math.min(txPage, txTotalPages - 1) : 0;
+  const pagedTx = withComputed.slice(safeTxPage * PAGE_SIZE, (safeTxPage + 1) * PAGE_SIZE);
   const activeBatches = batches.filter(b => b.status !== 'paid' || b.id === selectedBatchId);
   const batchTotalPages = Math.ceil(activeBatches.length / PAGE_SIZE);
   const pagedBatches = activeBatches.slice(batchPage * PAGE_SIZE, (batchPage + 1) * PAGE_SIZE);

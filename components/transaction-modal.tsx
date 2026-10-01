@@ -44,6 +44,10 @@ const EMPTY: Transaction = {
 const peso = (n: number) =>
   new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(n);
 
+const toYMD = (d: string) => (d ? new Date(d).toISOString().slice(0, 10) : d);
+
+const normalize = (t: Transaction): Transaction => ({ ...t, date: toYMD(t.date) });
+
 export default function TransactionModal({
   transaction,
   clients,
@@ -53,7 +57,7 @@ export default function TransactionModal({
   onSave,
 }: TransactionModalProps) {
   const [form, setForm] = useState<Transaction>(() =>
-    transaction ? transaction : { ...EMPTY, client_id: defaultClientId ?? '', batch_id: defaultBatchId ?? null }
+    transaction ? normalize(transaction) : { ...EMPTY, client_id: defaultClientId ?? '', batch_id: defaultBatchId ?? null }
   );
   const [feedTypes, setFeedTypes] = useState<FeedType[]>([]);
   const [batches, setBatches] = useState<BatchOption[]>([]);
@@ -75,7 +79,7 @@ export default function TransactionModal({
   }, [form.client_id]);
 
   useEffect(() => {
-    if (transaction) setForm(transaction);
+    if (transaction) setForm(normalize(transaction));
     else setForm({ ...EMPTY, client_id: defaultClientId ?? '', batch_id: defaultBatchId ?? null });
   }, [transaction, defaultClientId, defaultBatchId]);
 
@@ -95,13 +99,13 @@ export default function TransactionModal({
     fetchPrice(form.feed_type, form.date);
   }, [form.feed_type, form.date, fetchPrice]);
 
-  // Auto-calculate debit when bags or price changes (only if not editing)
+  // Auto-calculate debit when bags or price changes
   useEffect(() => {
     const bagsNum = Number(form.bags);
-    if (!transaction && pricePerBag !== null && bagsNum > 0) {
+    if (pricePerBag !== null && bagsNum > 0) {
       setForm((f) => ({ ...f, debit: bagsNum * pricePerBag }));
     }
-  }, [pricePerBag, form.bags, transaction]);
+  }, [pricePerBag, form.bags]);
 
   function set<K extends keyof Transaction>(key: K, value: Transaction[K]) {
     setForm((f) => ({ ...f, [key]: value }));
