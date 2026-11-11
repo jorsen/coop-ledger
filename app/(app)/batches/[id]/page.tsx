@@ -931,7 +931,7 @@ export default function BatchDetailPage() {
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Code Number</label>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Code #</label>
                   <input
                     value={editBatchForm.batch_number}
                     onChange={e => setEditBatchForm(f => ({ ...f, batch_number: e.target.value }))}

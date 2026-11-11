@@ -66,7 +66,7 @@ export default function ArchivesPage() {
   function handleDelete(batch: ArchivedBatch) {
     setDialog({
       title: 'Delete Archived Batch',
-      message: `This will permanently delete batch #${batch.batch_number} for ${batch.client_name} and all its transactions.`,
+      message: `This will permanently delete batch Code #${batch.batch_number} for ${batch.client_name} and all its transactions.`,
       variant: 'delete',
       onConfirm: async () => {
         await fetch(`/api/batches/${batch.id}`, { method: 'DELETE' });

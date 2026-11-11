@@ -178,7 +178,7 @@ export default function TransactionModal({
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Batch *</label>
             {defaultBatchId ? (
               <div className="w-full border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-white">
-                {batches.find((b) => b.id === defaultBatchId)?.batch_number ?? `Batch #${defaultBatchId}`}
+                {batches.find((b) => b.id === defaultBatchId)?.batch_number ?? `Code #${defaultBatchId}`}
               </div>
             ) : (
               <select
