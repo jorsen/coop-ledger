@@ -934,8 +934,8 @@ export default function BatchDetailPage() {
                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Code #</label>
                   <input
                     value={editBatchForm.batch_number}
-                    onChange={e => setEditBatchForm(f => ({ ...f, batch_number: e.target.value }))}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-800 dark:bg-gray-700 dark:text-white"
+                    disabled
+                    className="w-full border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-900 text-gray-500 dark:text-gray-400 rounded-lg px-3 py-2 text-sm cursor-not-allowed"
                   />
                 </div>
                 <div>
