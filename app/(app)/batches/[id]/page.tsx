@@ -339,7 +339,7 @@ export default function BatchDetailPage() {
       <div className="hidden print:flex print:items-center print:justify-between mb-2 border-b border-gray-400 pb-1 text-xs">
         <div className="flex items-center gap-4">
           {batch.client_name && <span><span className="text-gray-500">NAME: </span><strong>{batch.client_name}</strong></span>}
-          <span><span className="text-gray-500">CODE #: </span><strong>{batch.batch_number}</strong></span>
+          <span><span className="text-gray-500">C#: </span><strong>{batch.batch_number}</strong></span>
           {batch.client_code && <span><span className="text-gray-500">CLIENT ID: </span><strong>{batch.client_code}</strong></span>}
           <span><span className="text-gray-500"># of Heads: </span><strong>{batch.heads ?? '—'}</strong></span>
         </div>
@@ -391,7 +391,7 @@ export default function BatchDetailPage() {
               <p className="font-bold text-gray-900 dark:text-white">{batch.client_name}</p>
             </div>
             <div>
-              <p className="text-xs font-medium text-gray-600 mb-0.5 dark:text-gray-400">CODE #</p>
+              <p className="text-xs font-medium text-gray-600 mb-0.5 dark:text-gray-400">C#</p>
               <p className="font-semibold text-blue-600">{batch.batch_number}</p>
             </div>
             <div>
@@ -931,7 +931,7 @@ export default function BatchDetailPage() {
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Code #</label>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">C#</label>
                   <input
                     value={editBatchForm.batch_number}
                     disabled

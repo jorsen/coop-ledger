@@ -348,7 +348,7 @@ export default function CaretakerLedgerPage() {
       <div className="hidden print:flex print:items-center print:justify-between mb-2 border-b border-gray-400 pb-1 text-xs">
         <div className="flex items-center gap-4">
           <span><span className="text-gray-500">NAME: </span><strong>{client.name}</strong></span>
-          <span><span className="text-gray-500">CODE #: </span><strong>{batches[0]?.batch_number || '—'}</strong></span>
+          <span><span className="text-gray-500">C#: </span><strong>{batches[0]?.batch_number || '—'}</strong></span>
           <span><span className="text-gray-500">CLIENT ID: </span><strong>{client.client_code}</strong></span>
         </div>
         <div className="flex items-center gap-4 text-right">
@@ -528,7 +528,7 @@ export default function CaretakerLedgerPage() {
         </div>
         <div className="flex flex-wrap items-start gap-x-10 gap-y-4 text-sm print:gap-x-6 print:gap-y-1 print:text-xs">
           <div>
-            <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">CODE #</p>
+            <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-0.5">C#</p>
             <p className="font-semibold text-blue-600 dark:text-blue-400 whitespace-nowrap">{selectedBatch.batch_number}</p>
           </div>
           <div>
@@ -698,7 +698,7 @@ export default function CaretakerLedgerPage() {
           <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <h2 className="font-semibold text-gray-900 dark:text-white">Other Expenses</h2>
-              <span className="text-xs text-gray-400 dark:text-gray-500">Code #{selectedBatch?.batch_number}</span>
+              <span className="text-xs text-gray-400 dark:text-gray-500">C# {selectedBatch?.batch_number}</span>
               {expenses.length > 0 && (
                 <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full">{expenses.length}</span>
               )}
@@ -763,7 +763,7 @@ export default function CaretakerLedgerPage() {
                     {fmtKg(totalPigSalesKg)} kg &mdash; Total: <span className="font-semibold text-gray-700 dark:text-gray-300">₱{num(totalPigSalesAmount)}</span>
                   </p>
                 )}
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Code #{selectedBatch?.batch_number}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">C# {selectedBatch?.batch_number}</p>
                 <div className="flex items-center gap-1.5 mt-1 print:hidden">
                   <span className="text-xs text-gray-400 dark:text-gray-500">Default price:</span>
                   {editingPigPrice ? (
@@ -966,7 +966,7 @@ export default function CaretakerLedgerPage() {
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Code #</label>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">C#</label>
                 <input
                   value=""
                   placeholder="Auto-generated"
@@ -1082,7 +1082,7 @@ export default function CaretakerLedgerPage() {
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Code #</label>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">C#</label>
                 <input
                   value={editBatchForm.batch_number}
                   disabled

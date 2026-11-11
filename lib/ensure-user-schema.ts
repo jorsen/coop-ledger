@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { sql, rawQuery } from './db';
+import { codePrefix, formatCode } from './batch-code';
 
 export const USER_SCOPED_TABLES = [
   'clients',
@@ -84,7 +85,45 @@ export async function ensureUserSchema() {
 
   await sql`ALTER TABLE batches DROP CONSTRAINT IF EXISTS batches_batch_number_key`;
   await sql`ALTER TABLE batches DROP CONSTRAINT IF EXISTS batches_user_id_batch_number_key`;
+  await renumberBatchCodesOnce();
   await sql`ALTER TABLE batches ADD CONSTRAINT batches_user_id_batch_number_key UNIQUE (user_id, batch_number)`;
 
   ensured = true;
+}
+
+// One-time: give every existing batch a C# of caretaker initials + a number
+// in the order the batches were created (JM-001, JM-002, ...).
+// Runs while the (user_id, batch_number) unique constraint is dropped.
+async function renumberBatchCodesOnce() {
+  const name = 'renumber_batch_codes_v1';
+  await sql`CREATE TABLE IF NOT EXISTS app_migrations (name TEXT PRIMARY KEY, ran_at TIMESTAMPTZ DEFAULT NOW())`;
+  const [done] = await sql`SELECT name FROM app_migrations WHERE name = ${name}`;
+  if (done) return;
+
+  const rows = await sql`
+    SELECT b.id, b.user_id, c.name AS client_name
+    FROM batches b LEFT JOIN clients c ON c.id = b.client_id
+    ORDER BY b.user_id, b.created_at ASC NULLS LAST, b.id ASC
+  `;
+  const counters = new Map<string, number>();
+  const ids: number[] = [];
+  const codes: string[] = [];
+  for (const r of rows) {
+    const prefix = codePrefix(r.client_name as string | null);
+    const key = `${r.user_id}:${prefix}`;
+    const n = (counters.get(key) ?? 0) + 1;
+    counters.set(key, n);
+    ids.push(r.id as number);
+    codes.push(formatCode(prefix, n));
+  }
+
+  if (ids.length > 0) {
+    await rawQuery(
+      `UPDATE batches b SET batch_number = v.code
+       FROM unnest($1::int[], $2::text[]) AS v(id, code)
+       WHERE b.id = v.id`,
+      [ids, codes],
+    );
+  }
+  await sql`INSERT INTO app_migrations (name) VALUES (${name}) ON CONFLICT DO NOTHING`;
 }

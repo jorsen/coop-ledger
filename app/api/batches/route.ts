@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { sql } from '@/lib/db';
 import { logActivity } from '@/lib/activity';
+import { codePrefix, nextBatchCode } from '@/lib/batch-code';
 
 export async function GET(req: NextRequest) {
   const { session, error } = await requireAuth();
@@ -72,17 +73,25 @@ export async function POST(req: NextRequest) {
     const [cl] = client_id ? await sql`SELECT name FROM clients WHERE id = ${client_id} AND user_id = ${session.userId}` : [null];
     if (client_id && !cl) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-    // Batch numbers are always auto-generated from the row id.
-    const tmpName = `__TMP__${Date.now()}`;
-    const [inserted] = await sql`
-      INSERT INTO batches (batch_number, client_id, batch_date, notes, date_of_application, date_of_hauling, maturity_date, heads, allocation, status, transaction_type, user_id)
-      VALUES (${tmpName}, ${client_id || null}, ${dateVal}, ${notes || ''},
-        ${date_of_application || null}, ${date_of_hauling || null}, ${maturity_date || null},
-        ${heads ? Number(heads) : null}, ${allocation ? Number(allocation) : null}, ${statusVal}, ${transactionTypeVal}, ${session.userId})
-      RETURNING id
-    `;
-    const autoNumber = `BT-${String(inserted.id).padStart(3, '0')}`;
-    const [batch] = await sql`UPDATE batches SET batch_number = ${autoNumber} WHERE id = ${inserted.id} RETURNING *`;
+    // C# is always auto-generated: caretaker initials + lowest unused number.
+    // Retries if two batches grab the same code at the same moment.
+    const prefix = codePrefix(cl?.name);
+    let batch: any;
+    for (let attempt = 0; ; attempt++) {
+      const code = await nextBatchCode(session.userId, prefix);
+      try {
+        [batch] = await sql`
+          INSERT INTO batches (batch_number, client_id, batch_date, notes, date_of_application, date_of_hauling, maturity_date, heads, allocation, status, transaction_type, user_id)
+          VALUES (${code}, ${client_id || null}, ${dateVal}, ${notes || ''},
+            ${date_of_application || null}, ${date_of_hauling || null}, ${maturity_date || null},
+            ${heads ? Number(heads) : null}, ${allocation ? Number(allocation) : null}, ${statusVal}, ${transactionTypeVal}, ${session.userId})
+          RETURNING *
+        `;
+        break;
+      } catch (e) {
+        if (attempt >= 2 || !String(e).includes('batches_user_id_batch_number_key')) throw e;
+      }
+    }
 
     await logActivity('created', 'batch', batch.id, `Created batch ${batch.batch_number}${cl ? ` for ${cl.name}` : ''}`, session.userId);
     return NextResponse.json(batch, { status: 201 });
