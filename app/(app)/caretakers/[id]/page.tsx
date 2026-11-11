@@ -966,15 +966,6 @@ export default function CaretakerLedgerPage() {
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Batch Number</label>
-                <input
-                  value={batchForm.batch_number}
-                  onChange={(e) => setBatchForm((f) => ({ ...f, batch_number: e.target.value }))}
-                  placeholder="Auto-generated if empty"
-                  className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-800"
-                />
-              </div>
-              <div>
                 <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Heads</label>
                 <input
                   type="text"

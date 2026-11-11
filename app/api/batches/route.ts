@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
   if (error) return error;
 
   try {
-    const { batch_date, notes, client_id, batch_number, date_of_application, date_of_hauling, maturity_date, heads, allocation, status, transaction_type } = await req.json();
+    const { batch_date, notes, client_id, date_of_application, date_of_hauling, maturity_date, heads, allocation, status, transaction_type } = await req.json();
 
     await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS date_of_application DATE`;
     await sql`ALTER TABLE batches ADD COLUMN IF NOT EXISTS date_of_hauling DATE`;
@@ -72,29 +72,17 @@ export async function POST(req: NextRequest) {
     const [cl] = client_id ? await sql`SELECT name FROM clients WHERE id = ${client_id} AND user_id = ${session.userId}` : [null];
     if (client_id && !cl) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-    let batch;
-    if (batch_number?.trim()) {
-      const [b] = await sql`
-        INSERT INTO batches (batch_number, client_id, batch_date, notes, date_of_application, date_of_hauling, maturity_date, heads, allocation, status, transaction_type, user_id)
-        VALUES (${batch_number.trim()}, ${client_id || null}, ${dateVal}, ${notes || ''},
-          ${date_of_application || null}, ${date_of_hauling || null}, ${maturity_date || null},
-          ${heads ? Number(heads) : null}, ${allocation ? Number(allocation) : null}, ${statusVal}, ${transactionTypeVal}, ${session.userId})
-        RETURNING *
-      `;
-      batch = b;
-    } else {
-      const tmpName = `__TMP__${Date.now()}`;
-      const [inserted] = await sql`
-        INSERT INTO batches (batch_number, client_id, batch_date, notes, date_of_application, date_of_hauling, maturity_date, heads, allocation, status, transaction_type, user_id)
-        VALUES (${tmpName}, ${client_id || null}, ${dateVal}, ${notes || ''},
-          ${date_of_application || null}, ${date_of_hauling || null}, ${maturity_date || null},
-          ${heads ? Number(heads) : null}, ${allocation ? Number(allocation) : null}, ${statusVal}, ${transactionTypeVal}, ${session.userId})
-        RETURNING id
-      `;
-      const autoNumber = `BT-${String(inserted.id).padStart(3, '0')}`;
-      const [b] = await sql`UPDATE batches SET batch_number = ${autoNumber} WHERE id = ${inserted.id} RETURNING *`;
-      batch = b;
-    }
+    // Batch numbers are always auto-generated from the row id.
+    const tmpName = `__TMP__${Date.now()}`;
+    const [inserted] = await sql`
+      INSERT INTO batches (batch_number, client_id, batch_date, notes, date_of_application, date_of_hauling, maturity_date, heads, allocation, status, transaction_type, user_id)
+      VALUES (${tmpName}, ${client_id || null}, ${dateVal}, ${notes || ''},
+        ${date_of_application || null}, ${date_of_hauling || null}, ${maturity_date || null},
+        ${heads ? Number(heads) : null}, ${allocation ? Number(allocation) : null}, ${statusVal}, ${transactionTypeVal}, ${session.userId})
+      RETURNING id
+    `;
+    const autoNumber = `BT-${String(inserted.id).padStart(3, '0')}`;
+    const [batch] = await sql`UPDATE batches SET batch_number = ${autoNumber} WHERE id = ${inserted.id} RETURNING *`;
 
     await logActivity('created', 'batch', batch.id, `Created batch ${batch.batch_number}${cl ? ` for ${cl.name}` : ''}`, session.userId);
     return NextResponse.json(batch, { status: 201 });
