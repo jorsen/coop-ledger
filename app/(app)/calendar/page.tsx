@@ -269,7 +269,7 @@ export default function CalendarPage() {
                             <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                               <span className="text-xs text-gray-500 dark:text-gray-400">ID: {r.client_code}</span>
                               <span className="text-xs bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-1.5 py-0.5 rounded font-medium">
-                                Batch #{r.batch_number}
+                                Code #{r.batch_number}
                               </span>
                               {r.heads != null && (
                                 <span className="text-xs text-gray-400 dark:text-gray-500">{r.heads} heads</span>
